@@ -403,7 +403,7 @@
       "email": "tolu.adeyemi@brightpath.ng"
     },
     "subject": "Standup moved to 10:30 tomorrow",
-    "date": "2026-10-16T16:47:00",
+    "date": "2026-10-15T16:47:00",
     "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi team,</p><p style='margin:0 0 14px'>Quick heads-up: tomorrow's standup is moving from 9:30 to 10:30 because of the client call. Same Google Meet link as always.</p><p style='margin:0 0 14px'>Thanks,<br>Tolu</p></div>",
     "red_flags": [],
     "trust_signals": [
@@ -973,9 +973,9 @@
       "name": "Kemi Adebayo (via Google Calendar)",
       "email": "calendar-notification@google.com"
     },
-    "subject": "Invitation: Sprint Review @ Thu 23 Oct 2pm – 3pm (WAT)",
+    "subject": "Invitation: Sprint Review @ Thu 22 Oct 2pm – 3pm (WAT)",
     "date": "2026-10-16T15:55:00",
-    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Kemi Adebayo has invited you to an event.</p><p style='margin:0 0 14px'>Sprint Review<br>Thursday 23 October · 2:00 – 3:00pm (West Africa Time)<br>Join with Google Meet: meet.google.com/xqa-pmtr-gkn</p><p style='margin:0 0 14px'>Guests: kemi.adebayo@brightpath.ng, ada.okafor@brightpath.ng, tolu.adeyemi@brightpath.ng</p><p style='margin:22px 0;text-align:center'><a href='https://calendar.google.com/calendar/event?action=RESPOND' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Reply in Google Calendar</a></p></div></div>",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Kemi Adebayo has invited you to an event.</p><p style='margin:0 0 14px'>Sprint Review<br>Thursday 22 October · 2:00 – 3:00pm (West Africa Time)<br>Join with Google Meet: meet.google.com/xqa-pmtr-gkn</p><p style='margin:0 0 14px'>Guests: kemi.adebayo@brightpath.ng, ada.okafor@brightpath.ng, tolu.adeyemi@brightpath.ng</p><p style='margin:22px 0;text-align:center'><a href='https://calendar.google.com/calendar/event?action=RESPOND' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Reply in Google Calendar</a></p></div></div>",
     "red_flags": [],
     "trust_signals": [
       "Sent from google.com's calendar service",
@@ -1815,17 +1815,18 @@
       "name": "Wells Fargo",
       "email": "alerts@wellsfargo.com"
     },
-    "subject": "Your Statement is Ready - Action Required",
+    "subject": "Your monthly statement is ready",
     "date": "2024-01-14T14:30:00",
-    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #d71e28; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Wells Fargo</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hello,</p><p>Your monthly statement for account ending in 4521 is now available.</p><p>However, we noticed some unusual transactions that need your review:</p><ul><li>$1,247.99 - Online Purchase - Amazon</li><li>$89.50 - Restaurant - Istanbul Grill</li><li>$2,500.00 - Wire Transfer - Pending</li></ul><p style='color: #d71e28; font-weight: bold;'>The wire transfer is currently on hold pending verification.</p><div style='text-align: center; margin: 30px 0;'><a href='https://wellsfargo.com/secure/statements?id=xyz123' style='background: #d71e28; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>REVIEW TRANSACTIONS</a></div><p>Thank you for banking with Wells Fargo.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 12px; color: #666; text-align: center;'><p>© 2024 Wells Fargo. All rights reserved. | <a href='#'>Privacy Policy</a> | <a href='#'>Unsubscribe</a></p></div></div>",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #d71e28; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Wells Fargo</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hello,</p><p>Your monthly statement for account ending in 4521 is now available.</p><p>You can view or download it any time by signing in to the Wells Fargo app or wellsfargo.com.</p><p>For your security, we will never ask for your password, PIN or one-time code by email.</p><div style='text-align: center; margin: 30px 0;'><a href='https://www.wellsfargo.com/' style='background: #d71e28; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>Sign on to view</a></div><p>Thank you for banking with Wells Fargo.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 12px; color: #666; text-align: center;'><p>© 2024 Wells Fargo. All rights reserved. | <a href='#'>Privacy Policy</a> | <a href='#'>Unsubscribe</a></p></div></div>",
     "red_flags": [],
     "trust_signals": [
       "Sent from wellsfargo.com",
       "Link goes to wellsfargo.com",
       "Masked account number, no request for PIN or password",
+      "No urgency or threats: it simply tells you a statement is available",
       "Still safest to open the banking app yourself instead of the link"
     ],
-    "explanation": "This is a legitimate Wells Fargo email. The sender domain is correct (wellsfargo.com), the link goes to the official wellsfargo.com domain, and the content is typical of bank alerts. The specific account number reference adds credibility."
+    "explanation": "This is a legitimate Wells Fargo email. The sender domain is correct (wellsfargo.com), the link goes to the official wellsfargo.com domain, the account number is masked, and nothing is urgent or asks for details. Even so, opening the banking app yourself is the safest habit."
   },
   {
     "id": "bank_003",
