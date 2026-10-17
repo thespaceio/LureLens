@@ -1,0 +1,2060 @@
+[
+  {
+    "id": "ng-b-p01",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "GTBank Security",
+      "email": "gtbank.alert.team@gmail.com"
+    },
+    "subject": "URGENT!!! Your Account Will Be BLOCKED In 24 Hours",
+    "date": "2026-10-16T07:12:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Dear Valued Costumer,</p><p style='margin:0 0 14px'>We noticed unusual activity on your account. Your account will be BLOCKED within 24 hours unless you verify your details.</p><p style='margin:0 0 14px'>Click below and enter your BVN, ATM card number and 4-digit PIN to keep your account active:</p><p style='margin:22px 0;text-align:left'><a href='http://gtb-verify-account.xyz/login' style='color:#1a62d6'>Verify My Account Now</a></p><p style='margin:0 0 14px'>Failure to comply will result in permanent closure.</p><p style='margin:0 0 14px'>GTBank Security Team</p></div>",
+    "red_flags": [
+      {
+        "description": "A bank writing from a free @gmail.com address"
+      },
+      {
+        "description": "Threat of account closure within 24 hours"
+      },
+      {
+        "description": "Asks for your card PIN and BVN, which no bank ever requests"
+      },
+      {
+        "description": "Spelling mistake: \"Costumer\""
+      },
+      {
+        "description": "Link goes to gtb-verify-account.xyz, not gtbank.com"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Banks never ask for your PIN or BVN by email. Urgency, a Gmail sender and a strange link are the classic signs of a banking phish."
+  },
+  {
+    "id": "ng-b-p02",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Prizes & Promos",
+    "sender": {
+      "name": "MTN Mega Promo",
+      "email": "mtnpromo.winner2026@outlook.com"
+    },
+    "subject": "CONGRATULATIONS!!! You Have Won ₦5,000,000",
+    "date": "2026-10-15T21:45:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Congratulations!</p><p style='margin:0 0 14px'>Your phone number was randomly selected as a WINNER in the MTN Mega Anniversary Promo. You have won ₦5,000,000 (Five Million Naira).</p><p style='margin:0 0 14px'>To claim your prize, pay a processing fee of ₦15,000 to the account below and send your receipt to our claims agent on WhatsApp.</p><p style='margin:0 0 14px'>Account: 0123456789  |  Bank: Opay  |  Name: Promo Claims Office</p><p style='margin:0 0 14px'>Offer expires TODAY.</p></div>",
+    "red_flags": [
+      {
+        "description": "You won a promo you never entered"
+      },
+      {
+        "description": "You must pay a \"processing fee\" to receive a prize"
+      },
+      {
+        "description": "Payment goes to a personal account, not MTN"
+      },
+      {
+        "description": "Sent from a free Outlook address"
+      },
+      {
+        "description": "\"Expires TODAY\" pressure"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Real prizes never require you to pay to receive them. This is advance-fee fraud dressed up as a promo."
+  },
+  {
+    "id": "ng-b-p03",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "government",
+    "topic": "Government",
+    "sender": {
+      "name": "CBN Grant Office",
+      "email": "cbn.grants.nigeria@yahoo.com"
+    },
+    "subject": "Federal Government Youth Grant ₦250,000 Approved For You",
+    "date": "2026-10-12T11:03:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Good day,</p><p style='margin:0 0 14px'>You have been approved for the Federal Government Youth Empowerment Grant of ₦250,000.</p><p style='margin:0 0 14px'>To receive payment, reply to this email with:<br>- Full name<br>- NIN<br>- BVN<br>- Bank account number<br>- Date of birth</p><p style='margin:0 0 14px'>Payment will be made within 48 hours. Do not share this message.</p><p style='margin:0 0 14px'>Central Bank of Nigeria</p></div>",
+    "red_flags": [
+      {
+        "description": "Government agency using a Yahoo address"
+      },
+      {
+        "description": "Asks for NIN, BVN and bank details by email reply"
+      },
+      {
+        "description": "You never applied for a grant"
+      },
+      {
+        "description": "\"Do not share this message\" secrecy"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Government bodies use .gov.ng addresses and never collect NIN or BVN over email. Free money plus requests for ID numbers means identity theft."
+  },
+  {
+    "id": "ng-b-p04",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "shopping",
+    "topic": "Shopping",
+    "sender": {
+      "name": "Jumia Giveaway",
+      "email": "winners@jumia-free-gifts.net"
+    },
+    "subject": "You Won an iPhone 15 Pro Max – Pay Delivery Only!",
+    "date": "2026-10-11T16:20:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#F68B1E;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>JUMIA</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hello Lucky Customer!!!</p><p style='margin:0 0 14px'>You are our 1,000,000th visitor and you have won a brand new iPhone 15 Pro Max!</p><p style='margin:0 0 14px'>Just pay ₦4,500 for delivery and your phone will arrive in 2 days.</p><p style='margin:22px 0;text-align:center'><a href='http://jumia-free-gifts.net/claim?ref=winner' style='display:inline-block;background:#F68B1E;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>CLAIM MY IPHONE</a></p><p style='margin:0 0 14px'>Only 3 phones left!</p></div></div>",
+    "red_flags": [
+      {
+        "description": "\"1,000,000th visitor\" prize is a well-known scam line"
+      },
+      {
+        "description": "Domain jumia-free-gifts.net is not jumia.com.ng"
+      },
+      {
+        "description": "Pay a small fee to receive an expensive prize"
+      },
+      {
+        "description": "Fake scarcity: \"Only 3 phones left!\""
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "A free expensive gift that only needs a small payment is bait. The real Jumia emails from jumia.com.ng."
+  },
+  {
+    "id": "ng-b-p05",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Subscriptions",
+    "sender": {
+      "name": "Netflix Billing",
+      "email": "billing@netflx-support.com"
+    },
+    "subject": "Your payment was declined – update now",
+    "date": "2026-10-16T06:58:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#E50914;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>NETFLIX</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Costumer,</p><p style='margin:0 0 14px'>We was unable to process your last payment. Your Netflix membership will be cancel today.</p><p style='margin:0 0 14px'>Please update your card details to continue enjoying Netflix:</p><p style='margin:22px 0;text-align:center'><a href='http://netflx-support.com/billing' style='display:inline-block;background:#E50914;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Update Payment</a></p><p style='margin:0 0 14px'>Netflix Team</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Misspelled domain: netflx-support.com (missing the \"i\")"
+      },
+      {
+        "description": "Bad grammar: \"We was unable\", \"will be cancel\""
+      },
+      {
+        "description": "Cancellation today unless you act"
+      },
+      {
+        "description": "Asks you to enter card details through a link"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Typosquatted domains like \"netflx\" are cheap to register. If billing is really a problem, open the Netflix app directly."
+  },
+  {
+    "id": "ng-b-p06",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Jobs",
+    "sender": {
+      "name": "Shell Recruitment",
+      "email": "shell.nigeria.hr.recruit@gmail.com"
+    },
+    "subject": "Work From Home – Earn $500 Daily, No Experience",
+    "date": "2026-10-10T14:11:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hello,</p><p style='margin:0 0 14px'>Shell Nigeria is hiring online workers. No interview, no experience. Earn $500 per day from your phone!</p><p style='margin:0 0 14px'>To secure your slot, pay a registration fee of ₦10,000 and message our HR manager on WhatsApp: +234 801 234 5678.</p><p style='margin:0 0 14px'>Slots are limited. Act fast!</p></div>",
+    "red_flags": [
+      {
+        "description": "Big multinational recruiting from a Gmail address"
+      },
+      {
+        "description": "Unrealistic pay with no interview or experience"
+      },
+      {
+        "description": "Registration fee to get a job"
+      },
+      {
+        "description": "Moves you to WhatsApp, away from official channels"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Legitimate employers never charge you to apply. Job scams target students and graduates with easy-money promises."
+  },
+  {
+    "id": "ng-b-p07",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Mail Administrator",
+      "email": "admin@mailbox-quota-upgrade.com"
+    },
+    "subject": "Mailbox Full – You Will Stop Receiving Emails",
+    "date": "2026-10-16T10:02:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Your mailbox has exceeded its storage limit (99.8%).</p><p style='margin:0 0 14px'>You will stop receiving new messages and old messages will be DELETED.</p><p style='margin:0 0 14px'>Click below and log in with your email password to upgrade your storage for free:</p><p style='margin:22px 0;text-align:left'><a href='http://mailbox-quota-upgrade.com/webmail/login' style='color:#1a62d6'>Upgrade Storage</a></p><p style='margin:0 0 14px'>System Administrator</p></div>",
+    "red_flags": [
+      {
+        "description": "Generic \"Mail Administrator\" from an unrelated domain"
+      },
+      {
+        "description": "Threat that your emails will be deleted"
+      },
+      {
+        "description": "Asks you to log in through a link to \"upgrade\""
+      },
+      {
+        "description": "No company name, logo or contact"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Fake \"mailbox full\" notices are a classic way to steal email passwords. Your real email provider shows storage warnings inside the app."
+  },
+  {
+    "id": "ng-b-p08",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Advance-Fee Fraud",
+    "sender": {
+      "name": "Barr. James Williams",
+      "email": "barr.jameswilliams.chambers@hotmail.com"
+    },
+    "subject": "STRICTLY CONFIDENTIAL: Inheritance Fund of $8.5 Million",
+    "date": "2026-10-15T03:33:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Dear Friend,</p><p style='margin:0 0 14px'>I am Barrister James Williams, personal lawyer to the late Mr. Robert Okafor who died in a plane crash with his family. He left $8,500,000 USD in a bank with no next of kin. Since you share the same surname, I want to present you as the beneficiary.</p><p style='margin:0 0 14px'>We will share the money 50/50. Kindly send your full name, phone number and a copy of your ID card to begin the transfer.</p><p style='margin:0 0 14px'>This transaction is 100% risk free.</p><p style='margin:0 0 14px'>Yours faithfully,<br>Barr. James Williams</p></div>",
+    "red_flags": [
+      {
+        "description": "A stranger offering you millions"
+      },
+      {
+        "description": "Asks you to pose as a fake next of kin"
+      },
+      {
+        "description": "Requests ID card and personal details"
+      },
+      {
+        "description": "\"100% risk free\" and \"strictly confidential\""
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is the classic 419 scam. Once you reply, \"fees\" and \"taxes\" follow until you stop paying."
+  },
+  {
+    "id": "ng-b-p09",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "shopping",
+    "topic": "Delivery",
+    "sender": {
+      "name": "DHL Express",
+      "email": "delivery@dhl-parcels-ng.com"
+    },
+    "subject": "Your package is on hold – pay customs fee",
+    "date": "2026-10-16T08:40:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFCC00;padding:18px 24px;'><span style='color:#D40511;font-size:22px;font-weight:bold;letter-spacing:.3px'>DHL Express</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear customer,</p><p style='margin:0 0 14px'>Your package could not be delivered because customs duty of ₦3,500 has not been paid.</p><p style='margin:0 0 14px'>Pay now to avoid your package being returned to sender:</p><p style='margin:22px 0;text-align:center'><a href='https://bit.ly/dhl-ng-pay' style='display:inline-block;background:#FFCC00;color:#D40511;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Pay Customs Fee</a></p><p style='margin:0 0 14px'>DHL Express Nigeria</p></div></div>",
+    "red_flags": [
+      {
+        "description": "You were not expecting a package"
+      },
+      {
+        "description": "Domain dhl-parcels-ng.com is not dhl.com"
+      },
+      {
+        "description": "Shortened bit.ly link hides the destination"
+      },
+      {
+        "description": "Small fee request designed not to feel risky"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Fake delivery fees are one of the most common scams. Track parcels yourself on the courier's official site using your tracking number."
+  },
+  {
+    "id": "ng-b-p10",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "government",
+    "topic": "Education",
+    "sender": {
+      "name": "JAMB Official",
+      "email": "jamb.score.upgrade@gmail.com"
+    },
+    "subject": "Upgrade Your JAMB Score Before Admission List",
+    "date": "2026-10-14T17:15:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Attention Candidate,</p><p style='margin:0 0 14px'>We can officially upgrade your UTME score to 300+ before the admission list is released.</p><p style='margin:0 0 14px'>Pay ₦20,000 and send your registration number and phone number. 100% guaranteed.</p><p style='margin:0 0 14px'>Don't miss this chance!</p></div>",
+    "red_flags": [
+      {
+        "description": "Offers something impossible: changing an exam score"
+      },
+      {
+        "description": "JAMB using a Gmail address"
+      },
+      {
+        "description": "Asks for payment and your registration number"
+      },
+      {
+        "description": "\"100% guaranteed\" promise"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Score upgrades do not exist. JAMB uses jamb.gov.ng, and offers like this exist only to take your money."
+  },
+  {
+    "id": "ng-b-l01",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Shopping",
+    "sender": {
+      "name": "Jumia",
+      "email": "orders@jumia.com.ng"
+    },
+    "subject": "Your order #JM-284719 has been confirmed",
+    "date": "2026-10-16T13:22:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#F68B1E;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>JUMIA</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Thanks for shopping with Jumia! We've received your order.</p><p style='margin:0 0 14px'>Order number: JM-284719<br>Item: Oraimo FreePods 4 (Black) x1<br>Total: ₦28,500 (paid with card ending 4417)<br>Estimated delivery: 3–5 business days</p><p style='margin:0 0 14px'>You can track your order anytime in the Jumia app under My Orders.</p><p style='margin:0 0 14px'>The Jumia Team</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from the official jumia.com.ng domain",
+      "Specific order number, item and total you can check",
+      "Only shows the last 4 digits of the card",
+      "Tells you to use the app, no link to log in"
+    ],
+    "explanation": "A normal receipt: it gives information and asks for nothing. If you placed this order, the details will match your account."
+  },
+  {
+    "id": "ng-b-l02",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Transport",
+    "sender": {
+      "name": "Uber Receipts",
+      "email": "noreply@uber.com"
+    },
+    "subject": "Your Friday evening trip with Uber",
+    "date": "2026-10-09T20:51:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#000000;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Uber</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Thanks for riding, Ada.</p><p style='margin:0 0 14px'>Trip: Yaba → Lekki Phase 1<br>Driver: Emeka<br>Distance: 18.4 km  |  Time: 42 min<br>Total: ₦7,850</p><p style='margin:0 0 14px'>Rate your trip or get help with this ride in the Uber app.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official uber.com sender",
+      "Trip details match a real ride",
+      "No request for payment or login"
+    ],
+    "explanation": "A standard ride receipt. It refers you to the app for anything else rather than a link."
+  },
+  {
+    "id": "ng-b-l03",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "government",
+    "topic": "Education",
+    "sender": {
+      "name": "Coursera",
+      "email": "no-reply@m.mail.coursera.org"
+    },
+    "subject": "Welcome to Google Cybersecurity Certificate",
+    "date": "2026-10-13T10:10:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#0056D2;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>coursera</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>You're enrolled in the Google Cybersecurity Professional Certificate. Your first module, Foundations of Cybersecurity, is ready.</p><p style='margin:22px 0;text-align:center'><a href='https://www.coursera.org/learn/foundations-of-cybersecurity' style='display:inline-block;background:#0056D2;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Start learning</a></p><p style='margin:0 0 14px'>Tip: learners who set a weekly goal are more likely to finish.</p><p style='margin:0 0 14px'>The Coursera Team</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sender subdomain belongs to coursera.org",
+      "Link goes to coursera.org",
+      "Expected after you enroll in a course",
+      "No request for payment or passwords"
+    ],
+    "explanation": "Companies often send from subdomains like m.mail.coursera.org. What matters is that the main domain is genuine and nothing sensitive is requested."
+  },
+  {
+    "id": "ng-b-l04",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Google",
+      "email": "no-reply@accounts.google.com"
+    },
+    "subject": "Security alert: New sign-in on Windows",
+    "date": "2026-10-16T09:03:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>New sign-in to your account<br>ada.okafor@gmail.com</p><p style='margin:0 0 14px'>We noticed a new sign-in to your Google Account on a Windows device. If this was you, you don't need to do anything.</p><p style='margin:0 0 14px'>If not, we'll help you secure your account.</p><p style='margin:22px 0;text-align:center'><a href='https://myaccount.google.com/notifications' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Check activity</a></p><p style='margin:0 0 14px'>You can also see security activity at myaccount.google.com/notifications</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from accounts.google.com",
+      "Link goes to myaccount.google.com",
+      "Says no action is needed if it was you",
+      "Gives a web address you can type yourself"
+    ],
+    "explanation": "Real security alerts tell you what happened and let you check it yourself. They do not threaten you or ask for your password in the email."
+  },
+  {
+    "id": "ng-b-l05",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "Tolu Adeyemi",
+      "email": "tolu.adeyemi@brightpath.ng"
+    },
+    "subject": "Standup moved to 10:30 tomorrow",
+    "date": "2026-10-15T16:47:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi team,</p><p style='margin:0 0 14px'>Quick heads-up: tomorrow's standup is moving from 9:30 to 10:30 because of the client call. Same Google Meet link as always.</p><p style='margin:0 0 14px'>Thanks,<br>Tolu</p></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "From a colleague at your own company domain, brightpath.ng",
+      "Ordinary request with no pressure",
+      "No links, attachments or requests for information"
+    ],
+    "explanation": "A routine message from a known colleague on the company domain, asking for nothing."
+  },
+  {
+    "id": "ng-b-l06",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Travel",
+    "sender": {
+      "name": "Air Peace",
+      "email": "bookings@flyairpeace.com"
+    },
+    "subject": "Booking confirmed – Lagos to Abuja, ref XQ7P2L",
+    "date": "2026-10-12T12:30:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#1D3C78;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Air Peace</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Ada Okafor,</p><p style='margin:0 0 14px'>Your booking is confirmed.</p><p style='margin:0 0 14px'>Booking reference: XQ7P2L<br>Flight: P4 7120  Lagos (LOS) → Abuja (ABV)<br>Date: 24 Oct, 07:15</p><p style='margin:0 0 14px'>Online check-in opens 24 hours before departure on our website or app.</p><p style='margin:0 0 14px'>Thank you for flying Air Peace.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Addresses you by full name",
+      "Booking reference and flight details you can verify",
+      "Expected after making a booking",
+      "Asks for nothing"
+    ],
+    "explanation": "A booking confirmation full of verifiable details and no requests is what legitimate transactional mail looks like."
+  },
+  {
+    "id": "ng-b-l07",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "offers",
+    "topic": "Subscriptions",
+    "sender": {
+      "name": "Spotify",
+      "email": "no-reply@spotify.com"
+    },
+    "subject": "Your Spotify Premium receipt",
+    "date": "2026-10-10T06:00:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#1DB954;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Spotify</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Thanks for your payment. Here's your receipt.</p><p style='margin:0 0 14px'>Plan: Premium Individual<br>Amount: ₦1,300<br>Payment method: Mastercard ending 4417<br>Next billing date: 18 Nov</p><p style='margin:0 0 14px'>Manage your plan in your account page on spotify.com.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official spotify.com sender",
+      "Matches a subscription you pay for",
+      "Only last 4 card digits shown",
+      "No link to enter details"
+    ],
+    "explanation": "A routine receipt that tells you to manage things on the real website yourself."
+  },
+  {
+    "id": "ng-b-l08",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "government",
+    "topic": "Education",
+    "sender": {
+      "name": "Registry, University of Ilorin",
+      "email": "registry@unilorin.edu.ng"
+    },
+    "subject": "Reminder: Course registration closes Friday",
+    "date": "2026-10-14T09:00:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#00205B;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>University of Ilorin</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Student,</p><p style='margin:0 0 14px'>This is a reminder that first semester course registration closes on Friday at 11:59 PM.</p><p style='margin:0 0 14px'>Please complete your registration on the student portal through the university website. Students who miss the deadline will pay a late registration fee.</p><p style='margin:0 0 14px'>Registry Department<br>University of Ilorin</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official .edu.ng university domain",
+      "Points you to the official website, no direct link",
+      "Deadline is normal academic information, not a threat",
+      "Asks for no personal details"
+    ],
+    "explanation": "Deadlines alone are not a red flag. This email sends you to a portal you already know rather than to a link it controls."
+  },
+  {
+    "id": "ng-b-l09",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Social Media",
+    "sender": {
+      "name": "LinkedIn",
+      "email": "messages-noreply@linkedin.com"
+    },
+    "subject": "You appeared in 14 searches this week",
+    "date": "2026-10-12T07:30:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#0A66C2;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>LinkedIn</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>You appeared in 14 searches this week. Recruiters from fintech and cybersecurity companies were among those who found you.</p><p style='margin:22px 0;text-align:center'><a href='https://www.linkedin.com/me/search-appearances' style='display:inline-block;background:#0A66C2;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>See who's searching</a></p><p style='margin:0 0 14px'>Unsubscribe · Help</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official linkedin.com sender",
+      "Link goes to linkedin.com",
+      "Normal engagement email with unsubscribe option"
+    ],
+    "explanation": "A typical engagement notification. The link goes to the real domain and nothing is demanded."
+  },
+  {
+    "id": "ng-b-l10",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "GTBank",
+      "email": "gens@gtbank.com"
+    },
+    "subject": "GeNS Transaction Notification: Debit ₦12,000",
+    "date": "2026-10-16T11:48:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#DD4F05;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>GTBank</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear ADA OKAFOR,</p><p style='margin:0 0 14px'>A debit transaction occurred on your account.</p><p style='margin:0 0 14px'>Account: ****4521<br>Amount: ₦12,000.00<br>Description: POS Purchase – Shoprite Lekki<br>Balance: ₦184,320.55</p><p style='margin:0 0 14px'>If you did not authorise this transaction, please call our contact centre on the number on the back of your card.</p><p style='margin:0 0 14px'>GTBank will never ask for your PIN, password or token code.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official gtbank.com domain",
+      "Masked account number",
+      "Tells you to call the number on your card, not a number in the email",
+      "Reminds you the bank will never ask for your PIN"
+    ],
+    "explanation": "Transaction alerts are informational. A real one never asks you to click and verify anything."
+  },
+  {
+    "id": "ng-i-p01",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Access Bank",
+      "email": "noreply@accessbank-ng.com"
+    },
+    "subject": "CBN Directive: Update your BVN-linked details",
+    "date": "2026-10-16T08:15:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#EF7D00;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Access Bank</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Customer,</p><p style='margin:0 0 14px'>In line with the recent CBN directive on account verification, all customers are required to re-validate their BVN-linked details by 31 October.</p><p style='margin:0 0 14px'>Accounts not updated will be placed on Post-No-Debit restriction.</p><p style='margin:22px 0;text-align:center'><a href='https://accessbank-ng.com/bvn-update' style='display:inline-block;background:#EF7D00;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Update my details</a></p><p style='margin:0 0 14px'>Thank you for banking with us.<br>Access Bank Plc</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Domain accessbank-ng.com is a lookalike (real: accessbankplc.com)"
+      },
+      {
+        "description": "Uses a real-sounding regulator directive to justify urgency"
+      },
+      {
+        "description": "Threatens a Post-No-Debit restriction"
+      },
+      {
+        "description": "Asks you to update bank details through a link"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Scammers borrow real news (CBN directives) to sound official. Banks handle BVN updates in the app or at a branch, never through an email link."
+  },
+  {
+    "id": "ng-i-p02",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "IT Helpdesk",
+      "email": "it-support@micros0ft-365.com"
+    },
+    "subject": "Your Microsoft 365 password expires today",
+    "date": "2026-10-16T09:20:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#2F2F2F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Microsoft</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hello ada.okafor@brightpath.ng,</p><p style='margin:0 0 14px'>Your Microsoft 365 password is set to expire today. To keep your current password and avoid losing access to Outlook and Teams, confirm below.</p><p style='margin:22px 0;text-align:center'><a href='https://login.micros0ft-365.com/keep-password' style='display:inline-block;background:#2F2F2F;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Keep Current Password</a></p><p style='margin:0 0 14px'>Microsoft 365 Admin Center</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Domain uses a zero instead of an \"o\": micros0ft-365.com"
+      },
+      {
+        "description": "\"Keep current password\" is not a real Microsoft feature"
+      },
+      {
+        "description": "Generic IT Helpdesk not from your company domain"
+      },
+      {
+        "description": "Link leads to a fake login page"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Credential phishing often fakes password-expiry notices. Look letter-by-letter at the domain: 0 vs o is easy to miss."
+  },
+  {
+    "id": "ng-i-p03",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Payments",
+    "sender": {
+      "name": "Paystack Settlements",
+      "email": "settlements@paystack-merchants.com"
+    },
+    "subject": "Settlement of ₦1,240,500 placed on hold",
+    "date": "2026-10-15T18:40:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#011B33;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>paystack</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hello,</p><p style='margin:0 0 14px'>Your pending settlement of ₦1,240,500.00 has been placed on hold due to incomplete business verification.</p><p style='margin:0 0 14px'>To release your funds, log in and upload your CAC documents and director's BVN within 48 hours:</p><p style='margin:22px 0;text-align:center'><a href='https://paystack-merchants.com/dashboard/verify' style='display:inline-block;background:#011B33;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Release Settlement</a></p><p style='margin:0 0 14px'>Paystack Compliance</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Domain paystack-merchants.com is not paystack.com"
+      },
+      {
+        "description": "Large held payment creates pressure"
+      },
+      {
+        "description": "48-hour deadline"
+      },
+      {
+        "description": "Asks for login plus CAC documents and BVN through a link"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Business owners are targeted with fake payment-processor alerts. Always go to the dashboard by typing paystack.com yourself."
+  },
+  {
+    "id": "ng-i-p04",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "Social Media",
+    "sender": {
+      "name": "LinkedIn",
+      "email": "notifications@linkedin-mail.net"
+    },
+    "subject": "You have 3 new messages from recruiters",
+    "date": "2026-10-16T07:05:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#0A66C2;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>LinkedIn</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>You have 3 unread messages from recruiters at Flutterwave, Interswitch and Andela.</p><p style='margin:22px 0;text-align:center'><a href='https://www.linkedln.com/messaging' style='display:inline-block;background:#0A66C2;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>View messages</a></p><p style='margin:0 0 14px'>This email was intended for Ada Okafor.</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Sender domain linkedin-mail.net is not linkedin.com"
+      },
+      {
+        "description": "Link is linkedln.com (a lowercase L instead of an i)"
+      },
+      {
+        "description": "Uses famous company names as bait for job seekers"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "\"linkedln\" vs \"linkedin\" is a classic lookalike. Recruiter messages are tempting, so this works well on job hunters."
+  },
+  {
+    "id": "ng-i-p05",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "shopping",
+    "topic": "Delivery",
+    "sender": {
+      "name": "GIG Logistics",
+      "email": "tracking@giglogistics-delivery.com"
+    },
+    "subject": "Delivery attempt failed – Waybill GIG84021973",
+    "date": "2026-10-16T12:14:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#5B2C83;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>GIG Logistics</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Customer,</p><p style='margin:0 0 14px'>Our rider attempted delivery of your shipment (Waybill: GIG84021973) but no one was available.</p><p style='margin:0 0 14px'>To reschedule, pay a redelivery fee of ₦850. Unclaimed shipments are returned after 3 days.</p><p style='margin:22px 0;text-align:center'><a href='https://giglogistics-delivery.com/reschedule' style='display:inline-block;background:#5B2C83;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Reschedule Delivery</a></p><p style='margin:0 0 14px'>GIG Logistics</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Lookalike domain giglogistics-delivery.com"
+      },
+      {
+        "description": "Requests a card payment through an email link"
+      },
+      {
+        "description": "Waybill number looks real but you can't confirm it"
+      },
+      {
+        "description": "Return-to-sender deadline adds pressure"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Fake tracking numbers make delivery scams look real. Check the waybill on the courier's official site, not through the email."
+  },
+  {
+    "id": "ng-i-p06",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Cloud Sharing",
+    "sender": {
+      "name": "Tunde Bakare (via Google Drive)",
+      "email": "drive-shares@google-docs-share.com"
+    },
+    "subject": "Tunde shared \"Q4 Salary Adjustments.xlsx\" with you",
+    "date": "2026-10-16T14:36:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Tunde Bakare shared a spreadsheet with you.</p><p style='margin:0 0 14px'>Q4 Salary Adjustments.xlsx<br>\"Please review before Friday – confidential\"</p><p style='margin:22px 0;text-align:center'><a href='https://google-docs-share.com/sheets/d/Q4-salary' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Open in Sheets</a></p><p style='margin:0 0 14px'>Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Sender domain google-docs-share.com is not google.com"
+      },
+      {
+        "description": "Link does not go to docs.google.com"
+      },
+      {
+        "description": "Salary file is irresistible bait"
+      },
+      {
+        "description": "Copied Google footer to look authentic"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Real Google share notifications come from google.com and open on docs.google.com. Copying a real footer is easy, so it proves nothing."
+  },
+  {
+    "id": "ng-i-p07",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Fintech",
+    "sender": {
+      "name": "OPay",
+      "email": "kyc@opay-wallet-verify.com"
+    },
+    "subject": "Your OPay wallet will be frozen – complete KYC",
+    "date": "2026-10-16T05:10:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#1DCF9F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>OPay</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear OPay User,</p><p style='margin:0 0 14px'>Due to new KYC regulations, your wallet will be frozen within 24 hours unless you complete Tier-3 verification.</p><p style='margin:0 0 14px'>Tap below and enter your phone number, NIN and wallet PIN to verify:</p><p style='margin:22px 0;text-align:center'><a href='https://opay-wallet-verify.com/kyc' style='display:inline-block;background:#1DCF9F;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Complete KYC</a></p><p style='margin:0 0 14px'>OPay Customer Care</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Domain opay-wallet-verify.com is not OPay's"
+      },
+      {
+        "description": "Asks for your wallet PIN"
+      },
+      {
+        "description": "24-hour freeze threat"
+      },
+      {
+        "description": "KYC is done inside the app, not via email links"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Fintech KYC upgrades happen in the app. Any request for your PIN is a scam, no matter how official it looks."
+  },
+  {
+    "id": "ng-i-p08",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Utilities",
+    "sender": {
+      "name": "Ikeja Electric",
+      "email": "refunds@ikejaelectric-ng.com"
+    },
+    "subject": "You are eligible for a meter refund of ₦12,400",
+    "date": "2026-10-15T15:44:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#C8102E;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Ikeja Electric</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Customer,</p><p style='margin:0 0 14px'>Following the NERC review of estimated billing, you are eligible for a refund of ₦12,400 on your prepaid meter account.</p><p style='margin:0 0 14px'>To receive your refund, confirm your debit card details:</p><p style='margin:22px 0;text-align:center'><a href='https://ikejaelectric-ng.com/refund' style='display:inline-block;background:#C8102E;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Claim Refund</a></p><p style='margin:0 0 14px'>Ikeja Electric Customer Care</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Lookalike domain ikejaelectric-ng.com"
+      },
+      {
+        "description": "Refunds never need your card details"
+      },
+      {
+        "description": "Uses a real regulator (NERC) to sound credible"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "\"Refund\" scams flip the usual trick: instead of a fee, they promise money and capture your card details."
+  },
+  {
+    "id": "ng-i-p09",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "government",
+    "topic": "Government",
+    "sender": {
+      "name": "NYSC Mobilisation",
+      "email": "mobilisation@nysc-portal-update.com"
+    },
+    "subject": "Batch C: Confirm your details to avoid exclusion",
+    "date": "2026-10-13T10:25:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#006B3F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>NYSC</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Prospective Corps Member,</p><p style='margin:0 0 14px'>Your name appears on the Batch C senate list, but your profile is incomplete.</p><p style='margin:0 0 14px'>Log in and pay the ₦5,000 data verification fee to avoid exclusion from mobilisation:</p><p style='margin:22px 0;text-align:center'><a href='https://nysc-portal-update.com/login' style='display:inline-block;background:#006B3F;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Complete Profile</a></p><p style='margin:0 0 14px'>NYSC Directorate Headquarters</p></div></div>",
+    "red_flags": [
+      {
+        "description": "NYSC uses nysc.gov.ng, not nysc-portal-update.com"
+      },
+      {
+        "description": "Unofficial \"verification fee\""
+      },
+      {
+        "description": "Fear of exclusion from mobilisation"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Graduates are targeted around mobilisation dates. Official government sites end in .gov.ng."
+  },
+  {
+    "id": "ng-i-p10",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Telecom",
+    "sender": {
+      "name": "MTN Nigeria",
+      "email": "rewards@mtn-ng-rewards.com"
+    },
+    "subject": "Claim your 20GB loyalty data bonus",
+    "date": "2026-10-11T09:12:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFCB05;padding:18px 24px;'><span style='color:#000;font-size:22px;font-weight:bold;letter-spacing:.3px'>MTN</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Y'ello Ada,</p><p style='margin:0 0 14px'>As a loyal customer you qualify for a free 20GB data bonus.</p><p style='margin:0 0 14px'>Claim it before midnight by signing in with your MyMTN details:</p><p style='margin:22px 0;text-align:center'><a href='https://mtn-ng-rewards.com/claim' style='display:inline-block;background:#FFCB05;color:#000;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Claim 20GB</a></p><p style='margin:0 0 14px'>MTN Nigeria</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Domain mtn-ng-rewards.com is not MTN's"
+      },
+      {
+        "description": "Free reward with a midnight deadline"
+      },
+      {
+        "description": "Asks you to sign in through the link"
+      },
+      {
+        "description": "Uses MTN's real catchphrase to feel authentic"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Familiar slogans are easy to copy. Rewards are claimed in the official app or by USSD, not through email sign-ins."
+  },
+  {
+    "id": "ng-i-l01",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Google",
+      "email": "no-reply@accounts.google.com"
+    },
+    "subject": "Critical security alert",
+    "date": "2026-10-16T03:02:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Sign-in attempt was blocked<br>ada.okafor@gmail.com</p><p style='margin:0 0 14px'>Someone just used your password to try to sign in to your account from an unknown app. Google blocked them, but you should check what happened.</p><p style='margin:22px 0;text-align:center'><a href='https://myaccount.google.com/alert/nt/1729043000000' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Check activity</a></p><p style='margin:0 0 14px'>You received this email to let you know about important changes to your Google Account and services.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from accounts.google.com",
+      "Link goes to myaccount.google.com",
+      "Tells you the attempt was already blocked",
+      "Does not ask for your password in the email"
+    ],
+    "explanation": "Scary is not the same as fake. This real alert sends you to Google's own domain. If you are unsure, go to myaccount.google.com yourself."
+  },
+  {
+    "id": "ng-i-l02",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Microsoft account team",
+      "email": "account-security-noreply@accountprotection.microsoft.com"
+    },
+    "subject": "Microsoft account password change",
+    "date": "2026-10-15T20:14:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#2F2F2F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Microsoft</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Microsoft account</p><p style='margin:0 0 14px'>Password change</p><p style='margin:0 0 14px'>The password for the Microsoft account ad*****@outlook.com was changed.</p><p style='margin:0 0 14px'>If this was you, then you can safely ignore this email.</p><p style='margin:0 0 14px'>If you didn't change your password, your account might have been compromised. Go to account.microsoft.com to reset your password.</p><p style='margin:0 0 14px'>Thanks,<br>The Microsoft account team</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "accountprotection.microsoft.com is Microsoft's real security domain",
+      "Masks your email address",
+      "No link to click, tells you where to go yourself"
+    ],
+    "explanation": "Long, odd-looking addresses can still be real. The sender ends in microsoft.com, and the email asks for nothing."
+  },
+  {
+    "id": "ng-i-l03",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Payments",
+    "sender": {
+      "name": "Paystack",
+      "email": "notifications@paystack.com"
+    },
+    "subject": "Settlement of ₦386,200 sent to your bank",
+    "date": "2026-10-16T10:30:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#011B33;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>paystack</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi BrightPath Technologies,</p><p style='margin:0 0 14px'>We've sent a settlement to your bank account.</p><p style='margin:0 0 14px'>Amount: ₦386,200.00<br>Bank: Zenith Bank ****8890<br>Transactions: 47</p><p style='margin:0 0 14px'>View the full breakdown on your Paystack Dashboard.</p><p style='margin:0 0 14px'>Paystack</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official paystack.com domain",
+      "Informs you of money sent, asks nothing",
+      "Masked bank account number"
+    ],
+    "explanation": "Compare with the fake \"settlement on hold\" email: the real one informs, the fake one demands."
+  },
+  {
+    "id": "ng-i-l04",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Developer Tools",
+    "sender": {
+      "name": "GitHub",
+      "email": "noreply@github.com"
+    },
+    "subject": "[GitHub] A new SSH authentication public key was added to your account",
+    "date": "2026-10-16T11:05:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#24292F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>GitHub</span></div><div style='padding:24px'><p style='margin:0 0 14px'>The following SSH key was added to your account:</p><p style='margin:0 0 14px'>ada-laptop-2026<br>SHA256:9xJv3kQ8uYb...</p><p style='margin:0 0 14px'>If you believe this key was added in error, you can remove the key and disable access at the following location:</p><p style='margin:0 0 14px'>https://github.com/settings/keys</p><p style='margin:0 0 14px'>To see this and other security events for your account, visit github.com/settings/security-log</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official github.com domain",
+      "Matches an action you took (adding a key)",
+      "Points to settings pages on github.com"
+    ],
+    "explanation": "Security notifications that confirm actions you just took are expected. GitHub tells you where to check without asking for credentials."
+  },
+  {
+    "id": "ng-i-l05",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "offers",
+    "topic": "Subscriptions",
+    "sender": {
+      "name": "DStv",
+      "email": "noreply@dstv.com"
+    },
+    "subject": "Your DStv Compact subscription is due in 3 days",
+    "date": "2026-10-12T09:00:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#0072CE;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>DStv</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Ada,</p><p style='margin:0 0 14px'>Your DStv Compact subscription for smartcard ending 7712 is due on 19 October.</p><p style='margin:0 0 14px'>You can pay through the MyDStv app, your bank app, or by USSD. Ignore this message if you have already paid.</p><p style='margin:0 0 14px'>DStv Customer Care</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official dstv.com domain",
+      "Masked smartcard number",
+      "Offers several official payment channels, no link",
+      "\"Ignore if already paid\": no pressure"
+    ],
+    "explanation": "A reminder that lets you pay through channels you already use is normal billing communication."
+  },
+  {
+    "id": "ng-i-l06",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Shopping",
+    "sender": {
+      "name": "Konga",
+      "email": "orders@konga.com"
+    },
+    "subject": "Your order KNG-55210 has been shipped",
+    "date": "2026-10-14T14:18:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#ED017F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Konga</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Good news! Your order KNG-55210 has shipped.</p><p style='margin:0 0 14px'>Item: HP 15s Laptop Bag<br>Courier: Konga Express</p><p style='margin:22px 0;text-align:center'><a href='https://www.konga.com/account/orders' style='display:inline-block;background:#ED017F;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Track my order</a></p><p style='margin:0 0 14px'>Payment was already completed. No further action is needed.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official konga.com domain",
+      "Tracking link goes to konga.com",
+      "Clearly states no payment is needed"
+    ],
+    "explanation": "A real shipping notice with a link to the store's own domain. Nothing extra to pay."
+  },
+  {
+    "id": "ng-i-l07",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "BrightPath HR",
+      "email": "hr@brightpath.ng"
+    },
+    "subject": "HMO plan renewal – choose your plan by 25 Oct",
+    "date": "2026-10-13T11:40:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi everyone,</p><p style='margin:0 0 14px'>Our HMO renewal is coming up. Please choose your plan for next year on the HR page of the staff intranet before 25 October. If you don't choose, you'll stay on your current plan.</p><p style='margin:0 0 14px'>Questions? Drop by the People Team desk on the 3rd floor or message us on Slack.</p><p style='margin:0 0 14px'>People Team</p></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from your own company domain, brightpath.ng",
+      "Points to the intranet you already use",
+      "Default option if you do nothing, so no threat",
+      "Offers in-person and Slack contact"
+    ],
+    "explanation": "Internal HR mail with a calm deadline and familiar channels is normal."
+  },
+  {
+    "id": "ng-i-l08",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Cloud Sharing",
+    "sender": {
+      "name": "Kemi Adebayo (via Google Calendar)",
+      "email": "calendar-notification@google.com"
+    },
+    "subject": "Invitation: Sprint Review @ Thu 22 Oct 2pm – 3pm (WAT)",
+    "date": "2026-10-16T15:55:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Kemi Adebayo has invited you to an event.</p><p style='margin:0 0 14px'>Sprint Review<br>Thursday 22 October · 2:00 – 3:00pm (West Africa Time)<br>Join with Google Meet: meet.google.com/xqa-pmtr-gkn</p><p style='margin:0 0 14px'>Guests: kemi.adebayo@brightpath.ng, ada.okafor@brightpath.ng, tolu.adeyemi@brightpath.ng</p><p style='margin:22px 0;text-align:center'><a href='https://calendar.google.com/calendar/event?action=RESPOND' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Reply in Google Calendar</a></p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from google.com's calendar service",
+      "Organiser and guests are on your company domain",
+      "Links go to calendar.google.com and meet.google.com"
+    ],
+    "explanation": "A meeting invite from a colleague via Google's real calendar service. All links stay on google.com."
+  },
+  {
+    "id": "ng-i-l09",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Fintech",
+    "sender": {
+      "name": "Moniepoint",
+      "email": "notifications@moniepoint.com"
+    },
+    "subject": "Transfer successful: ₦45,000 to Chidi Nwosu",
+    "date": "2026-10-16T13:09:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#0357EE;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Moniepoint</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Your transfer was successful.</p><p style='margin:0 0 14px'>Amount: ₦45,000.00<br>Recipient: CHIDI NWOSU – Access Bank<br>Reference: MNP2610161309</p><p style='margin:0 0 14px'>If you did not make this transfer, call us immediately using the number in the Moniepoint app.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official moniepoint.com domain",
+      "Details of a transfer you made",
+      "Directs you to the in-app number"
+    ],
+    "explanation": "Transaction confirmations inform you and point to contact details you already trust."
+  },
+  {
+    "id": "ng-i-l10",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Access Bank",
+      "email": "info@accessbankplc.com"
+    },
+    "subject": "Fraud alert: Staff will never ask for your OTP",
+    "date": "2026-10-09T10:00:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#EF7D00;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Access Bank</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear Valued Customer,</p><p style='margin:0 0 14px'>Fraudsters are calling customers and pretending to be bank staff. Please remember:</p><ul style='margin:0 0 14px 18px;padding:0'><li>We will NEVER ask for your PIN, OTP, password or BVN.</li><li>We will NEVER send you a link to update your account.</li><li>If in doubt, call 01-2712005 or visit any branch.</li></ul><p style='margin:0 0 14px'>Stay safe,<br>Access Bank Plc</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official accessbankplc.com domain",
+      "Gives security advice and asks for nothing",
+      "No links at all"
+    ],
+    "explanation": "Security awareness messages are normal. Notice how this one contradicts what the fake BVN email asked you to do."
+  },
+  {
+    "id": "ng-a-p01",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Business Email Compromise",
+    "sender": {
+      "name": "Adebayo Ogunleye",
+      "email": "adebayo.ogunleye@brightpath-ng.com"
+    },
+    "subject": "Quick favour",
+    "date": "2026-10-16T11:52:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Ada,</p><p style='margin:0 0 14px'>Are you at your desk? I'm in back-to-back board meetings and can't take calls.</p><p style='margin:0 0 14px'>I need you to process an urgent payment of ₦4,850,000 to a new vendor for the Abuja project before 2pm. Account details below. Keep this between us for now, I'll explain later.</p><p style='margin:0 0 14px'>Acct: 2038847712 – Zenith Bank – Novatek Integrated Services</p><p style='margin:0 0 14px'>Sent from my iPhone<br>Adebayo</p></div>",
+    "red_flags": [
+      {
+        "description": "Domain is brightpath-ng.com, but your company is brightpath.ng"
+      },
+      {
+        "description": "Urgent payment to a new, unverified vendor"
+      },
+      {
+        "description": "Secrecy: \"Keep this between us\""
+      },
+      {
+        "description": "Blocks verification: \"can't take calls\""
+      },
+      {
+        "description": "Bypasses normal approval process"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is CEO fraud (Business Email Compromise). No links, no malware, just pressure from \"the boss\". Always verify payment requests on a separate channel."
+  },
+  {
+    "id": "ng-a-p02",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Invoice Fraud",
+    "sender": {
+      "name": "Chiamaka Eze – Zentrix Supplies",
+      "email": "accounts@zentrixsupplies.com.ng"
+    },
+    "subject": "RE: Invoice ZS-2291 – updated bank details",
+    "date": "2026-10-16T09:31:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Good morning Ada,</p><p style='margin:0 0 14px'>Following our audit, our company has changed banks. Kindly make payment for invoice ZS-2291 (₦2,140,000) into our new account below and update your records.</p><p style='margin:0 0 14px'>Acct: 1190027385 – Moniepoint MFB – Zentrix Supplies Ltd</p><p style='margin:0 0 14px'>Please confirm once payment is done. Thank you for your continued partnership.</p><p style='margin:0 0 14px'>Chiamaka Eze<br>Accounts, Zentrix Supplies</p></div>",
+    "red_flags": [
+      {
+        "description": "Reply-To goes to a different domain: zentrix-supplies.co"
+      },
+      {
+        "description": "Request to change a supplier's bank details by email"
+      },
+      {
+        "description": "Invoice number is real-looking because the attacker may have read past emails"
+      },
+      {
+        "description": "Payment to a new account at a different bank"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Vendor email compromise: the supplier's real mailbox may be hacked, so the sender looks right. Always confirm bank-detail changes by phone using a number you already have.",
+    "reply_to": "accounts.zentrix@zentrix-supplies.co"
+  },
+  {
+    "id": "ng-a-p03",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Google Workspace",
+      "email": "workspace-alerts@google-workspace-admin.com"
+    },
+    "subject": "Action required: Unusual sign-in to brightpath.ng admin console",
+    "date": "2026-10-16T06:45:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Google Workspace</p><p style='margin:0 0 14px'>We detected a suspicious sign-in to the admin console for brightpath.ng from Moscow, Russia.</p><p style='margin:0 0 14px'>If this wasn't you, review the activity immediately:</p><p style='margin:22px 0;text-align:center'><a href='https://admin.google.com.security-review.io/ac/security' style='color:#1a62d6'>https://admin.google.com/ac/security</a></p><p style='margin:0 0 14px'>The Google Workspace Team</p></div></div>",
+    "red_flags": [
+      {
+        "description": "The link text shows admin.google.com, but the real link goes to admin.google.com.security-review.io"
+      },
+      {
+        "description": "Sender domain google-workspace-admin.com is not google.com"
+      },
+      {
+        "description": "Foreign-location scare to rush you"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "The visible link text can say anything. Hover over (or long-press) links to see where they really go. Here the real domain is security-review.io."
+  },
+  {
+    "id": "ng-a-p04",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "E-Signature",
+    "sender": {
+      "name": "BrightPath HR via DocuSign",
+      "email": "dse@docusign.net.esign-review.com"
+    },
+    "subject": "Please DocuSign: Employment Contract Amendment 2026",
+    "date": "2026-10-16T10:14:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFCC22;padding:18px 24px;'><span style='color:#000;font-size:22px;font-weight:bold;letter-spacing:.3px'>DocuSign</span></div><div style='padding:24px'><p style='margin:0 0 14px'>BrightPath HR sent you a document to review and sign.</p><p style='margin:0 0 14px'>Employment Contract Amendment 2026.pdf</p><p style='margin:0 0 14px'>Please review and sign by end of day.</p><p style='margin:22px 0;text-align:center'><a href='https://docusign.net.esign-review.com/signing/4f8a2' style='display:inline-block;background:#FFCC22;color:#000;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>REVIEW DOCUMENT</a></p><p style='margin:0 0 14px'>Do Not Share This Email: This email contains a secure link to DocuSign.</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Real domain is esign-review.com. \"docusign.net\" is just a subdomain prefix"
+      },
+      {
+        "description": "Unexpected contract change with same-day deadline"
+      },
+      {
+        "description": "HR did not mention this through normal channels"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Read domains from the right: in docusign.net.esign-review.com, the part that matters is esign-review.com. Attackers put trusted names on the left."
+  },
+  {
+    "id": "ng-a-p05",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Malicious Attachment",
+    "sender": {
+      "name": "Kunle Afolabi – Finance, Lagoon Partners",
+      "email": "kunle.afolabi@lagoonpartners.com"
+    },
+    "subject": "Remittance advice – payment of ₦3,600,000",
+    "date": "2026-10-15T16:58:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hello,</p><p style='margin:0 0 14px'>Please find attached the remittance advice for the payment made to your company today.</p><p style='margin:0 0 14px'>Kindly open the attachment and sign in with your company email to view the secure document.</p><p style='margin:0 0 14px'>Regards,<br>Kunle Afolabi<br>Finance</p></div>",
+    "red_flags": [
+      {
+        "description": "Attachment is an .html file disguised with a .pdf in its name"
+      },
+      {
+        "description": "A PDF should never ask you to sign in with your email"
+      },
+      {
+        "description": "Unexpected payment notice from an unfamiliar contact"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "HTML attachments open a fake login page in your browser. Watch for double extensions like .pdf.html.",
+    "attachments": [
+      "Remittance_Advice_1016.pdf.html"
+    ]
+  },
+  {
+    "id": "ng-a-p06",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "MFA Fatigue",
+    "sender": {
+      "name": "IT Service Desk",
+      "email": "it-servicedesk@brightpath.ng"
+    },
+    "subject": "MFA migration tonight – reply with your code",
+    "date": "2026-10-16T17:40:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>We're migrating all staff accounts to the new MFA system tonight. In the next few minutes you'll receive a 6-digit verification code by SMS.</p><p style='margin:0 0 14px'>Please reply to this email with the code so we can link your device. If we don't receive it by 7pm your account will be locked until Monday.</p><p style='margin:0 0 14px'>Thanks,<br>IT Service Desk</p></div>",
+    "red_flags": [
+      {
+        "description": "Asks you to share a one-time code. IT never needs your code"
+      },
+      {
+        "description": "Threat of lockout until Monday"
+      },
+      {
+        "description": "Sender is your real company domain, so the account may be compromised or spoofed"
+      },
+      {
+        "description": "A real migration would be announced in advance"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "The sender address is correct, but the request is the red flag. Anyone asking for your MFA code is trying to log in as you."
+  },
+  {
+    "id": "ng-a-p07",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Developer Tools",
+    "sender": {
+      "name": "GitHub Security",
+      "email": "security-alerts@github-advisories.com"
+    },
+    "subject": "[GitHub] Critical vulnerability detected in brightpath/payments-api",
+    "date": "2026-10-16T08:02:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#24292F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>GitHub</span></div><div style='padding:24px'><p style='margin:0 0 14px'>A critical vulnerability (CVE-2026-31337) was detected in your repository brightpath/payments-api.</p><p style='margin:0 0 14px'>To run an automated fix, authorize the GitHub Security Scanner app:</p><p style='margin:22px 0;text-align:center'><a href='https://github.com/login/oauth/authorize?client_id=Iv1.8a61f9b3' style='display:inline-block;background:#24292F;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Authorize Security Scanner</a></p><p style='margin:0 0 14px'>Requested permissions: read and write access to code, admin access to organization.</p><p style='margin:0 0 14px'>GitHub Security Lab</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Sender domain github-advisories.com is not github.com"
+      },
+      {
+        "description": "Link is on the real github.com, but it authorises an unknown third-party app"
+      },
+      {
+        "description": "Requests write access to code and admin access to the organization"
+      },
+      {
+        "description": "Real alerts come as Dependabot alerts, not OAuth requests"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Consent phishing uses the real login page to give an attacker's app access. Never authorise apps you didn't go looking for."
+  },
+  {
+    "id": "ng-a-p08",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "BrightPath People Team",
+      "email": "people-team@brightpath-hr.com"
+    },
+    "subject": "Your 2026 salary review letter is ready",
+    "date": "2026-10-16T15:15:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Your confidential 2026 salary review letter is now available in the HR portal.</p><p style='margin:22px 0;text-align:left'><a href='https://brightpath.ng.hr-portal-login.com/salary-review' style='color:#1a62d6'>https://brightpath.ng/hr/salary-review</a></p><p style='margin:0 0 14px'>The portal will ask you to sign in with your work email. Letters are only available for 72 hours.</p><p style='margin:0 0 14px'>People Team</p></div>",
+    "red_flags": [
+      {
+        "description": "Sender domain brightpath-hr.com is not brightpath.ng"
+      },
+      {
+        "description": "Link text says brightpath.ng, but it goes to hr-portal-login.com"
+      },
+      {
+        "description": "72-hour expiry on a salary letter is unusual"
+      },
+      {
+        "description": "Salary is powerful bait"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Two tricks at once: a lookalike sender and a link whose text hides the real destination. Hover before you click."
+  },
+  {
+    "id": "ng-a-p09",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Malicious Attachment",
+    "sender": {
+      "name": "Funmi Oladipo",
+      "email": "funmi.oladipo@primelinklogistics.com"
+    },
+    "subject": "RE: RE: Q4 delivery schedule",
+    "date": "2026-10-16T13:47:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi,</p><p style='margin:0 0 14px'>As discussed, please see the updated delivery schedule attached. You may need to click \"Enable Editing\" and \"Enable Content\" to view the dates properly.</p><p style='margin:0 0 14px'>Thanks</p><p style='margin:0 0 14px'>-----Original Message-----<br>From: Ada Okafor<br>Subject: Q4 delivery schedule<br>Hi Funmi, can you send the latest schedule when ready?</p></div>",
+    "red_flags": [
+      {
+        "description": "Macro-enabled Excel file (.xlsm)"
+      },
+      {
+        "description": "Asks you to \"Enable Content\", which runs the macro"
+      },
+      {
+        "description": "Short, generic reply inserted into a real thread (thread hijacking)"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Attackers who break into a partner's mailbox reply to real conversations. The thread looks familiar, but a macro file and \"Enable Content\" mean malware.",
+    "attachments": [
+      "Delivery_Schedule_Q4.xlsm"
+    ]
+  },
+  {
+    "id": "ng-a-p10",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "QR Phishing",
+    "sender": {
+      "name": "Microsoft 365 Security",
+      "email": "no-reply@m365-security-center.com"
+    },
+    "subject": "Mandatory: Re-register your authenticator by Friday",
+    "date": "2026-10-14T09:05:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#2F2F2F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Microsoft</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Your organization requires all users to re-register Microsoft Authenticator.</p><p style='margin:0 0 14px'>Scan the QR code below with your phone camera to complete registration:</p><table cellspacing='0' cellpadding='0' style='border:10px solid #fff;outline:1px solid #ddd;margin:8px 0;border-collapse:collapse'><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td></tr><tr><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#000'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#fff'></td><td style='width:6px;height:6px;padding:0;background:#000'></td></tr></table><p style='margin:0 0 14px'>Users who do not re-register by Friday will lose access to Outlook and Teams.</p><p style='margin:0 0 14px'>Microsoft 365 Security</p></div></div>",
+    "red_flags": [
+      {
+        "description": "QR code hides the destination URL and moves you to your phone"
+      },
+      {
+        "description": "Sender domain m365-security-center.com is not microsoft.com"
+      },
+      {
+        "description": "Deadline with loss-of-access threat"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "QR phishing (\"quishing\") avoids email link scanners and moves you to a phone where it's harder to check the URL."
+  },
+  {
+    "id": "ng-a-l01",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "Adebayo Ogunleye",
+      "email": "adebayo.ogunleye@brightpath.ng"
+    },
+    "subject": "Town hall Friday 3pm",
+    "date": "2026-10-16T10:20:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Team,</p><p style='margin:0 0 14px'>We'll hold our Q4 town hall this Friday at 3pm in the main conference room and on Google Meet. I'll share an update on the Abuja project and next year's plans.</p><p style='margin:0 0 14px'>The agenda is in the Town Hall folder on our shared drive. Bring your questions.</p><p style='margin:0 0 14px'>Adebayo</p></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Correct company domain: brightpath.ng",
+      "Sent to the whole team, nothing secret",
+      "Points to the shared drive you already use",
+      "No payment, link or credential request"
+    ],
+    "explanation": "Same name as the CEO-fraud email, but the domain is right and the request is ordinary. Context matters as much as the sender."
+  },
+  {
+    "id": "ng-a-l02",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Microsoft account team",
+      "email": "account-security-noreply@accountprotection.microsoft.com"
+    },
+    "subject": "Your single-use code",
+    "date": "2026-10-16T14:01:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#2F2F2F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Microsoft</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Microsoft account</p><p style='margin:0 0 14px'>Single-use code</p><p style='margin:0 0 14px'>Hi ad*****@outlook.com,</p><p style='margin:0 0 14px'>We received your request for a single-use code to use with your Microsoft account.</p><p style='margin:0 0 14px'>Your single-use code is: 482915</p><p style='margin:0 0 14px'>If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.</p><p style='margin:0 0 14px'>Thanks,<br>The Microsoft account team</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Real Microsoft security domain",
+      "Delivers a code and asks you to share it with no one",
+      "\"Ignore if you didn't request it\": no pressure"
+    ],
+    "explanation": "A one-time code arriving is fine. Giving that code to someone else is what turns it into an attack."
+  },
+  {
+    "id": "ng-a-l03",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "E-Signature",
+    "sender": {
+      "name": "Kemi Adebayo via DocuSign",
+      "email": "dse@docusign.net"
+    },
+    "subject": "Please DocuSign: NDA – Lagoon Partners project",
+    "date": "2026-10-12T11:22:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFCC22;padding:18px 24px;'><span style='color:#000;font-size:22px;font-weight:bold;letter-spacing:.3px'>DocuSign</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Kemi Adebayo sent you a document to review and sign.</p><p style='margin:0 0 14px'>NDA – Lagoon Partners project.pdf</p><p style='margin:0 0 14px'>\"Hi Ada, here's the NDA we discussed in this morning's meeting.\"</p><p style='margin:22px 0;text-align:center'><a href='https://na3.docusign.net/Signing/EmailStart.aspx?a=6c2e' style='display:inline-block;background:#FFCC22;color:#000;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>REVIEW DOCUMENT</a></p><p style='margin:0 0 14px'>Alternate signing method: visit docusign.com, click Access Documents and enter the security code.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sender is docusign.net itself, not a subdomain trick",
+      "Link stays on docusign.net",
+      "Expected: discussed in a meeting earlier",
+      "Offers an alternative way to access the document directly"
+    ],
+    "explanation": "Compare with the fake DocuSign email: here the domain ends in docusign.net and the document was expected."
+  },
+  {
+    "id": "ng-a-l04",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "IT Service Desk",
+      "email": "it-servicedesk@brightpath.ng"
+    },
+    "subject": "Planned maintenance Saturday 10pm – no action needed",
+    "date": "2026-10-15T16:00:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Hi all,</p><p style='margin:0 0 14px'>We'll be upgrading the VPN servers this Saturday from 10pm to 1am. You may be disconnected briefly during that time.</p><p style='margin:0 0 14px'>No action is needed from you. Reminder: IT will never ask for your password or MFA codes by email, phone or chat.</p><p style='margin:0 0 14px'>IT Service Desk</p></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Correct company domain",
+      "Announced in advance, no action needed",
+      "Reminds you IT never asks for codes"
+    ],
+    "explanation": "Legitimate IT messages inform. The fake MFA email asked for a code, which this one explicitly says IT will never do."
+  },
+  {
+    "id": "ng-a-l05",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Developer Tools",
+    "sender": {
+      "name": "GitHub",
+      "email": "notifications@github.com"
+    },
+    "subject": "[brightpath/payments-api] Critical Dependabot alert: lodash",
+    "date": "2026-10-16T07:40:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#24292F;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>GitHub</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dependabot found 1 critical vulnerability in brightpath/payments-api.</p><p style='margin:0 0 14px'>lodash (npm) – Prototype Pollution<br>Severity: Critical<br>Patched version: 4.17.21</p><p style='margin:0 0 14px'>Dependabot has opened a pull request to update the dependency.</p><p style='margin:22px 0;text-align:center'><a href='https://github.com/brightpath/payments-api/security/dependabot/14' style='display:inline-block;background:#24292F;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Review security alert</a></p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official notifications@github.com sender",
+      "Link stays inside your repository on github.com",
+      "Offers a pull request, not app authorization"
+    ],
+    "explanation": "Real vulnerability alerts point to your repository's security tab, not to third-party app authorization."
+  },
+  {
+    "id": "ng-a-l06",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Invoice Fraud",
+    "sender": {
+      "name": "Chiamaka Eze – Zentrix Supplies",
+      "email": "accounts@zentrixsupplies.com.ng"
+    },
+    "subject": "Invoice ZS-2304 for October supplies",
+    "date": "2026-10-13T10:05:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px'><p style='margin:0 0 14px'>Good morning Ada,</p><p style='margin:0 0 14px'>Please find attached invoice ZS-2304 for the October supplies under PO-BP-0918.</p><p style='margin:0 0 14px'>Amount: ₦1,760,000<br>Payment terms: 30 days<br>Bank details: unchanged, as on file</p><p style='margin:0 0 14px'>Call me on my usual line if you have any questions.</p><p style='margin:0 0 14px'>Chiamaka Eze<br>Accounts, Zentrix Supplies</p></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Usual supplier domain with no Reply-To mismatch",
+      "References a real purchase order",
+      "Bank details explicitly unchanged",
+      "Normal PDF attachment"
+    ],
+    "explanation": "Same supplier as the fraud example, but no new bank details and no reply-to trick. Routine invoices are fine.",
+    "attachments": [
+      "ZS-2304.pdf"
+    ]
+  },
+  {
+    "id": "ng-a-l07",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Cloud Sharing",
+    "sender": {
+      "name": "Tunde Bakare (via Google Docs)",
+      "email": "drive-shares-dm-noreply@google.com"
+    },
+    "subject": "Document shared with you: \"Town Hall Agenda – Q4\"",
+    "date": "2026-10-16T10:24:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#FFFFFF;padding:18px 24px;border-bottom:1px solid #e5e5e5;'><span style='color:#4285F4;font-size:22px;font-weight:bold;letter-spacing:.3px'>Google</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Tunde Bakare (tunde.bakare@brightpath.ng) shared a document.</p><p style='margin:0 0 14px'>Town Hall Agenda – Q4<br>\"Adebayo asked me to share this ahead of Friday.\"</p><p style='margin:22px 0;text-align:center'><a href='https://docs.google.com/document/d/1QxT4kZ/edit' style='display:inline-block;background:#1a73e8;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Open</a></p><p style='margin:0 0 14px'>Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from google.com",
+      "Shows the colleague's real brightpath.ng address",
+      "Link goes to docs.google.com",
+      "Matches the town hall email you already received"
+    ],
+    "explanation": "Real Google sharing emails come from google.com and open on docs.google.com. The context also lines up with other emails."
+  },
+  {
+    "id": "ng-a-l08",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Zenith Bank",
+      "email": "ebusiness@zenithbank.com"
+    },
+    "subject": "Card transaction declined",
+    "date": "2026-10-16T12:37:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#E30613;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Zenith Bank</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Dear ADA OKAFOR,</p><p style='margin:0 0 14px'>A transaction of ₦250,000.00 on your debit card ending 3309 at ONLINE-STORE-LTD was declined because it exceeded your daily limit.</p><p style='margin:0 0 14px'>If you did not attempt this transaction, please block your card immediately through the Zenith mobile app or *966#, and contact us on the number on the back of your card.</p><p style='margin:0 0 14px'>Zenith Bank will never ask for your PIN, OTP or password.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official zenithbank.com domain",
+      "No link, points to the app and USSD",
+      "Masked card number",
+      "Reminds you the bank never asks for your PIN"
+    ],
+    "explanation": "Alarming but genuine: it tells you to act through channels you already trust, not through the email."
+  },
+  {
+    "id": "ng-a-l09",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Payments",
+    "sender": {
+      "name": "Remita",
+      "email": "noreply@remita.net"
+    },
+    "subject": "Payment receipt – RRR 2900-1847-3361",
+    "date": "2026-10-12T15:12:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#F15A29;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Remita</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Payment Successful</p><p style='margin:0 0 14px'>RRR: 2900-1847-3361<br>Payer: Ada Okafor<br>Description: Passport Renewal Fee<br>Amount: ₦35,000.00<br>Channel: Card</p><p style='margin:0 0 14px'>You can verify this payment anytime at remita.net using your RRR.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official remita.net domain",
+      "Receipt for a payment you made",
+      "Lets you verify independently with the RRR"
+    ],
+    "explanation": "A receipt that invites you to verify it yourself is a strong sign of legitimacy."
+  },
+  {
+    "id": "ng-a-l10",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "LinkedIn",
+      "email": "security-noreply@linkedin.com"
+    },
+    "subject": "Ada, here's the link to reset your password",
+    "date": "2026-10-16T14:44:00",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#0A66C2;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>LinkedIn</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>You recently requested a password reset from Chrome on Windows (Lagos, Nigeria).</p><p style='margin:22px 0;text-align:center'><a href='https://www.linkedin.com/checkpoint/rp/password-reset?token=7Yq2' style='display:inline-block;background:#0A66C2;color:#fff;padding:12px 26px;border-radius:6px;text-decoration:none;font-weight:bold'>Reset password</a></p><p style='margin:0 0 14px'>This link will expire in 24 hours. If you didn't request a password reset, you can ignore this email and your password will not be changed.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Official linkedin.com security sender",
+      "Link stays on linkedin.com",
+      "Shows device and location of the request",
+      "Safe to ignore if you didn't request it"
+    ],
+    "explanation": "Expected password-reset emails are fine when the link goes to the real domain. If you didn't request one, ignore it."
+  },
+  {
+    "id": "adv_001",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "E-Signature",
+    "sender": {
+      "name": "DocuSign",
+      "email": "dse@docusign-mail.net"
+    },
+    "subject": "Action Required: Please sign 'Contract Amendment 2024.pdf'",
+    "date": "2024-01-15T11:30:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #fff; padding: 20px; border-bottom: 2px solid #005cb9;'><img src='https://www.docusign.com/sites/default/files/docusign_logo_blue.png' alt='DocuSign' style='height: 40px;'></div><div style='padding: 20px;'><p>Hi Ada,</p><p><strong>Sarah Miller (sarah.miller@partnercorp.com)</strong> has sent you a document to review and sign.</p><div style='background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #005cb9;'><p style='margin: 0; font-size: 18px; font-weight: bold;'>Contract Amendment 2024.pdf</p><p style='margin: 10px 0 0 0; color: #666;'>Message from Sarah:</p><p style='margin: 5px 0; font-style: italic; color: #333;'>'Hi Ada, please review and sign the amended contract. We need this back by EOD today to meet our deadline. Let me know if you have any questions!'</p></div><div style='text-align: center; margin: 30px 0;'><a href='http://docusign-secure-document.net/sign/abc123' style='background: #005cb9; color: white; padding: 15px 50px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; font-size: 16px;'>REVIEW DOCUMENT</a></div><p style='font-size: 12px; color: #666;'>This document will expire in 7 days. Do not forward this email as it contains a unique link.</p><hr style='border: none; border-top: 1px solid #ddd; margin: 30px 0;'><p style='font-size: 12px; color: #666;'>About DocuSign: DocuSign helps organizations connect and automate how they prepare, sign, act on, and manage agreements.</p><p style='font-size: 12px; color: #666;'>Questions about the document? Contact the sender.</p><p style='font-size: 12px; color: #666;'>© 2024 DocuSign, Inc. | <a href='#'>Privacy</a> | <a href='#'>Unsubscribe</a></p></div></div>",
+    "red_flags": [
+      {
+        "description": "Sender domain is docusign-mail.net. Real DocuSign envelopes come from docusign.net",
+        "location": "From: dse@docusign-mail.net"
+      },
+      {
+        "description": "The REVIEW DOCUMENT button goes to docusign-secure-document.net, not docusign.net",
+        "location": "REVIEW DOCUMENT button"
+      },
+      {
+        "description": "Pressure to sign by end of day",
+        "location": "Message from Sarah"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "A fake DocuSign request. The sender and the link both use lookalike domains; real DocuSign emails come from docusign.net and links stay on docusign.net. If you weren't expecting a document, check with the sender another way."
+  },
+  {
+    "id": "adv_002",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "Slack",
+      "email": "notifications@slack-mail.com"
+    },
+    "subject": "You have a new direct message from #general",
+    "date": "2024-01-14T15:45:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #4a154b; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>slack</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada,</p><p>You have <strong>1 unread message</strong> in your workspace.</p><div style='background: #f8f8f8; padding: 15px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #4a154b;'><div style='display: flex; align-items: flex-start;'><div style='width: 40px; height: 40px; background: #e01e5a; border-radius: 5px; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;'>MC</div><div style='flex: 1;'><p style='margin: 0; font-weight: bold;'>Michael Chen <span style='font-weight: normal; color: #666;'>@ 3:42 PM</span></p><p style='margin: 5px 0 0 0;'>Hey Ada, can you check this document I shared? It's the Q4 report we discussed. <a href='#' style='color: #1264a3;'>https://docs.google.com/...</a></p></div></div></div><div style='text-align: center; margin: 30px 0;'><a href='http://slack-workspace-login.net/messages' style='background: #4a154b; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>OPEN IN SLACK</a></div><p style='font-size: 12px; color: #666;'>You're receiving this email because you have notifications enabled for direct messages.</p><p style='font-size: 12px; color: #666;'><a href='#' style='color: #1264a3;'>Change notification settings</a></p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Slack Technologies, LLC | 500 Howard Street, San Francisco, CA 94105</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Slack emails come from 'slack.com' not 'slack-mail.com'",
+        "location": "From: notifications@slack-mail.com"
+      },
+      {
+        "description": "Link goes to 'slack-workspace-login.net' not slack.com",
+        "location": "OPEN IN SLACK button"
+      },
+      {
+        "description": "The message preview contains a suspicious Google Docs link",
+        "location": "Message content"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a phishing email impersonating Slack. The sender domain 'slack-mail.com' is fake. The link is designed to steal Slack credentials. The message preview includes a suspicious link that could lead to malware."
+  },
+  {
+    "id": "adv_003",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "sender": {
+      "name": "Google Workspace",
+      "email": "workspace-noreply@google.com"
+    },
+    "subject": "Security alert: New device signed in to your Google Account",
+    "date": "2024-01-13T08:15:00",
+    "body": "<div style='font-family: Roboto, Arial, sans-serif; max-width: 600px;'><div style='padding: 20px;'><div style='text-align: center; margin-bottom: 20px;'><img src='https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png' alt='Google' style='height: 30px;'></div><h2 style='color: #202124; font-size: 24px; margin: 0 0 20px 0;'>New sign-in from iPhone</h2><p style='color: #5f6368; font-size: 16px;'>Hi Ada,</p><p style='color: #5f6368; font-size: 16px;'>Your Google Account <strong>ada.okafor@gmail.com</strong> was just signed in to from a new iPhone device. You're getting this email to make sure it was you.</p><div style='background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 8px;'><p style='margin: 0; color: #202124; font-weight: bold;'>Device: iPhone 14 Pro</p><p style='margin: 5px 0; color: #5f6368;'>Location: New York, NY, USA</p><p style='margin: 5px 0; color: #5f6368;'>Time: January 13, 2024, 8:12 AM EST</p><p style='margin: 5px 0; color: #5f6368;'>IP Address: 172.58.XXX.XXX</p></div><div style='text-align: center; margin: 30px 0;'><a href='https://myaccount.google.com/device-activity' style='background: #1a73e8; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-right: 10px;'>YES, IT WAS ME</a><a href='https://myaccount.google.com/security-checkup' style='background: #fff; color: #1a73e8; border: 1px solid #dadce0; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>NO, SECURE ACCOUNT</a></div><p style='color: #5f6368; font-size: 14px;'>If you don't recognize this activity, someone else might be using your account. Don't recognize this activity? <a href='https://support.google.com/accounts/answer/6294825' style='color: #1a73e8;'>Check if it's spam</a></p><p style='color: #5f6368; font-size: 14px; margin-top: 30px;'>Why are we sending this? We take security very seriously and we want to keep you in the loop on important actions in your account.</p><p style='color: #5f6368; font-size: 14px;'>The Google Accounts team</p><hr style='border: none; border-top: 1px solid #dadce0; margin: 30px 0;'><p style='color: #5f6368; font-size: 12px; text-align: center;'>© 2024 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from google.com",
+      "Links go to myaccount.google.com",
+      "Gives you choices instead of demanding action"
+    ],
+    "explanation": "This is a legitimate Google security alert. The sender domain is correct (google.com), the links go to myaccount.google.com, and the email provides specific device details without asking for passwords or personal information."
+  },
+  {
+    "id": "adv_004",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "Zoom Video Communications",
+      "email": "no-reply@zoom.us"
+    },
+    "subject": "You missed a Zoom meeting: 'Q1 Planning Session'",
+    "date": "2024-01-12T14:00:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #2d8cff; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>zoom</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada Okafor,</p><p>You missed a scheduled Zoom meeting.</p><div style='background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;'><p style='margin: 0; font-size: 18px; font-weight: bold; color: #333;'>Q1 Planning Session</p><p style='margin: 10px 0 0 0; color: #666;'><strong>Host:</strong> Sarah Miller (sarah.miller@company.com)</p><p style='margin: 5px 0; color: #666;'><strong>Scheduled:</strong> January 12, 2024 at 1:00 PM - 2:00 PM EST</p><p style='margin: 5px 0; color: #666;'><strong>Meeting ID:</strong> 847 3921 4567</p></div><p>A recording of this meeting may be available. Contact the host for access.</p><div style='text-align: center; margin: 30px 0;'><a href='https://zoom.us/meeting/register/abc123' style='background: #2d8cff; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>VIEW MEETING DETAILS</a></div><p style='font-size: 12px; color: #666;'>You received this email because you were invited to this meeting.</p><p style='font-size: 12px; color: #666;'><a href='https://zoom.us/profile/notification' style='color: #2d8cff;'>Manage email notifications</a></p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Zoom Video Communications, Inc. | 55 Almaden Boulevard, San Jose, CA 95113</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from zoom.us",
+      "Links go to zoom.us",
+      "Informational, asks for nothing"
+    ],
+    "explanation": "This is a legitimate Zoom notification. The sender domain is correct (zoom.us), the link goes to zoom.us, and the meeting details are specific. The host email matches the company domain."
+  },
+  {
+    "id": "adv_005",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Cloud Sharing",
+    "sender": {
+      "name": "Dropbox",
+      "email": "no-reply@dropbox.com"
+    },
+    "subject": "Sarah Miller shared 'Q4 Financial Reports.xlsx' with you",
+    "date": "2024-01-11T10:30:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #0061ff; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Dropbox</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada,</p><p><strong>Sarah Miller</strong> (sarah.miller@company.com) shared a file with you.</p><div style='background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center;'><div style='font-size: 48px; margin-bottom: 10px;'>📊</div><p style='margin: 0; font-size: 18px; font-weight: bold;'>Q4 Financial Reports.xlsx</p><p style='margin: 5px 0; color: #666;'>Excel Spreadsheet • 2.4 MB</p><p style='margin: 15px 0 0 0; color: #666; font-style: italic;'>'Hi Ada, here are the Q4 reports we discussed. Please review and let me know your thoughts. -Sarah'</p></div><div style='text-align: center; margin: 30px 0;'><a href='https://www.dropbox.com/s/abc123/q4-reports' style='background: #0061ff; color: white; padding: 15px 50px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>ACCESS FILE</a></div><p style='font-size: 12px; color: #666;'>Don't have Dropbox? <a href='https://www.dropbox.com/register' style='color: #0061ff;'>Create an account</a> to access this file.</p><p style='font-size: 12px; color: #666;'>This link will expire on February 10, 2024.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>© 2024 Dropbox | <a href='https://www.dropbox.com/privacy' style='color: #0061ff;'>Privacy Policy</a></p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from dropbox.com",
+      "Links go to dropbox.com",
+      "Shared by a named colleague with a normal message"
+    ],
+    "explanation": "This is a legitimate Dropbox sharing notification. The sender domain is correct (dropbox.com), the link goes to dropbox.com, and the sender's email matches the company domain. The file details and message are specific."
+  },
+  {
+    "id": "legit_001",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Shopping",
+    "sender": {
+      "name": "Amazon",
+      "email": "order-update@amazon.com"
+    },
+    "subject": "Your Amazon.com order has shipped (#112-8473921-4567382)",
+    "date": "2024-01-15T16:30:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #232f3e; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>amazon</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hello Ada,</p><p>Great news! Your order has shipped.</p><div style='background: #f3f3f3; padding: 15px; margin: 20px 0;'><p style='margin: 0;'><strong>Order #112-8473921-4567382</strong></p></div><table style='width: 100%; border-collapse: collapse;'><tr><td style='padding: 10px; border-bottom: 1px solid #ddd;'><img src='https://m.media-amazon.com/images/I/71XYZ.jpg' alt='Product' style='width: 80px;'></td><td style='padding: 10px; border-bottom: 1px solid #ddd;'><p style='margin: 0;'><strong>Wireless Bluetooth Headphones</strong></p><p style='margin: 5px 0; color: #666;'>Sold by: AudioTech Store</p></td><td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: right;'><p style='margin: 0;'>$49.99</p></td></tr></table><p><strong>Shipping Address:</strong><br>Ada Okafor<br>123 Main Street, Apt 4B<br>New York, NY 10001</p><p><strong>Estimated Delivery:</strong> January 18, 2024</p><p>You can track your package at: <a href='https://www.amazon.com/gp/your-account/order-details'>Order Details</a></p><p>Thank you for shopping with Amazon!</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>© 2024 Amazon.com, Inc. or its affiliates</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from amazon.com",
+      "Order number and item you can check in your account",
+      "Link goes to amazon.com",
+      "Asks for no payment or login details"
+    ],
+    "explanation": "This is a legitimate Amazon shipping confirmation. The sender domain is correct (amazon.com), the order number format is valid, and the link goes to the official Amazon website. It includes specific order details and shipping address."
+  },
+  {
+    "id": "legit_002",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "offers",
+    "topic": "Subscriptions",
+    "sender": {
+      "name": "Netflix",
+      "email": "info@mailer.netflix.com"
+    },
+    "subject": "New sign-in to your Netflix account",
+    "date": "2024-01-14T19:45:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #e50914; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>NETFLIX</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada,</p><p>We noticed a new sign-in to your Netflix account.</p><div style='background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px;'><p style='margin: 0;'><strong>Sign-in Details:</strong></p><p style='margin: 10px 0 0 0;'><strong>Date & Time:</strong> January 14, 2024 at 7:42 PM EST<br><strong>Device:</strong> iPhone 14 Pro<br><strong>Location:</strong> New York, NY, United States<br><strong>IP Address:</strong> 192.168.1.XXX</p></div><p>If this was you, no action is needed.</p><p style='background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107;'><strong>If you don't recognize this activity:</strong><br>Please <a href='https://www.netflix.com/password'>change your password</a> immediately and contact us.</p><p>Stay secure,<br>The Netflix Team</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Questions? Visit <a href='https://help.netflix.com'>help.netflix.com</a></p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "mailer.netflix.com is a Netflix subdomain",
+      "Says no action is needed if it was you",
+      "Links go to netflix.com",
+      "Never asks for your card or password in the email"
+    ],
+    "explanation": "This is a legitimate Netflix security alert. Netflix uses 'mailer.netflix.com' for notifications, which is a valid subdomain. The link goes to netflix.com, and the email provides specific sign-in details without asking you to click suspicious links."
+  },
+  {
+    "id": "legit_003",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Transport",
+    "sender": {
+      "name": "Uber",
+      "email": "receipts@uber.com"
+    },
+    "subject": "Your Thursday evening trip with Uber",
+    "date": "2024-01-11T22:15:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #000; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Uber</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Thanks for riding, Ada</p><div style='text-align: center; margin: 30px 0;'><p style='font-size: 48px; margin: 0; color: #276ef1; font-weight: bold;'>$24.50</p><p style='color: #666; margin: 5px 0;'>Charged to Visa ending in 4521</p></div><div style='background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px;'><p style='margin: 0;'><strong>Trip Details</strong></p><p style='margin: 10px 0 0 0;'><strong>Date:</strong> Thursday, January 11, 2024<br><strong>Time:</strong> 9:32 PM - 9:58 PM<br><strong>Driver:</strong> Michael T. (4.92★)</p></div><p><strong>Route:</strong><br>📍 123 Main Street, New York, NY<br>🏁 456 Broadway, New York, NY</p><p style='margin-top: 20px;'><a href='https://riders.uber.com/trips/abc123' style='color: #276ef1;'>View full trip details</a> | <a href='https://help.uber.com' style='color: #276ef1;'>Need help?</a></p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>© 2024 Uber Technologies Inc.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from uber.com",
+      "Trip details you can match to a real ride",
+      "Links go to uber.com"
+    ],
+    "explanation": "This is a legitimate Uber receipt. The sender domain is correct (uber.com), the trip details are specific, and the links go to official Uber domains. The formatting and content match typical Uber receipts."
+  },
+  {
+    "id": "legit_004",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "offers",
+    "topic": "Subscriptions",
+    "sender": {
+      "name": "Spotify",
+      "email": "no-reply@spotify.com"
+    },
+    "subject": "Your Spotify Premium receipt",
+    "date": "2024-01-10T08:00:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #1db954; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Spotify</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada,</p><p>Thanks for being a Premium subscriber! Here's your monthly receipt.</p><div style='background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px;'><p style='margin: 0;'><strong>Spotify Premium Individual</strong></p><p style='margin: 5px 0; color: #666;'>Monthly subscription</p><p style='margin: 15px 0 0 0; font-size: 24px; font-weight: bold;'>$10.99</p><p style='margin: 5px 0; color: #666; font-size: 12px;'>Charged on January 10, 2024</p></div><p><strong>Payment Method:</strong><br>Visa ending in 4521</p><p><strong>Billing Period:</strong><br>January 10, 2024 - February 9, 2024</p><p>Manage your subscription: <a href='https://www.spotify.com/account'>Account Overview</a></p><p>Thanks for listening!<br>The Spotify Team</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Spotify USA Inc. | 150 Greenwich Street, New York, NY 10007</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from spotify.com",
+      "Only the last 4 card digits are shown",
+      "Link goes to spotify.com",
+      "Nothing to pay or verify"
+    ],
+    "explanation": "This is a legitimate Spotify receipt. The sender domain is correct (spotify.com), the pricing matches Spotify's actual plans, and the link goes to the official Spotify account page. The formatting matches typical Spotify emails."
+  },
+  {
+    "id": "legit_005",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "offers",
+    "topic": "Subscriptions",
+    "sender": {
+      "name": "Apple",
+      "email": "no_reply@email.apple.com"
+    },
+    "subject": "Your invoice from Apple",
+    "date": "2024-01-09T14:20:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #000; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'> Apple</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada,</p><p>Thank you for your purchase.</p><div style='background: #f5f5f5; padding: 20px; margin: 20px 0; text-align: center;'><p style='margin: 0; color: #666;'>APPLE ID</p><p style='margin: 5px 0; font-weight: bold;'>ada.okafor@email.com</p><p style='margin: 20px 0 0 0; color: #666;'>INVOICE DATE</p><p style='margin: 5px 0; font-weight: bold;'>Jan 09, 2024</p><p style='margin: 20px 0 0 0; color: #666;'>ORDER ID</p><p style='margin: 5px 0; font-weight: bold;'>MT8X9J2K3L4M</p></div><table style='width: 100%; border-collapse: collapse; margin: 20px 0;'><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 15px 0;'><p style='margin: 0; font-weight: bold;'>iCloud+ 50GB</p><p style='margin: 5px 0 0 0; color: #666; font-size: 14px;'>Monthly subscription</p></td><td style='padding: 15px 0; text-align: right;'><p style='margin: 0;'>$0.99</p></td></tr><tr><td style='padding: 15px 0;'><p style='margin: 0; font-weight: bold;'>TOTAL</p></td><td style='padding: 15px 0; text-align: right;'><p style='margin: 0; font-weight: bold;'>$0.99</p></td></tr></table><p>Payment method: Visa ending in 4521</p><p>If you have questions about this invoice, <a href='https://support.apple.com/billing'>contact Apple Support</a>.</p><p>Thank you,<br>Apple</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Apple Inc. | One Apple Park Way, Cupertino, CA 95014</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "email.apple.com belongs to Apple",
+      "Invoice with an order ID you can check",
+      "Support link goes to apple.com"
+    ],
+    "explanation": "This is a legitimate Apple invoice. Apple uses 'email.apple.com' for notifications. The invoice includes specific details like Apple ID, order ID, and matches Apple's typical formatting. The link goes to support.apple.com."
+  },
+  {
+    "id": "bank_001",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Chase Security",
+      "email": "security@chase-secure.com"
+    },
+    "subject": "URGENT: Your Account Has Been Compromised",
+    "date": "2024-01-15T09:23:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #0b4f9c; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Chase Bank</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Dear Valued Customer,</p><p>We have detected <strong>suspicious activity</strong> on your account. Multiple failed login attempts were made from an unknown device in <strong>Istanbul, Turkey</strong>.</p><p style='background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107;'><strong>Action Required:</strong> Verify your identity within 24 hours or your account will be suspended.</p><div style='text-align: center; margin: 30px 0;'><a href='http://chase-verify-now.com/secure-login' style='background: #0b4f9c; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>VERIFY MY ACCOUNT</a></div><p>If you did not attempt these logins, please disregard this message.</p><p>Best regards,<br>Chase Security Team</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 12px; color: #666; text-align: center;'><p>© 2024 Chase Bank. All rights reserved.</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Sender email uses 'chase-secure.com' instead of official 'chase.com' domain",
+        "location": "From: security@chase-secure.com"
+      },
+      {
+        "description": "Creates false urgency with '24 hours' threat",
+        "location": "Subject and body text"
+      },
+      {
+        "description": "Link domain 'chase-verify-now.com' is not chase.com",
+        "location": "VERIFY MY ACCOUNT button"
+      },
+      {
+        "description": "Uses generic 'Dear Valued Customer' instead of your name",
+        "location": "Opening greeting"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a classic phishing email impersonating Chase Bank. The sender domain 'chase-secure.com' is fake - Chase only uses 'chase.com'. The urgency tactics and suspicious verification link are designed to panic you into clicking without thinking."
+  },
+  {
+    "id": "bank_002",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Wells Fargo",
+      "email": "alerts@wellsfargo.com"
+    },
+    "subject": "Your monthly statement is ready",
+    "date": "2024-01-14T14:30:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #d71e28; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Wells Fargo</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hello,</p><p>Your monthly statement for account ending in 4521 is now available.</p><p>You can view or download it any time by signing in to the Wells Fargo app or wellsfargo.com.</p><p>For your security, we will never ask for your password, PIN or one-time code by email.</p><div style='text-align: center; margin: 30px 0;'><a href='https://www.wellsfargo.com/' style='background: #d71e28; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>Sign on to view</a></div><p>Thank you for banking with Wells Fargo.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 12px; color: #666; text-align: center;'><p>© 2024 Wells Fargo. All rights reserved. | <a href='#'>Privacy Policy</a> | <a href='#'>Unsubscribe</a></p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from wellsfargo.com",
+      "Link goes to wellsfargo.com",
+      "Masked account number, no request for PIN or password",
+      "No urgency or threats: it simply tells you a statement is available",
+      "Still safest to open the banking app yourself instead of the link"
+    ],
+    "explanation": "This is a legitimate Wells Fargo email. The sender domain is correct (wellsfargo.com), the link goes to the official wellsfargo.com domain, the account number is masked, and nothing is urgent or asks for details. Even so, opening the banking app yourself is the safest habit."
+  },
+  {
+    "id": "bank_003",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "PayPal",
+      "email": "service@paypal-security.org"
+    },
+    "subject": "Your PayPal account has been limited #PP-9847",
+    "date": "2024-01-13T11:15:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #003087; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>PayPal</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Dear PayPal User,</p><p>We have limited access to your PayPal account due to suspicious activity.</p><p><strong>Case ID:</strong> PP-2024-9847</p><p style='background: #ffe6e6; padding: 15px; border: 1px solid #ff0000;'><strong>Why is my account access limited?</strong><br>We noticed an attempt to sign in to your account from an unrecognized device in Russia.</p><p>To restore full access to your account, we need you to confirm your identity:</p><ol><li>Click the button below</li><li>Log in to your account</li><li>Follow the verification steps</li></ol><div style='text-align: center; margin: 30px 0;'><a href='http://paypal-verification-center.net/login' style='background: #0070ba; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;'>RESOLVE NOW</a></div><p style='font-size: 12px; color: #666;'>If you don't complete this process within 48 hours, your account will be permanently suspended.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>PayPal Security Team | Please don't reply to this email</p></div></div>",
+    "red_flags": [
+      {
+        "description": "PayPal never uses 'paypal-security.org' domain - only 'paypal.com'",
+        "location": "From: service@paypal-security.org"
+      },
+      {
+        "description": "Link goes to 'paypal-verification-center.net' not paypal.com",
+        "location": "RESOLVE NOW button"
+      },
+      {
+        "description": "Uses 'Dear PayPal User' instead of your actual name",
+        "location": "Opening greeting"
+      },
+      {
+        "description": "Threatens permanent suspension to create panic",
+        "location": "48 hours warning"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a phishing email. PayPal only sends emails from 'paypal.com' domains. The fake domain 'paypal-security.org' and the suspicious verification link are clear indicators. PayPal also addresses you by your full name, never generic greetings."
+  },
+  {
+    "id": "bank_004",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Bank of America",
+      "email": "notifications@bankofamerica.com"
+    },
+    "subject": "Your debit card transaction receipt",
+    "date": "2024-01-12T16:45:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #012169; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Bank of America</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi ADA,</p><p>Here is your transaction receipt:</p><table style='width: 100%; border-collapse: collapse; margin: 20px 0;'><tr style='background: #f5f5f5;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Date</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>Jan 12, 2024</td></tr><tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Merchant</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>STARBUCKS #2847</td></tr><tr style='background: #f5f5f5;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Amount</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>$8.47</td></tr><tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Card Used</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>****4521</td></tr></table><p>You can view all your transactions by signing in to <a href='https://www.bankofamerica.com'>Online Banking</a> or the Mobile Banking app.</p><p>Questions? Call us at 1-800-432-1000</p><p>Thank you for choosing Bank of America.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>© 2024 Bank of America Corporation. All rights reserved.</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from bankofamerica.com",
+      "Masked card number",
+      "Tells you to sign in through the app or website yourself"
+    ],
+    "explanation": "This is a legitimate Bank of America transaction receipt. The sender domain is correct (bankofamerica.com), the link goes to the official website, and it includes specific transaction details. The greeting includes the customer's name."
+  },
+  {
+    "id": "bank_005",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "sender": {
+      "name": "Venmo",
+      "email": "venmo@email-venmo.com"
+    },
+    "subject": "You received $500.00 from Sarah Miller",
+    "date": "2024-01-11T08:20:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #008CFF; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>venmo</h2></div><div style='padding: 20px; border: 1px solid #ddd; text-align: center;'><p style='font-size: 18px;'>💰 <strong>Sarah Miller</strong> paid you</p><p style='font-size: 36px; color: #008CFF; font-weight: bold; margin: 20px 0;'>$500.00</p><p style='background: #e8f5e9; padding: 15px; border-radius: 5px;'>For: Freelance website design project</p><p style='color: #666; margin-top: 20px;'>This payment is pending verification of your account details.</p><div style='text-align: center; margin: 30px 0;'><a href='http://venmo-payment-confirm.net/claim' style='background: #008CFF; color: white; padding: 15px 50px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; font-size: 18px;'>CLAIM PAYMENT</a></div><p style='font-size: 12px; color: #666;'>Payment expires in 24 hours if not claimed.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Venmo is a service of PayPal, Inc.</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Venmo emails come from 'venmo.com' not 'email-venmo.com'",
+        "location": "From: venmo@email-venmo.com"
+      },
+      {
+        "description": "Link domain 'venmo-payment-confirm.net' is not venmo.com",
+        "location": "CLAIM PAYMENT button"
+      },
+      {
+        "description": "Venmo doesn't hold payments for 'verification' - this is a common scam",
+        "location": "Pending verification message"
+      },
+      {
+        "description": "Creates false urgency with 24-hour expiration",
+        "location": "Payment expires message"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a phishing scam. Venmo never holds payments for verification, and all official emails come from 'venmo.com'. The fake payment lure and suspicious claim link are designed to steal your Venmo login credentials."
+  },
+  {
+    "id": "corp_001",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "Michael Chen",
+      "email": "m.chen@company-secure.net"
+    },
+    "subject": "URGENT: Wire Transfer Authorization Needed",
+    "date": "2024-01-15T07:45:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='padding: 20px;'><p>Hi there,</p><p>I'm currently in back-to-back meetings and need your help with an urgent wire transfer for a confidential acquisition.</p><p>I need you to process a wire transfer of <strong>$47,500</strong> to our vendor immediately. This is time-sensitive as the deal closes today.</p><p>Here are the wire instructions:</p><div style='background: #f5f5f5; padding: 15px; margin: 15px 0; border-left: 4px solid #333;'><p><strong>Bank:</strong> First International Bank<br><strong>Account:</strong> 884739201456<br><strong>Routing:</strong> 021000021<br><strong>Beneficiary:</strong> Global Ventures LLC<br><strong>Reference:</strong> CONFIDENTIAL-ACQ-2024</p></div><p>Please confirm once processed. Do not discuss this with anyone else as it's a confidential matter.</p><p>Thanks,<br>Michael Chen<br>Chief Financial Officer</p><p style='font-size: 12px; color: #666; margin-top: 30px;'>Sent from my iPhone</p></div></div>",
+    "red_flags": [
+      {
+        "description": "CFO's email uses suspicious 'company-secure.net' domain instead of company domain",
+        "location": "From: m.chen@company-secure.net"
+      },
+      {
+        "description": "Creates urgency and asks to keep secret - classic CEO fraud tactics",
+        "location": "Subject and body text"
+      },
+      {
+        "description": "Uses 'Hi there' instead of addressing by name",
+        "location": "Opening greeting"
+      },
+      {
+        "description": "Unusual wire transfer request via email, asking to bypass normal procedures",
+        "location": "Wire transfer instructions"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a CEO fraud (BEC) phishing email. The attacker impersonates the CFO using a lookalike domain. The urgency, secrecy, and unusual wire request are red flags. Always verify wire transfers through a separate communication channel."
+  },
+  {
+    "id": "corp_002",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "IT Help Desk",
+      "email": "it-support@brightpath.ng"
+    },
+    "subject": "Your password expires in 3 days",
+    "date": "2024-01-14T09:00:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #2c3e50; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>BrightPath IT Department</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hello Ada Okafor,</p><p>Your BrightPath network password will expire in <strong>3 days</strong> (January 17, 2024).</p><p>To avoid any disruption to your access, please update your password before the expiration date.</p><div style='background: #e3f2fd; padding: 15px; margin: 20px 0; border-radius: 5px;'><p style='margin: 0;'><strong>How to change your password:</strong></p><ol style='margin: 10px 0;'><li>Log in to the <a href='https://portal.brightpath.ng/password'>IT Self-Service Portal</a></li><li>Click 'Change Password'</li><li>Follow the password requirements</li></ol></div><p><strong>Password Requirements:</strong></p><ul><li>Minimum 12 characters</li><li>Include uppercase, lowercase, numbers, and symbols</li><li>Cannot reuse previous 5 passwords</li></ul><p>If you need assistance, please contact the IT Help Desk at ext. 4357 or <a href='mailto:it-help@brightpath.ng'>it-help@brightpath.ng</a>.</p><p>Best regards,<br>BrightPath IT Support Team</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>BrightPath Internal Systems | Do not forward this email</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from your company domain, brightpath.ng",
+      "Points to the company IT portal you already use",
+      "Three days' notice with clear steps, no threat"
+    ],
+    "explanation": "This is a legitimate IT notification. The sender domain matches the company domain (brightpath.ng), the link goes to an internal portal, and it includes specific employee information. The tone is professional and provides proper contact channels."
+  },
+  {
+    "id": "corp_003",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "Microsoft 365 Security",
+      "email": "security@microsoft-365-verify.com"
+    },
+    "subject": "Your mailbox storage is full - Immediate action required",
+    "date": "2024-01-13T10:30:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #0078d4; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>Microsoft 365</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Dear User,</p><div style='background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;'><p style='margin: 0;'><strong>⚠️ Storage Warning</strong></p><p style='margin: 5px 0 0 0;'>Your mailbox is 98% full (49.2 GB of 50 GB used)</p></div><p>You will not be able to send or receive emails once your storage reaches 100%.</p><p>To continue using your email without interruption, you must verify your account and upgrade your storage:</p><div style='text-align: center; margin: 30px 0;'><a href='http://microsoft-365-storage-upgrade.net/verify' style='background: #0078d4; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>VERIFY AND UPGRADE</a></div><p style='font-size: 12px; color: #666;'>If you do not take action within 24 hours, your account will be temporarily suspended.</p><p>Regards,<br>Microsoft 365 Support Team</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>Microsoft Corporation | One Microsoft Way, Redmond, WA 98052</p></div></div>",
+    "red_flags": [
+      {
+        "description": "Microsoft emails come from 'microsoft.com' not 'microsoft-365-verify.com'",
+        "location": "From: security@microsoft-365-verify.com"
+      },
+      {
+        "description": "Link goes to fake 'microsoft-365-storage-upgrade.net' domain",
+        "location": "VERIFY AND UPGRADE button"
+      },
+      {
+        "description": "Uses 'Dear User' instead of your name",
+        "location": "Opening greeting"
+      },
+      {
+        "description": "Creates false urgency with account suspension threat",
+        "location": "24 hours warning"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a phishing email. Microsoft never sends storage warnings via email with upgrade links. Official Microsoft emails come from 'microsoft.com' domains only. The suspicious link is designed to steal your Microsoft credentials."
+  },
+  {
+    "id": "corp_004",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "HR Department",
+      "email": "hr@brightpath.ng"
+    },
+    "subject": "Important: Benefits Enrollment Period Opens Today",
+    "date": "2024-01-12T08:00:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #27ae60; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>BrightPath Human Resources</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Dear BrightPath Employees,</p><p>The annual benefits enrollment period begins today, <strong>January 12, 2024</strong>, and runs through <strong>January 26, 2024</strong>.</p><p>This is your opportunity to:</p><ul><li>Review and update your health insurance coverage</li><li>Enroll in or adjust your 401(k) contributions</li><li>Update dependent information</li><li>Review voluntary benefits (dental, vision, life insurance)</li></ul><div style='background: #e8f5e9; padding: 15px; margin: 20px 0; border-radius: 5px;'><p style='margin: 0;'><strong>📅 Important Dates:</strong></p><p style='margin: 5px 0 0 0;'>• Enrollment Opens: January 12, 2024<br>• Enrollment Closes: January 26, 2024 at 11:59 PM EST<br>• Coverage Effective: February 1, 2024</p></div><p>To access the benefits portal, visit: <a href='https://benefits.brightpath.ng'>https://benefits.brightpath.ng</a></p><p>HR will be hosting information sessions this week:</p><ul><li>Wednesday, Jan 17 at 2:00 PM - Conference Room A</li><li>Friday, Jan 19 at 10:00 AM - Virtual (Teams link in portal)</li></ul><p>Questions? Contact HR at <a href='mailto:hr@brightpath.ng'>hr@brightpath.ng</a> or ext. 5000.</p><p>Best regards,<br>BrightPath HR Team</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>BrightPath Human Resources Department</p></div></div>",
+    "red_flags": [],
+    "trust_signals": [
+      "Sent from your company HR address",
+      "Two-week enrollment window, no rush",
+      "Links stay on the company domain"
+    ],
+    "explanation": "This is a legitimate HR benefits enrollment email. The sender domain matches the company (brightpath.ng), the link goes to an internal benefits portal, and it includes specific dates and contact information. The tone is informative without creating false urgency."
+  },
+  {
+    "id": "corp_005",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Workplace",
+    "sender": {
+      "name": "LinkedIn",
+      "email": "messages@linkedin-security.com"
+    },
+    "subject": "You have 3 new messages on LinkedIn",
+    "date": "2024-01-11T14:20:00",
+    "body": "<div style='font-family: Arial, sans-serif; max-width: 600px;'><div style='background: #0077b5; padding: 20px; text-align: center;'><h2 style='color: white; margin: 0;'>LinkedIn</h2></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Hi Ada,</p><p>You have <strong>3 unread messages</strong> waiting for you on LinkedIn.</p><div style='background: #f3f6f8; padding: 15px; margin: 20px 0; border-radius: 8px;'><div style='display: flex; align-items: center; margin-bottom: 15px;'><div style='width: 50px; height: 50px; background: #0077b5; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;'>SM</div><div><p style='margin: 0; font-weight: bold;'>Sarah Miller</p><p style='margin: 5px 0 0 0; color: #666; font-size: 14px;'>Hi Ada, I came across your profile and...</p></div></div><div style='display: flex; align-items: center; margin-bottom: 15px;'><div style='width: 50px; height: 50px; background: #0077b5; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;'>DR</div><div><p style='margin: 0; font-weight: bold;'>David Rodriguez</p><p style='margin: 5px 0 0 0; color: #666; font-size: 14px;'>Thanks for connecting! I'd love to...</p></div></div><div style='display: flex; align-items: center;'><div style='width: 50px; height: 50px; background: #0077b5; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;'>LJ</div><div><p style='margin: 0; font-weight: bold;'>Lisa Johnson</p><p style='margin: 5px 0 0 0; color: #666; font-size: 14px;'>Are you open to new opportunities? I...</p></div></div></div><div style='text-align: center; margin: 30px 0;'><a href='http://linkedin-messages-view.net/inbox' style='background: #0077b5; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;'>VIEW MESSAGES</a></div><p style='font-size: 12px; color: #666;'>Don't miss out on these professional opportunities. Messages expire after 30 days.</p></div><div style='background: #f5f5f5; padding: 15px; font-size: 11px; color: #666; text-align: center;'><p>LinkedIn Corporation | 1000 W Maude Ave, Sunnyvale, CA 94085</p></div></div>",
+    "red_flags": [
+      {
+        "description": "LinkedIn emails come from 'linkedin.com' not 'linkedin-security.com'",
+        "location": "From: messages@linkedin-security.com"
+      },
+      {
+        "description": "Link goes to 'linkedin-messages-view.net' not linkedin.com",
+        "location": "VIEW MESSAGES button"
+      },
+      {
+        "description": "LinkedIn messages don't expire - this is a fake urgency tactic",
+        "location": "Messages expire after 30 days"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "This is a phishing email. LinkedIn only sends emails from 'linkedin.com' domains. The suspicious link is designed to steal your LinkedIn credentials. LinkedIn messages also don't expire, so that claim is false."
+  }
+]

@@ -1,225 +1,41 @@
-/* PhishGuard App Styles */
+/* PhishGuard app-level styles (theme tokens live in index.css) */
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Focus styles for accessibility */
+::selection {
+  background: rgba(0, 204, 106, 0.3);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #05080d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #26354f;
+  border-radius: 6px;
+}
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #3b82f6;
+select:focus-visible {
+  outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
 
-/* Animation utilities */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.3s ease-out;
-}
-
-.animate-pulse-slow {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.animate-bounce-slow {
-  animation: bounce 2s ease-in-out infinite;
-}
-
-/* Email viewer specific styles */
-.email-content {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  line-height: 1.6;
-}
-
-.email-content a {
-  color: #0066cc;
-  text-decoration: underline;
-}
-
-.email-content a:hover {
-  color: #0052a3;
-}
-
-.email-content img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Red flag highlight styles */
-.red-flag-highlight {
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 2px dashed #ef4444;
-  border-radius: 4px;
-  padding: 2px 4px;
-}
-
-/* Quiz interface styles */
-.quiz-button {
-  transition: all 0.2s ease;
-}
-
-.quiz-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.quiz-button:active {
-  transform: translateY(0);
-}
-
-/* Progress bar animation */
-.progress-bar-animated {
-  transition: width 0.5s ease-out;
-}
-
-/* Card hover effects */
-.card-hover {
-  transition: all 0.2s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* Badge styles */
-.badge-difficulty-beginner {
-  background-color: #10b981;
-  color: white;
-}
-
-.badge-difficulty-intermediate {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.badge-difficulty-advanced {
-  background-color: #8b5cf6;
-  color: white;
-}
-
-/* Toast notification styles */
-.toast-success {
-  background-color: #10b981;
-  color: white;
-}
-
-.toast-error {
-  background-color: #ef4444;
-  color: white;
-}
-
-/* Responsive typography */
-@media (max-width: 640px) {
-  html {
-    font-size: 14px;
-  }
-}
-
-@media (min-width: 1536px) {
-  html {
-    font-size: 18px;
-  }
-}
-
-/* Print styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  
-  body {
-    background: white;
-  }
-}
-
-/* Dark mode support (future) */
-@media (prefers-color-scheme: dark) {
-  /* Dark mode styles can be added here */
-}
-
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .email-content a {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
+    scroll-behavior: auto !important;
   }
 }

@@ -4,34 +4,37 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.625rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Th3 SpaceIO palette: Deep Navy #0A1628, Cyber Black #05080D,
+       Terminal Green #00CC6A, Cool Gray #A7B0BC, Threat Red #FF3B30 */
+    --background: 216 60% 8%;
+    --foreground: 0 0% 100%;
+    --card: 217 57% 14%;
+    --card-foreground: 0 0% 100%;
+    --popover: 217 57% 14%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 151 100% 40%;
+    --primary-foreground: 216 44% 4%;
+    --secondary: 217 51% 19%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217 51% 17%;
+    --muted-foreground: 214 14% 70%;
+    --accent: 217 51% 19%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 3 100% 59%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 216 35% 22%;
+    --input: 216 35% 22%;
+    --ring: 151 100% 40%;
+    --radius: 0.75rem;
+    --sidebar-background: 216 60% 8%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 151 100% 40%;
+    --sidebar-primary-foreground: 216 44% 4%;
+    --sidebar-accent: 217 51% 19%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 216 35% 22%;
+    --sidebar-ring: 151 100% 40%;
+    color-scheme: dark;
   }
 
   .dark {
@@ -69,7 +72,14 @@
   * {
     @apply border-border;
   }
+  html {
+    background: #05080D;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground antialiased;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(0, 204, 106, 0.08), transparent 60%),
+      linear-gradient(180deg, #0A1628 0px, #05080D 900px) no-repeat,
+      #05080D;
   }
 }
