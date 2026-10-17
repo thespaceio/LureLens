@@ -1,12 +1,15 @@
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
-import { inspectAttr } from 'kimi-plugin-inspect-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
-  plugins: [inspectAttr(), react()],
+  build: {
+    // The email bank is bundled into the main chunk on purpose (works offline).
+    chunkSizeWarningLimit: 700,
+  },
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

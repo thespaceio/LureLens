@@ -1,264 +1,167 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import DOMPurify from 'dompurify';
-import { Mail, User, Clock, AlertTriangle, ExternalLink } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Paperclip } from 'lucide-react';
+import type { Email } from '@/types';
 
 interface EmailViewerProps {
-  sender: {
-    name: string;
-    email: string;
-  };
-  subject: string;
-  date: string;
-  body: string;
-  showRedFlags?: boolean;
-  redFlags?: {
-    element: string;
-    description: string;
-    location: string;
-  }[];
+  email: Email;
+  /** Called when a link is hovered, focused or clicked. Links never open. */
+  onLinkInspect?: (url: string, clicked: boolean) => void;
+  /** Outline every link (used when reviewing an email after answering). */
+  highlightLinks?: boolean;
 }
 
-export const EmailViewer: React.FC<EmailViewerProps> = ({
-  sender,
-  subject,
-  date,
-  body,
-  showRedFlags = false,
-  redFlags = [],
-}) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [iframeHeight, setIframeHeight] = useState(400);
+const EMAIL_STYLES = `
+  :host { all: initial; display: block; }
+  .mail { font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #222;
+          padding: 20px; overflow-wrap: anywhere; }
+  .mail img, .mail table { max-width: 100%; }
+  .mail a[data-href] { cursor: pointer; }
+  .mail a[data-href]:focus { outline: 2px solid #1a62d6; outline-offset: 2px; }
+  .mail.highlight a[data-href] { outline: 2px dashed #e5484d; outline-offset: 3px; }
+`;
 
-  // Sanitize HTML content
-  const sanitizedHtml = DOMPurify.sanitize(body, {
+/**
+ * Sanitise the HTML and neutralise every link: the real URL moves to
+ * data-href so nothing in a training email can ever be opened.
+ */
+function prepareBody(html: string): string {
+  const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
       'div', 'p', 'span', 'a', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead',
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr', 'ul', 'ol', 'li', 'strong',
-      'em', 'b', 'i', 'u', 's', 'strike', 'blockquote', 'pre', 'code', 'center',
-      'font', 'style'
+      'em', 'b', 'i', 'u', 's', 'blockquote', 'pre', 'code', 'center', 'font',
     ],
     ALLOWED_ATTR: [
-      'href', 'src', 'alt', 'title', 'style', 'class', 'id', 'width', 'height',
-      'border', 'cellpadding', 'cellspacing', 'align', 'valign', 'bgcolor', 'color'
+      'href', 'src', 'alt', 'title', 'style', 'width', 'height', 'border',
+      'cellpadding', 'cellspacing', 'align', 'valign', 'bgcolor', 'color',
     ],
-    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout'],
+  });
+  const doc = new DOMParser().parseFromString(`<div>${clean}</div>`, 'text/html');
+  doc.querySelectorAll('a').forEach(a => {
+    const href = a.getAttribute('href') ?? '';
+    a.removeAttribute('href');
+    if (href && href !== '#') {
+      a.setAttribute('data-href', href);
+      a.setAttribute('tabindex', '0');
+      a.setAttribute('role', 'link');
+    }
+  });
+  return doc.body.firstElementChild?.innerHTML ?? '';
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString(undefined, {
+    weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
+  });
+}
+
+export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: EmailViewerProps) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const inspectRef = useRef(onLinkInspect);
+  const body = useMemo(() => prepareBody(email.body), [email.body]);
+
+  useEffect(() => {
+    inspectRef.current = onLinkInspect;
   });
 
-  // Adjust iframe height based on content
+  // Render the email inside a shadow root so its inline styles and the app's
+  // styles never affect each other.
   useEffect(() => {
-    if (iframeRef.current) {
-      const iframe = iframeRef.current;
-      const adjustHeight = () => {
-        try {
-          const height = iframe.contentWindow?.document.body.scrollHeight;
-          if (height) {
-            setIframeHeight(Math.max(height + 40, 400));
-          }
-        } catch (e) {
-          // Cross-origin restrictions may prevent access
-        }
-      };
-      
-      iframe.onload = adjustHeight;
-      // Fallback adjustment
-      setTimeout(adjustHeight, 100);
-    }
-  }, [sanitizedHtml]);
+    const host = hostRef.current;
+    if (!host) return;
+    const root = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+    root.innerHTML =
+      `<style>${EMAIL_STYLES}</style>` +
+      `<div class="mail${highlightLinks ? ' highlight' : ''}">${body}</div>`;
+  }, [body, highlightLinks]);
 
-  // Format date
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
+  useEffect(() => {
+    const root = hostRef.current?.shadowRoot;
+    if (!root) return;
+    const linkFrom = (e: Event) => (e.target as Element | null)?.closest?.('a[data-href]') ?? null;
+    const onOver = (e: Event) => {
+      const a = linkFrom(e);
+      if (a) inspectRef.current?.(a.getAttribute('data-href') ?? '', false);
+    };
+    const onClick = (e: Event) => {
+      const a = linkFrom(e);
+      if (!a) return;
+      e.preventDefault();
+      inspectRef.current?.(a.getAttribute('data-href') ?? '', true);
+    };
+    const onKey = (e: Event) => {
+      const k = e as KeyboardEvent;
+      if (k.key === 'Enter' && linkFrom(e)) onClick(e);
+    };
+    root.addEventListener('mouseover', onOver);
+    root.addEventListener('focusin', onOver);
+    root.addEventListener('click', onClick);
+    root.addEventListener('keydown', onKey);
+    return () => {
+      root.removeEventListener('mouseover', onOver);
+      root.removeEventListener('focusin', onOver);
+      root.removeEventListener('click', onClick);
+      root.removeEventListener('keydown', onKey);
+    };
+  }, [body]);
 
-  // Check if email domain is suspicious
-  const isSuspiciousDomain = (email: string) => {
-    const suspiciousPatterns = [
-      /-secure/i, /-verify/i, /-update/i, /-confirm/i,
-      /security/i, /verification/i, /support-/i,
-      /mailer-/i, /email-/i, /notification-/i,
-    ];
-    const domain = email.split('@')[1];
-    if (!domain) return false;
-    return suspiciousPatterns.some(pattern => pattern.test(domain));
-  };
-
-  // Extract domain from email
-  const getDomain = (email: string) => {
-    return email.split('@')[1] || '';
-  };
+  const initial = (email.sender.name.trim()[0] ?? '?').toUpperCase();
 
   return (
-    <TooltipProvider>
-      <Card className="w-full overflow-hidden border-gray-200 shadow-lg">
-        {/* Email Header */}
-        <CardHeader className="bg-gray-50 border-b border-gray-200 p-4">
-          <div className="space-y-3">
-            {/* Subject */}
-            <div className="flex items-start gap-2">
-              <Mail className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" />
-              <h2 className="text-lg font-semibold text-gray-900 leading-tight">
-                {subject}
-              </h2>
+    <article className="overflow-hidden rounded-xl bg-[#F7F9FC] text-[#1A2333] shadow-2xl shadow-black/40">
+      <div className="flex items-center gap-1.5 border-b border-[#DDE3EC] bg-[#E9EEF5] px-4 py-2.5">
+        <span className="size-2.5 rounded-full bg-[#C5CEDB]" />
+        <span className="size-2.5 rounded-full bg-[#C5CEDB]" />
+        <span className="size-2.5 rounded-full bg-[#C5CEDB]" />
+        <span className="ml-2 truncate font-mono text-xs text-[#5B6779]">Inbox · ada.okafor@brightpath.ng</span>
+      </div>
+
+      <header className="border-b border-[#DDE3EC] px-4 py-4 sm:px-6">
+        <h2 className="mb-3 text-lg font-semibold leading-snug [overflow-wrap:anywhere] sm:text-xl">
+          {email.subject}
+        </h2>
+        <div className="flex items-start gap-3">
+          <div className="hidden size-10 shrink-0 place-items-center rounded-full bg-[#D6DEEA] font-bold text-[#34445E] sm:grid">
+            {initial}
+          </div>
+          <div className="min-w-0 flex-1 text-sm">
+            <div className="[overflow-wrap:anywhere]">
+              <strong>{email.sender.name}</strong>{' '}
+              <span className="font-mono text-[13px] text-[#5B6779]">&lt;{email.sender.email}&gt;</span>
             </div>
-
-            {/* Sender Info */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{sender.name}</p>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p 
-                        className={`text-sm truncate cursor-help ${
-                          isSuspiciousDomain(sender.email) 
-                            ? 'text-red-600 font-medium' 
-                            : 'text-gray-500'
-                        }`}
-                      >
-                        {sender.email}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Domain: {getDomain(sender.email)}</p>
-                      {isSuspiciousDomain(sender.email) && (
-                        <p className="text-red-500">⚠️ Suspicious domain pattern detected</p>
-                      )}
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-gray-500 sm:ml-auto">
-                <Clock className="w-4 h-4" />
-                <span>{formatDate(date)}</span>
-              </div>
-            </div>
-
-            {/* Red Flags Banner */}
-            {showRedFlags && redFlags.length > 0 && (
-              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                  <span className="font-semibold text-red-700">Red Flags Detected</span>
-                </div>
-                <ul className="space-y-1">
-                  {redFlags.map((flag, index) => (
-                    <li 
-                      key={index} 
-                      className="text-sm text-red-600 flex items-start gap-2"
-                    >
-                      <span className="text-red-400 mt-0.5">•</span>
-                      <span>{flag.description}</span>
-                    </li>
-                  ))}
-                </ul>
+            {email.reply_to && (
+              <div className="font-mono text-[13px] text-[#9A5B00] [overflow-wrap:anywhere]">
+                reply-to &lt;{email.reply_to}&gt;
               </div>
             )}
+            <div className="font-mono text-[13px] text-[#5B6779]">to me &lt;ada.okafor@brightpath.ng&gt;</div>
           </div>
-        </CardHeader>
-
-        {/* Email Body */}
-        <CardContent className="p-0">
-          <div className="relative">
-            {/* Suspicious Link Warning */}
-            {showRedFlags && (
-              <div className="absolute top-2 right-2 z-10">
-                <Badge variant="destructive" className="flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" />
-                  Review Links Carefully
-                </Badge>
-              </div>
-            )}
-
-            {/* Iframe for isolated email rendering */}
-            <iframe
-              ref={iframeRef}
-              sandbox="allow-same-origin"
-              srcDoc={`
-                <!DOCTYPE html>
-                <html>
-                  <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <style>
-                      body {
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-                        font-size: 14px;
-                        line-height: 1.6;
-                        color: #333;
-                        margin: 0;
-                        padding: 20px;
-                        word-wrap: break-word;
-                      }
-                      a {
-                        color: #0066cc;
-                        text-decoration: underline;
-                      }
-                      a:hover {
-                        color: #0052a3;
-                      }
-                      img {
-                        max-width: 100%;
-                        height: auto;
-                      }
-                      table {
-                        max-width: 100%;
-                      }
-                      /* Highlight suspicious elements when red flags are shown */
-                      ${showRedFlags ? `
-                        a[href*="http://"] {
-                          border: 2px dashed #ef4444;
-                          padding: 2px 4px;
-                          border-radius: 4px;
-                        }
-                      ` : ''}
-                    </style>
-                  </head>
-                  <body>
-                    ${sanitizedHtml}
-                  </body>
-                </html>
-              `}
-              style={{
-                width: '100%',
-                height: `${iframeHeight}px`,
-                border: 'none',
-                backgroundColor: 'white',
-              }}
-              title="Email content"
-            />
-          </div>
-        </CardContent>
-
-        {/* Security Notice */}
-        <div className="bg-blue-50 border-t border-blue-100 p-3 text-xs text-blue-700 flex items-center gap-2">
-          <ExternalLink className="w-4 h-4 flex-shrink-0" />
-          <span>
-            <strong>Security Tip:</strong> Always hover over links to see the actual URL before clicking. 
-            Legitimate companies use their official domain (e.g., amazon.com, not amazon-secure.com).
-          </span>
+          <time className="hidden shrink-0 text-xs text-[#5B6779] sm:block" dateTime={email.date}>
+            {formatDate(email.date)}
+          </time>
         </div>
-      </Card>
-    </TooltipProvider>
+      </header>
+
+      <div ref={hostRef} className="min-h-[160px] bg-white" data-testid="email-body" />
+
+      {email.attachments && email.attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2 border-t border-[#DDE3EC] bg-white px-4 py-3 sm:px-6">
+          {email.attachments.map(name => (
+            <span
+              key={name}
+              className="inline-flex items-center gap-2 rounded-md border border-[#DDE3EC] bg-[#F7F9FC] px-3 py-1.5 font-mono text-xs [overflow-wrap:anywhere]"
+            >
+              <Paperclip className="size-3.5 shrink-0" />
+              {name}
+            </span>
+          ))}
+        </div>
+      )}
+    </article>
   );
-};
+}
 
 export default EmailViewer;

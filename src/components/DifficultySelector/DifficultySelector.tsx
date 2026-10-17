@@ -1,224 +1,199 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Baby, Brain, Trophy, Check, Filter, Play } from 'lucide-react';
+import { Check, Play, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-
-type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+import { Input } from '@/components/ui/input';
+import { categoryCounts, emailsFor } from '@/lib/game';
+import { bestScore } from '@/lib/stats';
+import { CATEGORIES, LEVELS, LEVEL_ORDER, PLAYER } from '@/types';
+import type { CategoryId, GameSession, Level } from '@/types';
 
 interface DifficultySelectorProps {
-  onSelect: (difficulty: Difficulty, categories: string[]) => void;
+  playerName: string;
+  sessions: GameSession[];
+  initialLevel?: Level;
+  onNameChange: (name: string) => void;
+  onStart: (level: Level, categories: CategoryId[]) => void;
 }
 
-const difficulties: { 
-  id: Difficulty; 
-  name: string; 
-  description: string; 
-  icon: React.ReactNode;
-  color: string;
-  features: string[];
-}[] = [
-  {
-    id: 'beginner',
-    name: 'Beginner',
-    description: 'Learn the basics of identifying phishing emails',
-    icon: <Baby className="w-6 h-6" />,
-    color: 'bg-green-500',
-    features: [
-      'Obvious phishing indicators',
-      'Common scam patterns',
-      'Basic red flag identification',
-      'Banking & retail focused',
-    ],
-  },
-  {
-    id: 'intermediate',
-    name: 'Intermediate',
-    description: 'Challenge yourself with more realistic examples',
-    icon: <Brain className="w-6 h-6" />,
-    color: 'bg-blue-500',
-    features: [
-      'Subtle phishing techniques',
-      'Corporate & business scams',
-      'Mixed legitimate and phishing',
-      'Social engineering tactics',
-    ],
-  },
-  {
-    id: 'advanced',
-    name: 'Advanced',
-    description: 'Master-level detection of sophisticated attacks',
-    icon: <Trophy className="w-6 h-6" />,
-    color: 'bg-purple-500',
-    features: [
-      'Highly sophisticated attacks',
-      'Spear phishing examples',
-      'Brand impersonation',
-      'Document & cloud service scams',
-    ],
-  },
-];
+const LEVEL_ACCENT: Record<Level, string> = {
+  beginner: 'text-primary border-primary',
+  intermediate: 'text-sky-400 border-sky-400',
+  advanced: 'text-violet-400 border-violet-400',
+};
 
-const categories = [
-  { id: 'banking', name: 'Banking & Finance', description: 'Bank alerts, payment notifications' },
-  { id: 'corporate', name: 'Corporate', description: 'Work emails, IT requests' },
-  { id: 'retail', name: 'Retail', description: 'Shopping, delivery notifications' },
-  { id: 'entertainment', name: 'Entertainment', description: 'Streaming, gaming services' },
-  { id: 'technology', name: 'Technology', description: 'Cloud services, software' },
-];
+export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart }: DifficultySelectorProps) {
+  const [level, setLevel] = useState<Level>(initialLevel ?? 'beginner');
+  const [categories, setCategories] = useState<CategoryId[]>([]);
+  const [nameError, setNameError] = useState(false);
 
-export const DifficultySelector: React.FC<DifficultySelectorProps> = ({ onSelect }) => {
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('beginner');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
+  const counts = useMemo(() => categoryCounts(level), [level]);
+  const available = useMemo(() => emailsFor(level, categories).length, [level, categories]);
+  const rounds = Math.min(LEVELS[level].rounds, available);
 
-  const handleCategoryToggle = (categoryId: string) => {
-    if (categoryId === 'all') {
-      setSelectedCategories(['all']);
-    } else {
-      setSelectedCategories(prev => {
-        const withoutAll = prev.filter(id => id !== 'all');
-        if (prev.includes(categoryId)) {
-          const newSelection = withoutAll.filter(id => id !== categoryId);
-          return newSelection.length === 0 ? ['all'] : newSelection;
-        } else {
-          return [...withoutAll, categoryId];
-        }
-      });
-    }
+  const selectLevel = (l: Level) => {
+    setLevel(l);
+    // Drop categories that don't exist at the new level.
+    const c = categoryCounts(l);
+    setCategories(prev => prev.filter(id => (c[id] ?? 0) > 0));
   };
 
-  const handleStart = () => {
-    onSelect(
-      selectedDifficulty,
-      selectedCategories.includes('all') ? [] : selectedCategories
-    );
+  const toggleCategory = (id: CategoryId) =>
+    setCategories(prev => (prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]));
+
+  const start = () => {
+    if (!playerName.trim()) {
+      setNameError(true);
+      document.getElementById('player-name')?.focus();
+      return;
+    }
+    onStart(level, categories);
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-2"
-      >
-        <h1 className="text-3xl font-bold text-gray-900">Choose Your Challenge</h1>
-        <p className="text-gray-600">Select a difficulty level to start training</p>
-      </motion.div>
+    <div className="mx-auto w-full max-w-5xl space-y-8">
+      <motion.section initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // CYBERSECURITY</p>
+        <h1 className="max-w-3xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+          Can you spot the phish before the clock runs out?
+        </h1>
+        <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+          You're <strong className="text-foreground">{PLAYER.name}</strong>, an analyst at {PLAYER.company} (
+          <span className="font-mono text-sm">{PLAYER.domain}</span>). Emails land in your inbox one at a time. Decide
+          which are <span className="rounded bg-primary/15 px-1.5 font-semibold text-primary">legitimate</span> and which
+          are <span className="rounded bg-destructive/15 px-1.5 font-semibold text-[#FF6A61]">phishing</span>. Faster
+          correct answers score more.
+        </p>
+      </motion.section>
 
-      {/* Difficulty Cards */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {difficulties.map((diff, index) => (
-          <motion.div
-            key={diff.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card
-              className={`cursor-pointer transition-all hover:shadow-lg ${
-                selectedDifficulty === diff.id
-                  ? 'ring-2 ring-offset-2 ring-blue-500 shadow-lg'
-                  : 'hover:border-gray-300'
-              }`}
-              onClick={() => setSelectedDifficulty(diff.id)}
-            >
-              <CardHeader className={`${diff.color} text-white rounded-t-lg`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {diff.icon}
-                    <CardTitle className="text-lg">{diff.name}</CardTitle>
-                  </div>
-                  {selectedDifficulty === diff.id && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-6 h-6 bg-white rounded-full flex items-center justify-center"
-                    >
-                      <Check className="w-4 h-4 text-gray-900" />
-                    </motion.div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <CardDescription className="text-gray-600 mb-4">
-                  {diff.description}
-                </CardDescription>
-                <ul className="space-y-2">
-                  {diff.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+      <div className="max-w-sm space-y-2">
+        <label htmlFor="player-name" className="text-sm text-muted-foreground">
+          Your name for the scoreboard
+        </label>
+        <Input
+          id="player-name"
+          value={playerName}
+          maxLength={24}
+          placeholder="e.g. Faith"
+          aria-invalid={nameError}
+          className={`h-11 bg-card ${nameError ? 'border-destructive' : ''}`}
+          onChange={e => {
+            onNameChange(e.target.value);
+            if (e.target.value.trim()) setNameError(false);
+          }}
+          onKeyDown={e => e.key === 'Enter' && start()}
+        />
+        {nameError && <p className="text-sm text-destructive">Enter a name to start.</p>}
       </div>
 
-      {/* Category Filter */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-500" />
-              <CardTitle className="text-lg">Filter by Category</CardTitle>
-            </div>
-            <CardDescription>
-              Select which types of emails you want to practice with
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
-              <Badge
-                variant={selectedCategories.includes('all') ? 'default' : 'outline'}
-                className="cursor-pointer px-4 py-2 text-sm"
-                onClick={() => handleCategoryToggle('all')}
-              >
-                All Categories
-              </Badge>
-              <Separator orientation="vertical" className="h-8" />
-              {categories.map(cat => (
-                <Badge
-                  key={cat.id}
-                  variant={selectedCategories.includes(cat.id) ? 'default' : 'outline'}
-                  className="cursor-pointer px-4 py-2 text-sm"
-                  onClick={() => handleCategoryToggle(cat.id)}
-                >
-                  {cat.name}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <div className="grid gap-4 md:grid-cols-3" role="radiogroup" aria-label="Difficulty">
+        {LEVEL_ORDER.map((id, i) => {
+          const cfg = LEVELS[id];
+          const selected = level === id;
+          const best = playerName.trim() ? bestScore(sessions, playerName, id) : 0;
+          return (
+            <motion.button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              data-level={id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+              onClick={() => selectLevel(id)}
+              className={`flex flex-col gap-3 rounded-xl border bg-card p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-primary ${
+                selected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-primary/50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`rounded-full border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.1em] ${LEVEL_ACCENT[id]}`}>
+                  {cfg.label}
+                </span>
+                {selected ? (
+                  <span className="grid size-6 place-items-center rounded-full bg-primary text-primary-foreground">
+                    <Check className="size-4" />
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
+                    <Timer className="size-3.5" /> {cfg.seconds}s
+                  </span>
+                )}
+              </div>
+              <h3 className="text-lg font-semibold">{cfg.tagline}</h3>
+              <p className="text-sm text-muted-foreground">{cfg.description}</p>
+              <ul className="flex flex-wrap gap-1.5 text-xs text-muted-foreground">
+                <li className="rounded-md bg-background/60 px-2 py-1">{cfg.seconds}s per email</li>
+                <li className="rounded-md bg-background/60 px-2 py-1">×{cfg.multiplier} points</li>
+                <li className="rounded-md bg-background/60 px-2 py-1">
+                  Your best: <strong className="text-foreground">{best ? best.toLocaleString() : '–'}</strong>
+                </li>
+              </ul>
+            </motion.button>
+          );
+        })}
+      </div>
 
-      {/* Start Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="flex justify-center"
-      >
-        <Button
-          size="lg"
-          onClick={handleStart}
-          className="px-12 py-6 text-lg gap-3"
-        >
-          <Play className="w-5 h-5" />
-          Start Training
+      <section className="rounded-xl border border-border bg-card p-5">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-semibold">Practise specific topics (optional)</h2>
+          <span className="font-mono text-xs text-muted-foreground">
+            {available} email{available === 1 ? '' : 's'} available
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setCategories([])}
+            className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+              categories.length === 0 ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
+            }`}
+          >
+            All topics
+          </button>
+          {(Object.keys(CATEGORIES) as CategoryId[]).map(id => {
+            const count = counts[id] ?? 0;
+            const on = categories.includes(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                disabled={count === 0}
+                title={CATEGORIES[id].description}
+                onClick={() => toggleCategory(id)}
+                className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
+                  on ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
+                }`}
+              >
+                {CATEGORIES[id].label} <span className="opacity-60">({count})</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="flex flex-col items-center gap-2">
+        <Button size="lg" onClick={start} disabled={rounds === 0} className="h-12 gap-2 px-10 text-base font-semibold">
+          <Play className="size-5" />
+          Start {LEVELS[level].label}
         </Button>
-      </motion.div>
+        <p className="text-xs text-muted-foreground">
+          {rounds} emails · {LEVELS[level].seconds}s each
+        </p>
+      </div>
+
+      <section className="rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground">
+        <h2 className="mb-2 font-semibold text-foreground">How scoring works</h2>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong className="text-foreground">100 points</strong> per correct answer, plus up to <strong className="text-foreground">50</strong> for speed.</li>
+          <li>Intermediate scores <strong className="text-foreground">×1.5</strong>, Advanced <strong className="text-foreground">×2</strong>.</li>
+          <li>From <strong className="text-foreground">3 correct in a row</strong>, every further correct answer adds <strong className="text-foreground">+50</strong>.</li>
+          <li>Running out of time or skipping scores 0 and resets your streak.</li>
+          <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
+        </ul>
+      </section>
     </div>
   );
-};
+}
 
 export default DifficultySelector;
