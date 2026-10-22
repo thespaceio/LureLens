@@ -33,9 +33,10 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
 - **Safe link inspection.** Hover over or tap a link to see where it really goes. Links in training emails never open.
 - **Scoreboard** with a top-3 podium, level tabs and best score per player.
 - **Progress dashboard** showing accuracy per level and per attack type, weak spots to practise, and recent games.
-- **Topic filter** to practise one area, such as Banking & Payments.
+- **Topic filter** to practise one area, such as Banking & Payments. Practice rounds count towards progress, not the scoreboard.
 - Keyboard shortcuts: `L` legitimate, `P` phishing, `S` skip, `Enter` next.
-- Works on phones, and offline after the first visit (PWA).
+- **Pause** stops the clock and hides the email; switching apps pauses automatically.
+- Works on phones, and offline from the first visit (PWA).
 
 ## Run it locally
 
@@ -47,6 +48,8 @@ npm run dev       # http://localhost:5173
 npm run build     # production build in dist/
 npm run preview   # serve the production build
 npm run lint
+npm test          # unit tests for scoring, rounds and the scoreboard
+npm run check:data  # checks src/data/emails.json (also runs in CI)
 ```
 
 ## Deploy

@@ -35,7 +35,12 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
           {session.score.toLocaleString()} <span className="text-base font-medium text-muted-foreground">points</span>
         </p>
         <p className="mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank">
-          <Trophy className="size-4" />#{rank.rank} of {rank.of} on the {cfg.label} scoreboard
+          <Trophy className="size-4" />
+          {session.practice ? (
+            <>Topic practice round, saved to your progress but not the scoreboard</>
+          ) : (
+            <>#{rank.rank} of {rank.of} on the {cfg.label} scoreboard</>
+          )}
           {personalBest && <span className="font-semibold text-primary">· New personal best!</span>}
         </p>
       </div>

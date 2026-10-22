@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link2, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
+import { Link2, Pause, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailViewer from '@/components/EmailViewer/EmailViewer';
 import FeedbackModal from '@/components/FeedbackModal/FeedbackModal';
@@ -38,15 +38,18 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const [last, setLast] = useState<LastAnswer | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(cfg.seconds);
   const [link, setLink] = useState<{ url: string; clicked: boolean } | null>(null);
+  const [paused, setPaused] = useState(false);
 
   const deadline = useRef(0);
   const answered = useRef(false);
+  const pausedRef = useRef(false);
+  const remainingMs = useRef(0);
   const email = emails[index];
   const isLast = index === emails.length - 1;
 
   const answer = useCallback(
     (choice: Choice) => {
-      if (phase !== 'answering' || answered.current || !email) return;
+      if (phase !== 'answering' || answered.current || pausedRef.current || !email) return;
       answered.current = true;
 
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
@@ -98,17 +101,46 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
     answerRef.current = answer;
   });
 
-  // Countdown for the current email.
+  // Start a fresh clock for each email.
   useEffect(() => {
     if (phase !== 'answering') return;
     deadline.current = performance.now() + cfg.seconds * 1000;
+  }, [phase, index, cfg.seconds]);
+
+  // Tick while answering and not paused.
+  useEffect(() => {
+    if (phase !== 'answering' || paused) return;
     const id = window.setInterval(() => {
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
       setSecondsLeft(left);
       if (left <= 0) answerRef.current('timeout');
     }, 100);
     return () => window.clearInterval(id);
-  }, [phase, index, cfg.seconds]);
+  }, [phase, index, paused]);
+
+  // Pausing freezes the clock and hides the email, so it can't be used to study it.
+  const pause = useCallback(() => {
+    if (phase !== 'answering' || pausedRef.current || answered.current) return;
+    remainingMs.current = Math.max(0, deadline.current - performance.now());
+    pausedRef.current = true;
+    setPaused(true);
+  }, [phase]);
+
+  const resume = useCallback(() => {
+    if (!pausedRef.current) return;
+    deadline.current = performance.now() + remainingMs.current;
+    pausedRef.current = false;
+    setPaused(false);
+  }, []);
+
+  // A phone call or switching tabs pauses the game instead of timing out.
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') pause();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [pause]);
 
   // Keyboard shortcuts: L = legitimate, P = phishing, S = skip.
   useEffect(() => {
@@ -132,7 +164,9 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const pct = Math.max(0, Math.min(100, (secondsLeft / cfg.seconds) * 100));
   const danger = secondsLeft <= 5;
   const warn = !danger && secondsLeft <= cfg.seconds * 0.4;
+  // mailto: and other links without a web address have no host to highlight.
   const host = link ? hostOf(link.url) : '';
+  const showHost = Boolean(host) && host !== link?.url;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4">
@@ -171,8 +205,32 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       </div>
 
       {/* Email */}
-      <motion.div key={email.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-        <EmailViewer email={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
+      <motion.div
+        key={email.id}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="relative"
+      >
+        <div aria-hidden={paused} className={paused ? 'invisible' : undefined}>
+          <EmailViewer email={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
+        </div>
+        {paused && (
+          <div
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-6 text-center"
+            data-testid="paused-overlay"
+          >
+            <Pause className="size-8 text-lavender" />
+            <h2 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Paused</h2>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              The clock is stopped at {Math.ceil(secondsLeft)}s and the email is hidden until you come back.
+            </p>
+            <Button autoFocus size="lg" className="mt-1 gap-2 font-semibold" onClick={resume}>
+              <Play className="size-4" />
+              Resume
+            </Button>
+          </div>
+        )}
         <div
           className={`mt-2 flex min-h-10 items-start gap-2 rounded-lg px-3 py-2 text-xs ${
             link ? 'bg-secondary text-foreground' : 'text-muted-foreground'
@@ -187,12 +245,14 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
                 {link.clicked ? 'Links are disabled in training. This one goes to: ' : 'Link goes to: '}
               </span>
               <span className="font-mono">
-                {link.url.split(host).map((part, i, arr) => (
-                  <span key={i}>
-                    {part}
-                    {i < arr.length - 1 && <mark className="rounded bg-primary/20 px-0.5 text-primary">{host}</mark>}
-                  </span>
-                ))}
+                {showHost
+                  ? link.url.split(host).map((part, i, arr) => (
+                      <span key={i}>
+                        {part}
+                        {i < arr.length - 1 && <mark className="rounded bg-primary/20 px-0.5 text-primary">{host}</mark>}
+                      </span>
+                    ))
+                  : link.url}
               </span>
             </span>
           ) : (
@@ -208,7 +268,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           size="lg"
           className="h-14 gap-2 border-primary/50 bg-primary/10 text-base font-semibold text-primary hover:bg-primary/20 hover:text-primary"
           onClick={() => answer('legitimate')}
-          disabled={phase !== 'answering'}
+          disabled={phase !== 'answering' || paused}
         >
           <ShieldCheck className="size-5" />
           Legitimate
@@ -219,18 +279,35 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           size="lg"
           className="h-14 gap-2 border-destructive/50 bg-destructive/10 text-base font-semibold text-destructive hover:bg-destructive/20 hover:text-destructive"
           onClick={() => answer('phishing')}
-          disabled={phase !== 'answering'}
+          disabled={phase !== 'answering' || paused}
         >
           <ShieldAlert className="size-5" />
           Phishing
           <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">P</kbd>
         </Button>
       </div>
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
         <Button variant="ghost" size="sm" onClick={handleQuit}>
           Quit game
         </Button>
-        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => answer('skip')} disabled={phase !== 'answering'}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-1.5"
+          onClick={paused ? resume : pause}
+          disabled={phase !== 'answering'}
+          data-testid="pause-button"
+        >
+          {paused ? <Play className="size-4" /> : <Pause className="size-4" />}
+          {paused ? 'Resume' : 'Pause'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-1.5"
+          onClick={() => answer('skip')}
+          disabled={phase !== 'answering' || paused}
+        >
           <SkipForward className="size-4" />
           Skip (0 points)
         </Button>
