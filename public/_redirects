@@ -1,0 +1,4 @@
+# Netlify redirects. Both Netlify sites build from this repo; this rule only
+# fires on the old PhishGuard address and sends visitors to LureLens.
+https://phishguard-by-faith.netlify.app/*  https://lurelens.netlify.app/:splat  301!
+http://phishguard-by-faith.netlify.app/*   https://lurelens.netlify.app/:splat  301!
