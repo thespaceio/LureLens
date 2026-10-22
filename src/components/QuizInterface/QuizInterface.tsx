@@ -164,7 +164,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       <div className="h-1.5 overflow-hidden rounded-full bg-secondary" aria-hidden>
         <div
           className={`h-full rounded-full transition-[width] duration-100 ease-linear ${
-            danger ? 'bg-destructive' : warn ? 'bg-amber-400' : 'bg-primary'
+            danger ? 'bg-destructive' : warn ? 'bg-lavender' : 'bg-primary'
           }`}
           style={{ width: `${pct}%` }}
         />
@@ -175,7 +175,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         <EmailViewer email={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
         <div
           className={`mt-2 flex min-h-10 items-start gap-2 rounded-lg px-3 py-2 text-xs ${
-            link ? 'bg-black/40 text-foreground' : 'text-muted-foreground'
+            link ? 'bg-secondary text-foreground' : 'text-muted-foreground'
           }`}
           data-testid="link-status"
           aria-live="polite"
@@ -190,7 +190,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
                 {link.url.split(host).map((part, i, arr) => (
                   <span key={i}>
                     {part}
-                    {i < arr.length - 1 && <mark className="rounded bg-amber-400/25 px-0.5 text-amber-200">{host}</mark>}
+                    {i < arr.length - 1 && <mark className="rounded bg-primary/20 px-0.5 text-primary">{host}</mark>}
                   </span>
                 ))}
               </span>
@@ -217,7 +217,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         <Button
           variant="outline"
           size="lg"
-          className="h-14 gap-2 border-destructive/50 bg-destructive/10 text-base font-semibold text-[#FF6A61] hover:bg-destructive/20 hover:text-[#FF6A61]"
+          className="h-14 gap-2 border-destructive/50 bg-destructive/10 text-base font-semibold text-destructive hover:bg-destructive/20 hover:text-destructive"
           onClick={() => answer('phishing')}
           disabled={phase !== 'answering'}
         >

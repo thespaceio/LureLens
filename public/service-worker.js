@@ -1,7 +1,7 @@
 // LureLens service worker: makes the game work offline after the first visit.
 // Paths are relative so the app also works under a sub-path (e.g. GitHub Pages).
-const CACHE_NAME = 'lurelens-v3';
-const APP_SHELL = ['./', './index.html', './manifest.json', './icons/icon-192x192.png', './icons/icon-512x512.png'];
+const CACHE_NAME = 'lurelens-v4';
+const APP_SHELL = ['./', './index.html', './manifest.json', './favicon.svg', './icons/icon-192x192.png', './icons/icon-512x512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(

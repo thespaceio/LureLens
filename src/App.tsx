@@ -6,6 +6,7 @@ import QuizInterface from '@/components/QuizInterface/QuizInterface';
 import type { QuizResult } from '@/components/QuizInterface/QuizInterface';
 import ResultsScreen from '@/components/ResultsScreen/ResultsScreen';
 import Leaderboard from '@/components/Leaderboard/Leaderboard';
+import { Logo } from '@/components/Logo/Logo';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
@@ -36,15 +37,6 @@ const NAV: { id: View; label: string; short: string; icon: typeof Play }[] = [
   { id: 'progress', label: 'Progress', short: 'Stats', icon: BarChart3 },
   { id: 'about', label: 'About', short: '', icon: Info },
 ];
-
-function Logo() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-7 text-primary" aria-hidden>
-      <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function App() {
   const store = useGameStore();
@@ -164,11 +156,10 @@ function App() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-40 border-b border-border bg-[#05080D]/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-border bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-          <button onClick={() => navigate('menu')} className="flex items-center gap-2 font-bold" aria-label="LureLens home">
-            <Logo />
-            <span className="hidden text-lg sm:inline">LureLens</span>
+          <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg" aria-label="LureLens home">
+            <Logo size={34} wordmarkClassName="hidden sm:inline" />
           </button>
           <nav className="flex items-center gap-1">
             {NAV.map(item => (

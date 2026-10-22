@@ -4,36 +4,37 @@
 
 @layer base {
   :root {
-    /* Th3 SpaceIO palette: Deep Navy #0A1628, Cyber Black #05080D,
-       Terminal Green #00CC6A, Cool Gray #A7B0BC, Threat Red #FF3B30 */
-    --background: 216 60% 8%;
+    /* LureLens palette (see brand/README.md): Abyss #0F0822, Midnight #1B1035,
+       Lavender #B9A6FF, Lime #C6F432, Coral #FF6B6B, Mist #CFC6E8 */
+    --background: 256 62% 8%;
     --foreground: 0 0% 100%;
-    --card: 217 57% 14%;
+    --card: 258 54% 14%;
     --card-foreground: 0 0% 100%;
-    --popover: 217 57% 14%;
+    --popover: 258 54% 14%;
     --popover-foreground: 0 0% 100%;
-    --primary: 151 100% 40%;
-    --primary-foreground: 216 44% 4%;
-    --secondary: 217 51% 19%;
+    --primary: 74 90% 58%;
+    --primary-foreground: 258 54% 14%;
+    --secondary: 256 52% 24%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 217 51% 17%;
-    --muted-foreground: 214 14% 70%;
-    --accent: 217 51% 19%;
+    --muted: 256 54% 19%;
+    --muted-foreground: 256 42% 84%;
+    --accent: 256 52% 24%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 3 100% 59%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 216 35% 22%;
-    --input: 216 35% 22%;
-    --ring: 151 100% 40%;
+    --destructive: 0 100% 71%;
+    --destructive-foreground: 258 54% 14%;
+    --lavender: 253 100% 83%;
+    --border: 257 40% 28%;
+    --input: 257 40% 28%;
+    --ring: 74 90% 58%;
     --radius: 0.75rem;
-    --sidebar-background: 216 60% 8%;
+    --sidebar-background: 256 62% 8%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 151 100% 40%;
-    --sidebar-primary-foreground: 216 44% 4%;
-    --sidebar-accent: 217 51% 19%;
+    --sidebar-primary: 74 90% 58%;
+    --sidebar-primary-foreground: 258 54% 14%;
+    --sidebar-accent: 256 52% 24%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 216 35% 22%;
-    --sidebar-ring: 151 100% 40%;
+    --sidebar-border: 257 40% 28%;
+    --sidebar-ring: 74 90% 58%;
     color-scheme: dark;
   }
 
@@ -73,13 +74,12 @@
     @apply border-border;
   }
   html {
-    background: #05080D;
+    background: #0F0822;
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
-    background:
-      radial-gradient(1200px 600px at 85% -10%, rgba(0, 204, 106, 0.08), transparent 60%),
-      linear-gradient(180deg, #0A1628 0px, #05080D 900px) no-repeat,
-      #05080D;
+  }
+  h1 {
+    @apply font-display font-extrabold tracking-[-0.025em];
   }
 }

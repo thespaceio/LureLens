@@ -13,10 +13,10 @@ interface LeaderboardProps {
 
 const PILL: Record<Level, string> = {
   beginner: 'text-primary border-primary',
-  intermediate: 'text-sky-400 border-sky-400',
-  advanced: 'text-violet-400 border-violet-400',
+  intermediate: 'text-lavender border-lavender',
+  advanced: 'text-muted-foreground border-muted-foreground',
 };
-const MEDAL = ['bg-[#F5C542]', 'bg-[#C9D1DB]', 'bg-[#D9935B]'];
+const MEDAL = ['bg-primary', 'bg-lavender', 'bg-muted-foreground'];
 
 function formatDate(iso: string) {
   const d = new Date(iso);
@@ -83,8 +83,8 @@ export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) 
             {podium.filter(i => rows[i]).map(i => {
               const r = rows[i];
               return (
-                <div key={r.id} className={`rounded-xl border bg-card p-4 text-center ${i === 0 ? 'border-[#F5C542]/60' : 'border-border'}`}>
-                  <span className={`mx-auto grid size-7 place-items-center rounded-full text-sm font-bold text-black ${MEDAL[i]}`}>{i + 1}</span>
+                <div key={r.id} className={`rounded-xl border bg-card p-4 text-center ${i === 0 ? 'border-primary/60' : 'border-border'}`}>
+                  <span className={`mx-auto grid size-7 place-items-center rounded-full text-sm font-bold text-primary-foreground ${MEDAL[i]}`}>{i + 1}</span>
                   <div className="mt-2 truncate font-semibold">{r.name}</div>
                   <div className="text-xl font-bold text-primary">{r.score.toLocaleString()}</div>
                   <div className="text-xs text-muted-foreground">{r.accuracy}% · {LEVELS[r.level].label}</div>
@@ -111,7 +111,7 @@ export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) 
                 {rows.map((r, i) => (
                   <tr key={r.id} className={`border-t border-border first:border-t-0 ${r.name.trim().toLowerCase() === me ? 'bg-primary/10' : ''}`}>
                     <td className="px-4 py-3 font-mono font-bold">
-                      {i < 3 ? <span className={`grid size-6 place-items-center rounded-full text-xs text-black ${MEDAL[i]}`}>{i + 1}</span> : i + 1}
+                      {i < 3 ? <span className={`grid size-6 place-items-center rounded-full text-xs text-primary-foreground ${MEDAL[i]}`}>{i + 1}</span> : i + 1}
                     </td>
                     <td className="max-w-[10rem] truncate px-4 py-3">{r.name}</td>
                     {level === 'all' && (

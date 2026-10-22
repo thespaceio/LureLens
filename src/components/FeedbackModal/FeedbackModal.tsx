@@ -44,8 +44,8 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
         <div
           className={`border-b border-border px-6 pb-4 pt-6 ${
             correct
-              ? 'bg-gradient-to-b from-primary/15 to-transparent'
-              : 'bg-gradient-to-b from-destructive/15 to-transparent'
+              ? 'bg-primary/10'
+              : 'bg-destructive/10'
           }`}
         >
           <p className={`mb-1 font-mono text-xs uppercase tracking-[0.14em] ${correct ? 'text-primary' : 'text-destructive'}`}>
