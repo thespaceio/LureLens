@@ -1,6 +1,7 @@
 import { ArrowRight, Check, ShieldAlert, ShieldCheck, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { CHANNELS, channelOf } from '@/types';
 import type { Choice, Email, Points } from '@/types';
 
 interface FeedbackModalProps {
@@ -52,7 +53,7 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
             {verdict}
           </p>
           <DialogTitle className="text-xl font-semibold">
-            This email was {isPhish ? 'phishing' : 'legitimate'}
+            This {CHANNELS[channelOf(email)].noun} was {isPhish ? 'phishing' : 'legitimate'}
           </DialogTitle>
           <DialogDescription className="mt-1 font-mono text-xs text-muted-foreground">
             {correct ? `+${points.total} points · ` : ''}
@@ -107,7 +108,7 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
 
         <div className="border-t border-border px-6 py-4">
           <Button autoFocus onClick={onNext} size="lg" className="w-full gap-2 font-semibold">
-            {isLast ? 'See results' : 'Next email'}
+            {isLast ? 'See results' : 'Next message'}
             <ArrowRight className="size-4" />
             <kbd className="ml-1 hidden rounded border border-current px-1.5 opacity-60 font-mono text-[10px] sm:inline">Enter</kbd>
           </Button>

@@ -2,7 +2,7 @@
 
 LureLens teaches people which senders to trust, so a wrong "real domain" does real harm (an early version taught that a genuine DocuSign address was fake). This file records what has been checked and how.
 
-**Last full review:** 23 October 2026, covering all 80 emails.
+**Last full review:** 23 October 2026, covering all 80 emails. The 30 SMS and WhatsApp scenarios added the same day were checked as they were written.
 
 ## What was checked
 
@@ -38,6 +38,10 @@ Exact sender addresses (the part before the @) are illustrative. Players are tau
 | NYSC | nysc.gov.ng (main site), portal.nysc.org.ng (registration portal) | Wikipedia infobox; NYSC portal guidance |
 | NIMC | nimc.gov.ng | Official site |
 | CBN | cbn.gov.ng | Official site |
+| FRSC | frsc.gov.ng | FRSC's own site; FRSC has publicly warned about fake traffic-fine texts and websites |
+| Lagos State Internal Revenue Service | etax.lirs.net (eTax portal) | TechCabal's 2026 guide to the LIRS eTax portal. Note: not a .gov.ng address |
+| GTBank app | GTWorld | Listed on gtbank.com's apps page |
+| MTN | myMTN app | Official app listing |
 | Ikeja Electric | ikejaelectric.com | Wikipedia; company pages |
 | Facebook security alerts | facebookmail.com | Trend Micro: security@facebookmail.com is genuine |
 | Google | google.com, accounts.google.com, docs/calendar/meet.google.com | Google's own services |
@@ -57,13 +61,20 @@ BrightPath Technologies (`brightpath.ng`), Zentrix Supplies and the people in th
 - **ng-b-l06 (Air Peace):** replaced the weak trust signal "addresses you by full name" (scammers often know your name) with the real domain.
 - **ng-b-p12:** replaced a second "₦250,000 Federal Government grant" story that duplicated ng-b-p03 with an instant-loan upfront-fee scam.
 
+## SMS and WhatsApp
+
+- **Sender names on texts can be faked.** A fake text can appear in the same thread as genuine bank alerts (see police advisories on spoofed bank SMS). Scenarios teach players to judge what a text asks for, not who it claims to be from.
+- **Phone numbers are fictional.** Every number uses the `555 01xx` pattern so that no real person's number is shown as a scammer. Keep to this pattern for new scenarios.
+- **USSD codes and short codes are avoided** unless confirmed, because they change between networks and over time.
+
 ## Not checked
 
 - Whether the made-up phishing domains (for example `kuda-verify.com.ng`) are registered by anyone. Links in the game never open, but avoid real company names in new fake domains where possible.
 
 ## Checking new emails
 
-1. Confirm the sender's real domain on the organisation's own website before writing a legitimate email or a "the real domain is X" red flag.
-2. Prefer trust signals that are hard to fake: the domain, no request for credentials or money, being told to use the app or type the address yourself.
-3. Add the organisation to the table above.
-4. Run `npm run check:data`.
+1. For SMS and WhatsApp, use a `555 01xx` phone number and avoid unconfirmed USSD or short codes.
+2. Confirm the sender's real domain on the organisation's own website before writing a legitimate email or a "the real domain is X" red flag.
+3. Prefer trust signals that are hard to fake: the domain, no request for credentials or money, being told to use the app or type the address yourself.
+4. Add the organisation to the table above.
+5. Run `npm run check:data`.

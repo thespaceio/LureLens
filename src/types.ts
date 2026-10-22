@@ -10,25 +10,55 @@ export interface RedFlag {
   location?: string;
 }
 
-export interface Email {
+export type Channel = 'email' | 'sms' | 'whatsapp';
+
+interface MessageBase {
   id: string;
   level: Level;
   is_phishing: boolean;
   category: CategoryId;
   /** Finer-grained attack type shown on the dashboard, e.g. "Invoice Fraud". */
   topic: string;
-  sender: { name: string; email: string };
-  reply_to?: string;
+  /** Email subject, or a one-line summary of an SMS or chat (shown in the results). */
   subject: string;
   /** ISO date, e.g. 2026-10-16T09:30:00 */
   date: string;
-  /** HTML body. Sanitised before rendering. */
-  body: string;
   attachments?: string[];
   red_flags: RedFlag[];
   trust_signals: string[];
   explanation: string;
 }
+
+export interface EmailMessage extends MessageBase {
+  channel?: 'email';
+  sender: { name: string; email: string };
+  reply_to?: string;
+  /** HTML body. Sanitised before rendering. */
+  body: string;
+}
+
+export interface PhoneMessage extends MessageBase {
+  channel: 'sms' | 'whatsapp';
+  /**
+   * name: the sender ID (e.g. "GTBank"), saved contact name or phone number shown at the top.
+   * number: the phone number, when there is one.
+   * saved: whether the number is in Ada's contacts (WhatsApp shows unknown numbers differently).
+   */
+  sender: { name: string; number?: string; saved?: boolean };
+  /** One entry per bubble, plain text. URLs are detected and made inspectable. */
+  messages: string[];
+}
+
+/** One item in a round: an email, a text message or a WhatsApp chat. */
+export type Email = EmailMessage | PhoneMessage;
+
+export const channelOf = (m: Email): Channel => m.channel ?? 'email';
+
+export const CHANNELS: Record<Channel, { label: string; noun: string }> = {
+  email: { label: 'Email', noun: 'email' },
+  sms: { label: 'SMS', noun: 'text message' },
+  whatsapp: { label: 'WhatsApp', noun: 'WhatsApp message' },
+};
 
 export type Choice = 'phishing' | 'legitimate' | 'timeout' | 'skip';
 

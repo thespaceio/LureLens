@@ -29,11 +29,13 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
 
 - **Countdown timer** on every email. Running out of time counts as wrong.
 - **Scoring:** 100 points per correct answer, plus up to 50 for speed, times the level multiplier. From 3 correct in a row, each further correct answer adds +50.
+- **Emails, SMS and WhatsApp.** 110 scenarios: 80 emails, 15 text messages and 15 WhatsApp chats, including spoofed bank sender IDs, OTP tricks and hijacked friends asking for money. Every mixed round includes texts or chats.
+- **Share your result** as a branded image card (works offline), straight to WhatsApp, LinkedIn or X.
 - **Feedback after every answer**, with the specific red flags or trust signals.
 - **Safe link inspection.** Hover over or tap a link to see where it really goes. Links in training emails never open.
 - **Scoreboard** with a top-3 podium, level tabs and best score per player.
 - **Progress dashboard** showing accuracy per level and per attack type, weak spots to practise, and recent games.
-- **Topic filter** to practise one area, such as Banking & Payments. Practice rounds count towards progress, not the scoreboard.
+- **Practice filters** for one channel (Email, SMS, WhatsApp) or one topic, such as Banking & Payments. Practice rounds count towards progress, not the scoreboard.
 - Keyboard shortcuts: `L` legitimate, `P` phishing, `S` skip, `Enter` next.
 - **Pause** stops the clock and hides the email; switching apps pauses automatically.
 - Works on phones, and offline from the first visit (PWA).

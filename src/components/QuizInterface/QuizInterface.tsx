@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { Link2, Pause, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailViewer from '@/components/EmailViewer/EmailViewer';
+import MessageViewer from '@/components/MessageViewer/MessageViewer';
 import FeedbackModal from '@/components/FeedbackModal/FeedbackModal';
 import { hostOf, scoreAnswer } from '@/lib/game';
-import { LEVELS } from '@/types';
-import type { AnswerRecord, Choice, Email, Level, Points } from '@/types';
+import { CHANNELS, LEVELS, channelOf } from '@/types';
+import type { AnswerRecord, Choice, Email, EmailMessage, Level, Points } from '@/types';
 
 export interface QuizResult {
   answers: AnswerRecord[];
@@ -165,6 +166,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const danger = secondsLeft <= 5;
   const warn = !danger && secondsLeft <= cfg.seconds * 0.4;
   // mailto: and other links without a web address have no host to highlight.
+  const noun = CHANNELS[channelOf(email)].noun;
   const host = link ? hostOf(link.url) : '';
   const showHost = Boolean(host) && host !== link?.url;
 
@@ -174,7 +176,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
         {[
           { label: 'Level', value: cfg.label, className: 'hidden sm:flex' },
-          { label: 'Email', value: `${index + 1} / ${emails.length}` },
+          { label: 'Message', value: `${index + 1} / ${emails.length}` },
           { label: 'Score', value: score.toLocaleString(), testId: 'hud-score' },
           { label: 'Streak', value: String(streak) },
           {
@@ -213,7 +215,11 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         className="relative"
       >
         <div aria-hidden={paused} className={paused ? 'invisible' : undefined}>
-          <EmailViewer email={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
+          {email.channel === 'sms' || email.channel === 'whatsapp' ? (
+            <MessageViewer message={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
+          ) : (
+            <EmailViewer email={email as EmailMessage} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
+          )}
         </div>
         {paused && (
           <div
@@ -223,7 +229,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
             <Pause className="size-8 text-lavender" />
             <h2 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Paused</h2>
             <p className="max-w-sm text-sm text-muted-foreground">
-              The clock is stopped at {Math.ceil(secondsLeft)}s and the email is hidden until you come back.
+              The clock is stopped at {Math.ceil(secondsLeft)}s and the {noun} is hidden until you come back.
             </p>
             <Button autoFocus size="lg" className="mt-1 gap-2 font-semibold" onClick={resume}>
               <Play className="size-4" />
@@ -256,7 +262,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
               </span>
             </span>
           ) : (
-            <span>Hover over or tap a link in the email to see where it really goes.</span>
+            <span>Hover over or tap a link in the {noun} to see where it really goes.</span>
           )}
         </div>
       </motion.div>
