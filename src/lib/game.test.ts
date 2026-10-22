@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, splitLinks } from './game';
+import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, MIN_PHONE_MESSAGES, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, splitLinks } from './game';
 import { LEVELS, LEVEL_ORDER, channelOf } from '@/types';
 
 describe('buildRound', () => {
@@ -75,6 +75,13 @@ describe('channels', () => {
     const counts = channelCounts(level);
     expect(counts.sms).toBeGreaterThan(0);
     expect(counts.whatsapp).toBeGreaterThan(0);
+  });
+
+  it.each(LEVEL_ORDER)('always mixes texts or chats into a %s round', level => {
+    for (let i = 0; i < 50; i++) {
+      const round = buildRound(level);
+      expect(round.filter(e => channelOf(e) !== 'email').length).toBeGreaterThanOrEqual(MIN_PHONE_MESSAGES);
+    }
   });
 
   it('builds a round from one channel only', () => {

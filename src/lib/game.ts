@@ -59,7 +59,27 @@ export function buildRound(level: Level, categories: CategoryId[] = [], channels
   phishCount = Math.max(0, phishCount);
   const legitCount = Math.min(rounds - phishCount, legit.length);
 
-  return shuffle([...phish.slice(0, phishCount), ...legit.slice(0, legitCount)]);
+  const round = [...phish.slice(0, phishCount), ...legit.slice(0, legitCount)];
+  if (channels.length === 0) mixInPhoneMessages(round, pool);
+  return shuffle(round);
+}
+
+/** Mixed rounds always include a few texts or chats, not just emails. */
+export const MIN_PHONE_MESSAGES = 2;
+
+/** Swap emails for unused SMS or WhatsApp items of the same answer, keeping the balance. */
+function mixInPhoneMessages(round: Email[], pool: Email[]) {
+  const isPhone = (e: Email) => channelOf(e) !== 'email';
+  const used = new Set(round.map(e => e.id));
+  const spare = shuffle(pool.filter(e => isPhone(e) && !used.has(e.id)));
+  let missing = MIN_PHONE_MESSAGES - round.filter(isPhone).length;
+  for (let i = 0; i < round.length && missing > 0; i++) {
+    if (isPhone(round[i])) continue;
+    const j = spare.findIndex(e => e.is_phishing === round[i].is_phishing);
+    if (j === -1) continue;
+    round[i] = spare.splice(j, 1)[0];
+    missing--;
+  }
 }
 
 export function scoreAnswer(
