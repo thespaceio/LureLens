@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, RotateCcw, Trophy, X } from 'lucide-react';
+import { Check, RotateCcw, Share2, Trophy, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SharePanel from '@/components/SharePanel/SharePanel';
 import { rankTitle } from '@/lib/game';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { Choice, GameSession, Level } from '@/types';
@@ -25,6 +27,7 @@ const CHOICE: Record<Choice, string> = {
 export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlayLevel, onScoreboard, onProgress }: ResultsScreenProps) {
   const cfg = LEVELS[session.level];
   const nextLevel = LEVEL_ORDER[LEVEL_ORDER.indexOf(session.level) + 1];
+  const [sharing, setSharing] = useState(false);
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="mx-auto w-full max-w-3xl space-y-6">
@@ -63,6 +66,15 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
         <Button onClick={onPlayAgain} className="gap-2 font-semibold">
           <RotateCcw className="size-4" /> Play again
         </Button>
+        <Button
+          variant="secondary"
+          className="gap-2"
+          aria-expanded={sharing}
+          onClick={() => setSharing(s => !s)}
+          data-testid="share-button"
+        >
+          <Share2 className="size-4" /> {sharing ? 'Hide share card' : 'Share result'}
+        </Button>
         {nextLevel && session.accuracy >= 70 && (
           <Button variant="secondary" onClick={() => onPlayLevel(nextLevel)}>
             Try {LEVELS[nextLevel].label}
@@ -75,6 +87,8 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
           My progress
         </Button>
       </div>
+
+      {sharing && <SharePanel session={session} />}
 
       <section>
         <h2 className="mb-3 font-semibold">Review your answers</h2>
