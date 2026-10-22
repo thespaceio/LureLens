@@ -37,7 +37,7 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
         <p className="mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank">
           <Trophy className="size-4" />
           {session.practice ? (
-            <>Topic practice round, saved to your progress but not the scoreboard</>
+            <>Practice round, saved to your progress but not the scoreboard</>
           ) : (
             <>#{rank.rank} of {rank.of} on the {cfg.label} scoreboard</>
           )}

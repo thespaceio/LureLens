@@ -10,7 +10,7 @@ import { Logo } from '@/components/Logo/Logo';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
-import type { CategoryId, Email, GameSession, Level } from '@/types';
+import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
 import './App.css';
 
 // The dashboard pulls in the charting library, so load it only when opened.
@@ -22,6 +22,7 @@ interface Game {
   id: string;
   level: Level;
   categories: CategoryId[];
+  channels: Channel[];
   emails: Email[];
 }
 
@@ -52,11 +53,11 @@ function App() {
     window.scrollTo(0, 0);
   };
 
-  const startGame = useCallback((level: Level, categories: CategoryId[] = []) => {
-    const emails = buildRound(level, categories);
+  const startGame = useCallback((level: Level, categories: CategoryId[] = [], channels: Channel[] = []) => {
+    const emails = buildRound(level, categories, channels);
     if (emails.length === 0) return;
     setMenuLevel(level);
-    setGame({ id: `${level}-${Date.now()}`, level, categories, emails });
+    setGame({ id: `${level}-${Date.now()}`, level, categories, channels, emails });
     setView('quiz');
     window.scrollTo(0, 0);
   }, []);
@@ -79,7 +80,7 @@ function App() {
         bestStreak,
         avgSeconds: total ? Math.round((answers.reduce((s, a) => s + a.seconds, 0) / total) * 10) / 10 : 0,
         answers,
-        ...(game.categories.length > 0 ? { practice: true } : {}),
+        ...(game.categories.length > 0 || game.channels.length > 0 ? { practice: true } : {}),
       };
       const playedBefore = playerSessions(store.sessions, name).some(s => !s.practice && s.level === game.level);
       const previousBest = bestScore(store.sessions, name, game.level);
@@ -114,7 +115,7 @@ function App() {
         return result ? (
           <ResultsScreen
             {...result}
-            onPlayAgain={() => startGame(result.session.level, game?.categories ?? [])}
+            onPlayAgain={() => startGame(result.session.level, game?.categories ?? [], game?.channels ?? [])}
             onPlayLevel={level => startGame(level)}
             onScoreboard={() => navigate('scoreboard')}
             onProgress={() => navigate('progress')}
@@ -211,10 +212,10 @@ function About() {
         <h1 className="mt-1 text-3xl font-bold sm:text-4xl">About LureLens</h1>
       </div>
       <p className="text-muted-foreground">
-        LureLens is a phishing-awareness training game by Th3 SpaceIO. You get a few seconds per email to decide if it's
-        safe, then see exactly which signs gave it away. The scenarios are built around what people in Nigeria actually
-        receive: bank and fintech alerts, BVN and NIN requests, grants, NYSC and JAMB scams, delivery fees, fake jobs and
-        targeted attacks on businesses.
+        LureLens is a phishing-awareness training game by Th3 SpaceIO. You get a few seconds per email, text message or
+        WhatsApp chat to decide if it's safe, then see exactly which signs gave it away. The scenarios are built around
+        what people in Nigeria actually receive: bank and fintech alerts, BVN and NIN requests, grants, NYSC and JAMB
+        scams, delivery fees, fake jobs, hijacked WhatsApp accounts and targeted attacks on businesses.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="rounded-xl border border-border bg-card p-5">
@@ -222,6 +223,8 @@ function About() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
               'Check the real sender domain, letter by letter',
+              'Know that a text\'s sender name can be faked',
+              'Spot a friend\'s hijacked WhatsApp asking for money or codes',
               'Spot urgency, threats and too-good-to-be-true offers',
               'Find where a link really goes before clicking',
               'Recognise CEO fraud and changed bank details',

@@ -3,17 +3,17 @@ import { motion } from 'framer-motion';
 import { Check, Play, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { categoryCounts, emailsFor } from '@/lib/game';
+import { categoryCounts, channelCounts, emailsFor } from '@/lib/game';
 import { bestScore } from '@/lib/stats';
-import { CATEGORIES, LEVELS, LEVEL_ORDER, PLAYER } from '@/types';
-import type { CategoryId, GameSession, Level } from '@/types';
+import { CATEGORIES, CHANNELS, LEVELS, LEVEL_ORDER, PLAYER } from '@/types';
+import type { CategoryId, Channel, GameSession, Level } from '@/types';
 
 interface DifficultySelectorProps {
   playerName: string;
   sessions: GameSession[];
   initialLevel?: Level;
   onNameChange: (name: string) => void;
-  onStart: (level: Level, categories: CategoryId[]) => void;
+  onStart: (level: Level, categories: CategoryId[], channels: Channel[]) => void;
 }
 
 const LEVEL_ACCENT: Record<Level, string> = {
@@ -25,10 +25,12 @@ const LEVEL_ACCENT: Record<Level, string> = {
 export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart }: DifficultySelectorProps) {
   const [level, setLevel] = useState<Level>(initialLevel ?? 'beginner');
   const [categories, setCategories] = useState<CategoryId[]>([]);
+  const [channels, setChannels] = useState<Channel[]>([]);
   const [nameError, setNameError] = useState(false);
 
   const counts = useMemo(() => categoryCounts(level), [level]);
-  const available = useMemo(() => emailsFor(level, categories).length, [level, categories]);
+  const chCounts = useMemo(() => channelCounts(level), [level]);
+  const available = useMemo(() => emailsFor(level, categories, channels).length, [level, categories, channels]);
   const rounds = Math.min(LEVELS[level].rounds, available);
 
   const selectLevel = (l: Level) => {
@@ -41,13 +43,16 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
   const toggleCategory = (id: CategoryId) =>
     setCategories(prev => (prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]));
 
+  const toggleChannel = (id: Channel) =>
+    setChannels(prev => (prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]));
+
   const start = () => {
     if (!playerName.trim()) {
       setNameError(true);
       document.getElementById('player-name')?.focus();
       return;
     }
-    onStart(level, categories);
+    onStart(level, categories, channels);
   };
 
   return (
@@ -136,14 +141,44 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
 
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-semibold">Practise specific topics (optional, not ranked)</h2>
+          <h2 className="font-semibold">Practise a channel or topic (optional, not ranked)</h2>
           <span className="font-mono text-xs text-muted-foreground">
             {available} message{available === 1 ? '' : 's'} available
           </span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Channels">
           <button
             type="button"
+            aria-pressed={channels.length === 0}
+            onClick={() => setChannels([])}
+            className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+              channels.length === 0 ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
+            }`}
+          >
+            All channels
+          </button>
+          {(Object.keys(CHANNELS) as Channel[]).map(id => {
+            const on = channels.includes(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={on}
+                disabled={chCounts[id] === 0}
+                onClick={() => toggleChannel(id)}
+                className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
+                  on ? 'border-lavender bg-lavender text-primary-foreground' : 'border-border hover:border-lavender/60'
+                }`}
+              >
+                {CHANNELS[id].label} <span className="opacity-60">({chCounts[id]})</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Topics">
+          <button
+            type="button"
+            aria-pressed={categories.length === 0}
             onClick={() => setCategories([])}
             className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
               categories.length === 0 ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
@@ -158,6 +193,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
               <button
                 key={id}
                 type="button"
+                aria-pressed={on}
                 disabled={count === 0}
                 title={CATEGORIES[id].description}
                 onClick={() => toggleCategory(id)}
@@ -190,7 +226,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           <li>From <strong className="text-foreground">3 correct in a row</strong>, every further correct answer adds <strong className="text-foreground">+50</strong>.</li>
           <li>Running out of time or skipping scores 0 and resets your streak.</li>
           <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the message. Switching apps pauses automatically.</li>
-          <li>Topic practice rounds count towards your progress but not the scoreboard.</li>
+          <li>Channel or topic practice rounds count towards your progress but not the scoreboard.</li>
           <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
         </ul>
       </section>
