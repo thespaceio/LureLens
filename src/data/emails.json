@@ -752,7 +752,7 @@
     },
     "subject": "Your September 2026 statement is ready",
     "date": "2026-10-02T08:15:00",
-    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#40196D;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Kuda.</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Your account statement for September 2026 is now available.</p><p style='margin:0 0 14px'>To view or download it, open the Kuda app and go to Me > Statements. For your security, we do not attach statements to emails.</p><p style='margin:0 0 14px'>Kuda will never ask for your PIN, password or OTP.</p><p style='margin:0 0 14px'>Kuda</p></div></div>",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#40196D;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>Kuda.</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>Your account statement for September 2026 is now available.</p><p style='margin:0 0 14px'>To view or download it, open the Kuda app and find Statements in your account settings. For your security, we do not attach statements to emails.</p><p style='margin:0 0 14px'>Kuda will never ask for your PIN, password or OTP.</p><p style='margin:0 0 14px'>Kuda</p></div></div>",
     "red_flags": [],
     "trust_signals": [
       "Comes from kuda.com, Kuda's real domain",
@@ -1360,7 +1360,7 @@
     },
     "subject": "New login to Facebook from Android in Abuja",
     "date": "2026-10-16T22:18:00",
-    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#1877F2;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>facebook</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>We noticed a new login to your account from an Android device near Abuja, Nigeria on 16 October at 22:16.</p><p style='margin:0 0 14px'>If this was you, you can ignore this message. If it wasn't you, open Facebook, go to Settings > Password and security, and change your password.</p><p style='margin:0 0 14px'>Thanks,<br>The Facebook Security Team</p></div></div>",
+    "body": "<div style='font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:620px;border:1px solid #e5e5e5'><div style='background:#1877F2;padding:18px 24px;'><span style='color:#fff;font-size:22px;font-weight:bold;letter-spacing:.3px'>facebook</span></div><div style='padding:24px'><p style='margin:0 0 14px'>Hi Ada,</p><p style='margin:0 0 14px'>We noticed a new login to your account from an Android device near Abuja, Nigeria on 16 October at 22:16.</p><p style='margin:0 0 14px'>If this was you, you can ignore this message. If it wasn't you, open the Facebook app yourself and change your password from your security settings.</p><p style='margin:0 0 14px'>Thanks,<br>The Facebook Security Team</p></div></div>",
     "red_flags": [],
     "trust_signals": [
       "security@facebookmail.com is the address Facebook really uses for security alerts",
