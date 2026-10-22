@@ -1,4 +1,4 @@
-// Shared types and game settings for PhishGuard.
+// Shared types and game settings for LureLens.
 
 export type Level = 'beginner' | 'intermediate' | 'advanced';
 

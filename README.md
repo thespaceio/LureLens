@@ -1,6 +1,10 @@
-# PhishGuard
+# LureLens
 
 **A timed phishing-detection training game by [Th3 SpaceIO](https://th3spaceio.community).**
+
+**Play it:** [lurelens.netlify.app](https://lurelens.netlify.app/) · [GitHub Pages mirror](https://thespaceio.github.io/LureLens/)
+
+LureLens was previously called PhishGuard. Old links to `phishguard-by-faith.netlify.app` redirect here.
 
 You play as Ada Okafor, an analyst at the fictional BrightPath Technologies (`brightpath.ng`). Realistic emails land in your inbox one at a time, and you have a few seconds to decide whether each one is **Legitimate** or **Phishing**. After every answer you see the red flags (or the signs it was safe) and why they matter.
 
@@ -44,7 +48,7 @@ npm run lint
 
 **Netlify or Vercel:** build command `npm run build`, output folder `dist`.
 
-The app uses relative paths, so it works from a sub-path such as `username.github.io/PhishGuard/`.
+The app uses relative paths, so it works from a sub-path such as `username.github.io/LureLens/`.
 
 ## Project structure
 

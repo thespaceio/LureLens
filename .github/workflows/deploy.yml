@@ -1,4 +1,4 @@
-# Builds PhishGuard on every pull request and publishes it to GitHub Pages on
+# Builds LureLens on every pull request and publishes it to GitHub Pages on
 # every push to main.
 # One-time setup: repo Settings → Pages → Source: "GitHub Actions".
 name: Deploy to GitHub Pages
