@@ -7,6 +7,8 @@ const FILE = new URL('../src/data/emails.json', import.meta.url);
 const LEVELS = ['beginner', 'intermediate', 'advanced'];
 const CATEGORIES = ['banking', 'workplace', 'accounts', 'shopping', 'government', 'offers'];
 const ROUNDS = 10;
+const CHANNELS = ['email', 'sms', 'whatsapp'];
+const PHONE_RE = /^\+?[0-9][0-9 ]{6,}$/;
 const EMAIL_RE = /^[^\s@<>]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
 const errors = [];
@@ -35,11 +37,27 @@ for (const e of emails) {
   if (!LEVELS.includes(e.level)) fail(id, `unknown level "${e.level}"`);
   if (!CATEGORIES.includes(e.category)) fail(id, `unknown category "${e.category}"`);
   if (typeof e.is_phishing !== 'boolean') fail(id, 'is_phishing must be true or false');
-  for (const key of ['topic', 'subject', 'body', 'explanation']) {
+  const channel = e.channel ?? 'email';
+  if (!CHANNELS.includes(channel)) fail(id, `unknown channel "${e.channel}"`);
+  for (const key of ['topic', 'subject', 'explanation']) {
     if (typeof e[key] !== 'string' || !e[key].trim()) fail(id, `missing ${key}`);
   }
-  if (!e.sender?.name || !EMAIL_RE.test(e.sender?.email ?? '')) fail(id, 'sender needs a name and a valid address');
-  if (e.reply_to !== undefined && !EMAIL_RE.test(e.reply_to)) fail(id, 'reply_to is not a valid address');
+  if (channel === 'email') {
+    if (typeof e.body !== 'string' || !e.body.trim()) fail(id, 'missing body');
+    if (!e.sender?.name || !EMAIL_RE.test(e.sender?.email ?? '')) fail(id, 'sender needs a name and a valid address');
+    if (e.reply_to !== undefined && !EMAIL_RE.test(e.reply_to)) fail(id, 'reply_to is not a valid address');
+    if (e.messages !== undefined) fail(id, 'emails use body, not messages');
+  } else {
+    if (!Array.isArray(e.messages) || !e.messages.length || e.messages.some(m => typeof m !== 'string' || !m.trim())) {
+      fail(id, 'SMS and WhatsApp items need a non-empty messages list');
+    }
+    if (e.body !== undefined || e.reply_to !== undefined) fail(id, 'SMS and WhatsApp items use messages, not body or reply_to');
+    if (!e.sender?.name) fail(id, 'sender needs a name, sender ID or number');
+    if (e.sender?.email !== undefined) fail(id, 'SMS and WhatsApp senders have no email address');
+    if (e.sender?.number !== undefined && !PHONE_RE.test(e.sender.number)) fail(id, 'sender number is not a phone number');
+    if (channel === 'whatsapp' && !e.sender?.number) fail(id, 'WhatsApp senders need a phone number');
+    if ((e.messages ?? []).some(m => /javascript:|<script|<[a-z][^>]*>/i.test(m))) fail(id, 'messages must be plain text');
+  }
   if (Number.isNaN(Date.parse(e.date ?? ''))) fail(id, 'date is not a valid ISO date');
   if (e.attachments !== undefined && !(Array.isArray(e.attachments) && e.attachments.every(a => typeof a === 'string'))) {
     fail(id, 'attachments must be a list of file names');
@@ -63,7 +81,7 @@ for (const e of emails) {
   }
 
   // Safety: bodies are sanitised at runtime, but keep the source clean too.
-  const body = e.body ?? '';
+  const body = channel === 'email' ? e.body ?? '' : '';
   if (/<script|<iframe|<object|<embed|<form/i.test(body)) fail(id, 'body contains a disallowed tag');
   if (/\son[a-z]+\s*=/i.test(body)) fail(id, 'body contains an inline event handler');
   if (/javascript:/i.test(body)) fail(id, 'body contains a javascript: link');
@@ -84,4 +102,5 @@ if (errors.length) {
   process.exit(1);
 }
 const counts = LEVELS.map(l => `${l} ${emails.filter(e => e.level === l).length}`).join(', ');
-console.log(`emails.json OK: ${emails.length} emails (${counts})`);
+const byChannel = CHANNELS.map(c => `${c} ${emails.filter(e => (e.channel ?? 'email') === c).length}`).join(', ');
+console.log(`emails.json OK: ${emails.length} messages (${counts}; ${byChannel})`);

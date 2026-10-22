@@ -785,6 +785,302 @@
     "explanation": "A normal trip receipt. If you took the ride, the details will match your trip history."
   },
   {
+    "id": "ng-b-sp01",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "sms",
+    "sender": {
+      "name": "GTBank"
+    },
+    "subject": "SMS: account on hold over a BVN mismatch",
+    "date": "2026-10-15T07:41:00",
+    "messages": [
+      "Dear Customer, your account has been placed on HOLD due to BVN mismatch. Update now to avoid permanent suspension: gtb-bvn-update.xyz"
+    ],
+    "red_flags": [
+      {
+        "description": "Banks do not send links asking you to update your BVN"
+      },
+      {
+        "description": "The link goes to gtb-bvn-update.xyz, not gtbank.com"
+      },
+      {
+        "description": "Threat of permanent suspension"
+      },
+      {
+        "description": "The sender name can be faked; it can sit in the same thread as real GTBank alerts"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "A sender name like \"GTBank\" can be faked, so these texts can even appear in the same thread as your real alerts. Banks do not send links to update your BVN; use the official app or visit a branch."
+  },
+  {
+    "id": "ng-b-sp02",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Prizes & Promos",
+    "channel": "sms",
+    "sender": {
+      "name": "+234 812 555 0193",
+      "number": "+234 812 555 0193"
+    },
+    "subject": "SMS: you won ₦1,000,000 in an MTN promo",
+    "date": "2026-10-13T12:05:00",
+    "messages": [
+      "MTN MEGA PROMO: Congrats! Your line has won N1,000,000. To claim, send your full name, bank account number and N5,000 activation fee to 08125550193. Hurry, claim closes today!!"
+    ],
+    "red_flags": [
+      {
+        "description": "A prize text from an ordinary phone number, not MTN"
+      },
+      {
+        "description": "You never entered any promo"
+      },
+      {
+        "description": "You must pay an \"activation fee\" to receive a prize"
+      },
+      {
+        "description": "Asks for your bank details"
+      },
+      {
+        "description": "\"Claim closes today\" pressure"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "You cannot win a promo you never entered, and real prizes never cost money to collect. A prize from MTN would not come from an ordinary phone number."
+  },
+  {
+    "id": "ng-b-sp03",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "shopping",
+    "topic": "Delivery",
+    "channel": "sms",
+    "sender": {
+      "name": "+234 703 555 0140",
+      "number": "+234 703 555 0140"
+    },
+    "subject": "SMS: pay ₦1,200 to redeliver a parcel",
+    "date": "2026-10-16T10:22:00",
+    "messages": [
+      "GIGL: Your parcel could not be delivered due to incomplete address. Pay N1,200 redelivery fee within 24hrs or it will be returned: gigl-redeliver.top/pay"
+    ],
+    "red_flags": [
+      {
+        "description": "Sent from an ordinary phone number"
+      },
+      {
+        "description": "No waybill number or shop name, so it could be sent to anyone"
+      },
+      {
+        "description": "Link goes to gigl-redeliver.top, not giglogistics.com"
+      },
+      {
+        "description": "A small fee makes you less likely to stop and think"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Small \"redelivery fees\" are a popular way to steal card details. Check deliveries in the courier's app with the waybill number from the shop you ordered from."
+  },
+  {
+    "id": "ng-b-sl01",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "sms",
+    "sender": {
+      "name": "AccessBank"
+    },
+    "subject": "SMS: debit alert for a Chowdeck order",
+    "date": "2026-10-16T13:48:00",
+    "messages": [
+      "Acct:******4417\nDR:NGN5,400.00\nDesc:POS/WEB CHOWDECK LAGOS\nDT:16-OCT-26 13:47\nBal:NGN181,920.55"
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Matches a payment you just made (the Chowdeck order)",
+      "Masked account number and a believable balance",
+      "No link, no phone number to call, no request",
+      "Only information you can confirm in your banking app"
+    ],
+    "explanation": "A normal debit alert: it matches something you just paid for and asks for nothing. Even so, if an alert ever looks wrong, check your balance in the app rather than replying."
+  },
+  {
+    "id": "ng-b-sl02",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "accounts",
+    "topic": "Account Security",
+    "channel": "sms",
+    "sender": {
+      "name": "Bolt"
+    },
+    "subject": "SMS: Bolt sign-in code you requested",
+    "date": "2026-10-14T19:36:00",
+    "messages": [
+      "Your Bolt verification code is 4821. Do not share this code with anyone."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "You requested it moments ago by signing in",
+      "Says plainly not to share the code",
+      "No link and no request to reply",
+      "Short and specific, like real one-time codes"
+    ],
+    "explanation": "Genuine, because you just asked for it by signing in. The rule never changes: type the code into the app yourself and never read it out or forward it to anyone."
+  },
+  {
+    "id": "ng-b-wp01",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Jobs",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "+234 906 555 0187",
+      "number": "+234 906 555 0187",
+      "saved": false
+    },
+    "subject": "WhatsApp: earn ₦20,000 a day liking YouTube videos",
+    "date": "2026-10-12T09:15:00",
+    "messages": [
+      "Hello dear 😊 I am Grace, HR recruiter for an online marketing agency. We need part-time remote staff to like and subscribe to YouTube videos. You earn ₦5,000 to ₦20,000 DAILY.",
+      "To start, join our task group and pay a ₦10,000 registration fee (fully refundable after your first task). Interested?"
+    ],
+    "red_flags": [
+      {
+        "description": "Message from a number you do not know"
+      },
+      {
+        "description": "Huge pay for almost no work"
+      },
+      {
+        "description": "You must pay a \"registration fee\" to get a job"
+      },
+      {
+        "description": "No company name, website or interview"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Task scams start by paying you small amounts for easy work, then ask for bigger \"deposits\". Real jobs never ask you to pay to start."
+  },
+  {
+    "id": "ng-b-wp02",
+    "level": "beginner",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Telecom",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "+234 701 555 0120",
+      "number": "+234 701 555 0120",
+      "saved": false
+    },
+    "subject": "WhatsApp: free 50GB data, share to 10 groups",
+    "date": "2026-10-15T20:02:00",
+    "messages": [
+      "🎉 AIRTEL 2026 ANNIVERSARY 🎉\nGet FREE 50GB data valid for 3 months! Click to claim: airtel-free-data.site\nShare this message to 10 groups to activate your bonus."
+    ],
+    "red_flags": [
+      {
+        "description": "Unknown number pretending to be a network"
+      },
+      {
+        "description": "Link goes to airtel-free-data.site, not an Airtel site"
+      },
+      {
+        "description": "Asks you to share to 10 groups, which spreads the scam"
+      },
+      {
+        "description": "Too-good-to-be-true free data"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Chain messages that make you share to activate a reward spread scam links fast. Network bonuses show up in the official app or by text from the network, not as forwarded links."
+  },
+  {
+    "id": "ng-b-wl01",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Tolu Adeyemi (Work)",
+      "number": "+234 803 555 0142",
+      "saved": true
+    },
+    "subject": "WhatsApp: colleague running late to standup",
+    "date": "2026-10-16T09:52:00",
+    "messages": [
+      "Morning Ada, running about 10 mins late to standup. Traffic on Third Mainland 😩 Start without me, I'll catch up."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "From a contact saved in your phone",
+      "Fits the normal working day (standup at 10:30)",
+      "No link, money or code requested"
+    ],
+    "explanation": "A normal message from a saved colleague. It asks for nothing and matches what you would expect."
+  },
+  {
+    "id": "ng-b-wl02",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Delivery",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "+234 708 555 0131",
+      "number": "+234 708 555 0131",
+      "saved": false
+    },
+    "subject": "WhatsApp: delivery rider at your gate",
+    "date": "2026-10-17T14:12:00",
+    "messages": [
+      "Good afternoon, I am the Jumia delivery rider for your order JM-284719 (Oraimo FreePods).",
+      "I am at the gate of 14 Admiralty Way. Please come out or tell security to let me in. It has already been paid for."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Names the exact order you placed and its item",
+      "Confirms it is already paid, so there is nothing to pay",
+      "Asks only for you to come out, no link, code or money",
+      "You are expecting this delivery"
+    ],
+    "explanation": "An unknown number is not automatically a scam. This rider names the exact order you are expecting and asks only for you to come to the gate. A scam would ask for a fee, a code or a link."
+  },
+  {
+    "id": "ng-b-wl03",
+    "level": "beginner",
+    "is_phishing": false,
+    "category": "shopping",
+    "topic": "Shopping",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Mama Put Kitchen",
+      "number": "+234 809 555 0115",
+      "saved": true
+    },
+    "subject": "WhatsApp: your food order is ready for pickup",
+    "date": "2026-10-15T12:40:00",
+    "messages": [
+      "Hello Ada, your order (2 plates of jollof rice and plantain) is ready for pickup.",
+      "Pay at the counter as usual. Thank you!"
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "A business number you saved before",
+      "Confirms an order you actually placed",
+      "Payment happens in person as usual, not by transfer to a new account"
+    ],
+    "explanation": "A small business you already buy from, confirming an order you placed and asking you to pay in person as usual."
+  },
+  {
     "id": "ng-i-p01",
     "level": "intermediate",
     "is_phishing": true,
@@ -1413,6 +1709,293 @@
       "Tracking happens in the app with the waybill number, no link needed"
     ],
     "explanation": "Compare this with the fake \"delivery failed\" email: the real one names the sender you ordered from and asks for no payment."
+  },
+  {
+    "id": "ng-i-sp01",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "sms",
+    "sender": {
+      "name": "ZenithBank"
+    },
+    "subject": "SMS: cancel a ₦450,000 transfer within 10 minutes",
+    "date": "2026-10-16T22:11:00",
+    "messages": [
+      "Zenith Alert: A transfer of NGN450,000.00 to 0123987744 is being processed from your account. If you did not initiate this, CANCEL within 10 mins: zenith-cancel-txn.com"
+    ],
+    "red_flags": [
+      {
+        "description": "Link goes to zenith-cancel-txn.com, not zenithbank.com"
+      },
+      {
+        "description": "Ten-minute deadline to stop you thinking"
+      },
+      {
+        "description": "Real banks never cancel transfers through a texted link"
+      },
+      {
+        "description": "The sender name can be faked and appear in your real Zenith thread"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Fear of losing money makes people click fast. A real bank would tell you to use the app or call the number on your card, never to \"cancel\" through a link."
+  },
+  {
+    "id": "ng-i-sp02",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "government",
+    "topic": "Government",
+    "channel": "sms",
+    "sender": {
+      "name": "FRSC"
+    },
+    "subject": "SMS: unpaid traffic fine, pay within 48 hours",
+    "date": "2026-10-14T08:30:00",
+    "messages": [
+      "FRSC NOTICE: Your vehicle has an unpaid traffic offence fine of N25,000 (Ref: FRSC/LAG/88213). Pay within 48hrs to avoid court action: frsc-fines.com.ng"
+    ],
+    "red_flags": [
+      {
+        "description": "Link goes to frsc-fines.com.ng; FRSC's official site is frsc.gov.ng"
+      },
+      {
+        "description": "No vehicle number, date or place of the offence"
+      },
+      {
+        "description": "Threat of court action within 48 hours"
+      },
+      {
+        "description": "FRSC has publicly warned about fake fine texts like this"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "FRSC has warned motorists about fake traffic-offence texts and websites. Check any fine on FRSC's official site, frsc.gov.ng, or at an FRSC office."
+  },
+  {
+    "id": "ng-i-sp03",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Fintech",
+    "channel": "sms",
+    "sender": {
+      "name": "Moniepoint"
+    },
+    "subject": "SMS: a code you should read out to an \"agent\"",
+    "date": "2026-10-15T16:04:00",
+    "messages": [
+      "Your one-time code is 552013. A Moniepoint agent will call you shortly to confirm this code and complete your refund."
+    ],
+    "red_flags": [
+      {
+        "description": "Tells you to read your code to a caller; real code texts say never share it"
+      },
+      {
+        "description": "You did not ask for a refund"
+      },
+      {
+        "description": "Sets you up for a phone call from someone posing as the bank"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Scammers trigger a real code, then call pretending to be the bank. Genuine code texts always say never to share them. Anyone who asks for your code is trying to get into your account."
+  },
+  {
+    "id": "ng-i-sl01",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "sms",
+    "sender": {
+      "name": "GTBank"
+    },
+    "subject": "SMS: GTWorld sign-in code",
+    "date": "2026-10-16T08:12:00",
+    "messages": [
+      "Your GTWorld login code is 731904. It expires in 5 minutes. GTBank will never ask you for this code."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Arrives while you are signing in to the GTWorld app",
+      "Short expiry, like real codes",
+      "Warns that the bank will never ask for it",
+      "No link and nothing to reply to"
+    ],
+    "explanation": "Genuine if you were signing in to GTWorld, GTBank's app, at that moment. If you were not, someone may have your password: change it in the app."
+  },
+  {
+    "id": "ng-i-sl02",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "offers",
+    "topic": "Telecom",
+    "channel": "sms",
+    "sender": {
+      "name": "MTN"
+    },
+    "subject": "SMS: you have used 80% of your data plan",
+    "date": "2026-10-13T21:30:00",
+    "messages": [
+      "Y'ello! You have used 80% of your 10GB monthly data plan. Check your balance or buy more in the myMTN app."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Matches a data plan you have",
+      "Sends you to the myMTN app, not a link",
+      "No request for money, codes or details",
+      "Uses MTN's usual greeting, but the safe part is that it asks for nothing"
+    ],
+    "explanation": "A routine usage notice. It points you to the official app rather than a link, and asks for nothing."
+  },
+  {
+    "id": "ng-i-wp01",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Impersonation",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Chinedu (Uni)",
+      "number": "+234 816 555 0174",
+      "saved": true
+    },
+    "subject": "WhatsApp: a friend urgently needs ₦45,000",
+    "date": "2026-10-16T19:47:00",
+    "messages": [
+      "Hey Ada, sorry to bother you. I'm at the hospital with my mum and my bank app isn't working 😢",
+      "Please can you send ₦45,000 to this account? I'll refund you tonight. 0123456789 OPay – Joy Eze",
+      "Please don't call, I can't talk right now."
+    ],
+    "red_flags": [
+      {
+        "description": "The account name (Joy Eze) is not your friend's name"
+      },
+      {
+        "description": "Urgent emergency and a request for money"
+      },
+      {
+        "description": "Asks you not to call, so you cannot check"
+      },
+      {
+        "description": "Friends' WhatsApp accounts are often hijacked and used like this"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Hacked WhatsApp accounts are used to message every contact for money. The name is right because it is your friend's real account. Call them on their usual number before sending anything."
+  },
+  {
+    "id": "ng-i-wp02",
+    "level": "intermediate",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "Social Media",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Kemi Adebayo",
+      "number": "+234 805 555 0126",
+      "saved": true
+    },
+    "subject": "WhatsApp: friend asks you to send back a 6-digit code",
+    "date": "2026-10-15T07:58:00",
+    "messages": [
+      "Hi Ada! Good morning 😊 I mistakenly sent my 6-digit code to your number. Please can you send it back to me? It's urgent."
+    ],
+    "red_flags": [
+      {
+        "description": "The code on your phone belongs to your own account"
+      },
+      {
+        "description": "Comes from a friend's account that has probably been hijacked"
+      },
+      {
+        "description": "Urgency over something that should not matter to them"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "The code that just arrived on your phone is for YOUR WhatsApp account. Sending it lets the attacker take over your number, and then they message your contacts. This is how hijackings spread."
+  },
+  {
+    "id": "ng-i-wl01",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Femi – BrightPath IT",
+      "number": "+234 818 555 0107",
+      "saved": true
+    },
+    "subject": "WhatsApp: IT about the new laptops",
+    "date": "2026-10-14T11:10:00",
+    "messages": [
+      "Hi Ada, the new laptops arrive Thursday. Bring your old one to the IT desk on the 3rd floor when you're free.",
+      "No need to send any passwords, we'll set up the new one with you in person."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Saved contact from your IT team",
+      "Asks you to come in person",
+      "Says no passwords are needed",
+      "No link or attachment"
+    ],
+    "explanation": "A saved colleague about a normal IT task. It sends you to the desk in person and explicitly asks for no passwords."
+  },
+  {
+    "id": "ng-i-wl02",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Mr Okon (Landlord)",
+      "number": "+234 803 555 0145",
+      "saved": true
+    },
+    "subject": "WhatsApp: rent reminder, same account as before",
+    "date": "2026-10-20T18:05:00",
+    "messages": [
+      "Good evening Ada. Reminder that rent for November is due on the 1st.",
+      "Pay into the same account as before. Thank you."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Saved contact you deal with regularly",
+      "Expected at this time of month",
+      "Same account as before, no new details",
+      "No urgency or threat"
+    ],
+    "explanation": "A routine reminder from a saved contact. Crucially, the account has not changed. If a landlord ever sends new bank details, call them first."
+  },
+  {
+    "id": "ng-i-wl03",
+    "level": "intermediate",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Dad",
+      "number": "+234 802 555 0130",
+      "saved": true
+    },
+    "subject": "WhatsApp: Dad sent money for transport",
+    "date": "2026-10-16T08:30:00",
+    "messages": [
+      "I've sent ₦20,000 for your transport this week. Check your account and let me know when it lands."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Saved family contact",
+      "Money is being sent to you, not requested from you",
+      "You can check it yourself in your bank app"
+    ],
+    "explanation": "Money coming in, from a saved family contact, with nothing asked of you except to check your own account."
   },
   {
     "id": "ng-a-p01",
@@ -2068,5 +2651,300 @@
       "Refers to a real internal process you can confirm with IT"
     ],
     "explanation": "Security teams run simulations and share results. This one is safe because it asks for nothing and deliberately avoids links."
+  },
+  {
+    "id": "ng-a-sp01",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "accounts",
+    "topic": "Account Security",
+    "channel": "sms",
+    "sender": {
+      "name": "Microsoft"
+    },
+    "subject": "SMS: mailbox locked in 2 hours, verify now",
+    "date": "2026-10-15T15:20:00",
+    "messages": [
+      "Microsoft 365: Your BrightPath mailbox will be locked in 2 hours due to a policy violation. Verify your account: m365-login-verify.com/brightpath"
+    ],
+    "red_flags": [
+      {
+        "description": "Link goes to m365-login-verify.com, not a Microsoft or brightpath.ng address"
+      },
+      {
+        "description": "Two-hour lock-out threat"
+      },
+      {
+        "description": "Uses your company name to look targeted and real"
+      },
+      {
+        "description": "IT issues would come from your IT team, not an SMS"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Attackers text staff because phones show less of the link and have no email filters. Company account problems are handled by your IT team, not a link in a text."
+  },
+  {
+    "id": "ng-a-sp02",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "workplace",
+    "topic": "Business Email Compromise",
+    "channel": "sms",
+    "sender": {
+      "name": "+234 909 555 0103",
+      "number": "+234 909 555 0103"
+    },
+    "subject": "SMS: \"the MD\" needs gift cards urgently",
+    "date": "2026-10-16T14:02:00",
+    "messages": [
+      "Ada, this is Adebayo. I'm in a board meeting and can't talk. I need you to buy 4 Apple gift cards (₦50k each) for a client right away. Send me the codes here, I'll refund you. Keep this between us for now."
+    ],
+    "red_flags": [
+      {
+        "description": "Claims to be the MD but comes from an unknown number"
+      },
+      {
+        "description": "Gift cards are a classic untraceable payment for scammers"
+      },
+      {
+        "description": "Secrecy: \"keep this between us\""
+      },
+      {
+        "description": "Says he cannot talk, so you cannot check"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "CEO fraud moves to SMS and WhatsApp to avoid company email checks. Gift cards are untraceable, which is why attackers ask for them. Confirm through a known number or in person."
+  },
+  {
+    "id": "ng-a-sp03",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "government",
+    "topic": "Payments",
+    "channel": "sms",
+    "sender": {
+      "name": "LIRS"
+    },
+    "subject": "SMS: income tax arrears, pay to avoid penalty",
+    "date": "2026-10-14T10:45:00",
+    "messages": [
+      "LIRS: Your 2025 personal income tax assessment shows N48,200 outstanding. Pay before 31/10 to avoid penalty and enforcement: lirs-etax.com.ng/pay"
+    ],
+    "red_flags": [
+      {
+        "description": "The real LIRS eTax portal is etax.lirs.net, not lirs-etax.com.ng"
+      },
+      {
+        "description": "Penalty and enforcement threat"
+      },
+      {
+        "description": "Most salaried staff pay through PAYE at work, so a personal arrears text is unusual"
+      },
+      {
+        "description": "A sender name like \"LIRS\" can be faked"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Tax portals do not always end in .gov.ng: the real LIRS eTax portal is etax.lirs.net. Learn the exact address and type it yourself instead of following a texted link."
+  },
+  {
+    "id": "ng-a-sl01",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "sms",
+    "sender": {
+      "name": "AccessBank"
+    },
+    "subject": "SMS: code for a ₦289,500 payment you did not make",
+    "date": "2026-10-16T23:14:00",
+    "messages": [
+      "Your OTP for a NGN289,500.00 payment to an online merchant is 884120. If you did not start this payment, DO NOT share this code. Call the number on the back of your card."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Tells you never to share the code",
+      "Sends you to the number on the back of your card, not a number in the text",
+      "No link",
+      "Real banks send exactly this kind of code for card payments"
+    ],
+    "explanation": "This text is genuine, and it is warning you: someone is trying to use your card. Never share the code, and call your bank using the number on your card to block it. Not every alarming text is a scam."
+  },
+  {
+    "id": "ng-a-sl02",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Banking",
+    "channel": "sms",
+    "sender": {
+      "name": "FirstBank"
+    },
+    "subject": "SMS: new debit card ready at your branch",
+    "date": "2026-10-13T11:00:00",
+    "messages": [
+      "Dear Customer, your new FirstBank debit card ending 2290 has been dispatched to your branch (Yaba). Please pick it up with a valid ID."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Matches a card you requested",
+      "Collection is in person with ID",
+      "No link, payment or code requested"
+    ],
+    "explanation": "A normal service text: no link, no request, and you collect the card in person with ID."
+  },
+  {
+    "id": "ng-a-wp01",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "banking",
+    "topic": "Invoice Fraud",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Zentrix Supplies – Accounts",
+      "number": "+234 907 555 0148",
+      "saved": false
+    },
+    "subject": "WhatsApp: supplier sends \"new\" bank details",
+    "date": "2026-10-16T15:30:00",
+    "messages": [
+      "Good afternoon Ada, this is Chiamaka from Zentrix Supplies. Our email is having issues, so I'm reaching out here.",
+      "Please note our NEW account for invoice ZS-2304 (₦1,760,000): 1190027385, Moniepoint MFB, Zentrix Supplies Ltd. Kindly pay today and send the receipt here."
+    ],
+    "red_flags": [
+      {
+        "description": "A number not saved in your contacts, though you already know Chiamaka"
+      },
+      {
+        "description": "New bank details for an invoice whose email said the details were unchanged"
+      },
+      {
+        "description": "\"Our email is having issues\" is a reason to avoid checks"
+      },
+      {
+        "description": "Pressure to pay today"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "Payment fraud often moves to WhatsApp so the change avoids the paper trail at work. The invoice really exists, which is what makes this convincing. Call the supplier on the number you already have."
+  },
+  {
+    "id": "ng-a-wp02",
+    "level": "advanced",
+    "is_phishing": true,
+    "category": "offers",
+    "topic": "Investment Scam",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "+44 7700 900461",
+      "number": "+44 7700 900461",
+      "saved": false
+    },
+    "subject": "WhatsApp: \"wrong number\" turns into a crypto tip",
+    "date": "2026-10-12T21:18:00",
+    "messages": [
+      "Hello, is this Mrs Bello? I was told she sells ankara fabrics.",
+      "Oh sorry, wrong number! You seem nice though 😊 I'm Linda, I work in crypto trading in London.",
+      "I made 40% on USDT this month with a special platform. Would you like me to show you how? Small deposit, big returns."
+    ],
+    "red_flags": [
+      {
+        "description": "A friendly chat with a stranger that turns to money"
+      },
+      {
+        "description": "Promises 40% returns in a month"
+      },
+      {
+        "description": "Pushes a \"special platform\" you have never heard of"
+      },
+      {
+        "description": "Foreign number with no real connection to you"
+      }
+    ],
+    "trust_signals": [],
+    "explanation": "A friendly \"wrong number\" chat that turns into an investment offer is the opening of a long scam: fake profits on a fake platform until you deposit more. Block and do not engage."
+  },
+  {
+    "id": "ng-a-wl01",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Adebayo Ogunleye (MD)",
+      "number": "+234 803 555 0155",
+      "saved": true
+    },
+    "subject": "WhatsApp: MD thanks you after a meeting",
+    "date": "2026-10-16T18:10:00",
+    "messages": [
+      "Ada, thanks for the vendor review today.",
+      "Let's go through the Zentrix contract renewal at Monday's management meeting. Enjoy your weekend."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Saved number for the MD",
+      "Refers to a meeting that actually happened",
+      "Moves decisions to a normal meeting, no money or secrecy"
+    ],
+    "explanation": "From the MD's saved number, about real work, with no request for money or secrecy. Compare with the gift-card text from an unknown number."
+  },
+  {
+    "id": "ng-a-wl02",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "workplace",
+    "topic": "Workplace",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Bisi – BrightPath HR",
+      "number": "+234 817 555 0168",
+      "saved": true
+    },
+    "subject": "WhatsApp: HR reminder to use the portal",
+    "date": "2026-10-21T10:15:00",
+    "messages": [
+      "Hi all, reminder that HMO enrolment closes on 25 Oct.",
+      "Please choose your plan on the HR portal on the intranet as usual. Don't send ID documents or account details on WhatsApp."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Saved HR contact",
+      "Matches the HMO renewal email you already received",
+      "Sends you to the intranet as usual",
+      "Warns you not to share documents on WhatsApp"
+    ],
+    "explanation": "A reminder that points you to the usual system and warns against sharing documents on chat, the opposite of what a scammer wants."
+  },
+  {
+    "id": "ng-a-wl03",
+    "level": "advanced",
+    "is_phishing": false,
+    "category": "banking",
+    "topic": "Invoice Fraud",
+    "channel": "whatsapp",
+    "sender": {
+      "name": "Chiamaka Eze (Zentrix)",
+      "number": "+234 803 555 0104",
+      "saved": true
+    },
+    "subject": "WhatsApp: supplier confirms bank details are unchanged",
+    "date": "2026-10-13T10:20:00",
+    "messages": [
+      "Hi Ada, I've emailed invoice ZS-2304 for the October supplies.",
+      "Bank details are unchanged. Call me on my office line if anything ever looks different."
+    ],
+    "red_flags": [],
+    "trust_signals": [
+      "Saved contact you already know",
+      "Matches the invoice email you received",
+      "Bank details explicitly unchanged",
+      "Invites you to verify by phone"
+    ],
+    "explanation": "From the supplier's saved number, matching the invoice email, with unchanged bank details and an invitation to call. This is what a safe supplier message looks like."
   }
 ]

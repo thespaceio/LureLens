@@ -59,7 +59,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
         </h1>
         <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
           You're <strong className="text-foreground">{PLAYER.name}</strong>, an analyst at {PLAYER.company} (
-          <span className="font-mono text-sm">{PLAYER.domain}</span>). Emails land in your inbox one at a time. Decide
+          <span className="font-mono text-sm">{PLAYER.domain}</span>). Emails, texts and WhatsApp messages land on your phone and in your inbox one at a time. Decide
           which are <span className="rounded bg-primary/15 px-1.5 font-semibold text-primary">legitimate</span> and which
           are <span className="rounded bg-destructive/15 px-1.5 font-semibold text-destructive">phishing</span>. Faster
           correct answers score more.
@@ -123,7 +123,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
               <h3 className="text-lg font-semibold">{cfg.tagline}</h3>
               <p className="text-sm text-muted-foreground">{cfg.description}</p>
               <ul className="flex flex-wrap gap-1.5 text-xs text-muted-foreground">
-                <li className="rounded-md bg-background/60 px-2 py-1">{cfg.seconds}s per email</li>
+                <li className="rounded-md bg-background/60 px-2 py-1">{cfg.seconds}s per message</li>
                 <li className="rounded-md bg-background/60 px-2 py-1">×{cfg.multiplier} points</li>
                 <li className="rounded-md bg-background/60 px-2 py-1">
                   Your best: <strong className="text-foreground">{best ? best.toLocaleString() : '–'}</strong>
@@ -138,7 +138,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-semibold">Practise specific topics (optional, not ranked)</h2>
           <span className="font-mono text-xs text-muted-foreground">
-            {available} email{available === 1 ? '' : 's'} available
+            {available} message{available === 1 ? '' : 's'} available
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -178,7 +178,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           Start {LEVELS[level].label}
         </Button>
         <p className="text-xs text-muted-foreground">
-          {rounds} emails · {LEVELS[level].seconds}s each
+          {rounds} messages · {LEVELS[level].seconds}s each
         </p>
       </div>
 
@@ -189,7 +189,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           <li>Intermediate scores <strong className="text-foreground">×1.5</strong>, Advanced <strong className="text-foreground">×2</strong>.</li>
           <li>From <strong className="text-foreground">3 correct in a row</strong>, every further correct answer adds <strong className="text-foreground">+50</strong>.</li>
           <li>Running out of time or skipping scores 0 and resets your streak.</li>
-          <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the email. Switching apps pauses automatically.</li>
+          <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the message. Switching apps pauses automatically.</li>
           <li>Topic practice rounds count towards your progress but not the scoreboard.</li>
           <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
         </ul>

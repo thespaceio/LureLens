@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, emailsFor, hostOf, rankTitle, scoreAnswer } from './game';
-import { LEVELS, LEVEL_ORDER } from '@/types';
+import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, splitLinks } from './game';
+import { LEVELS, LEVEL_ORDER, channelOf } from '@/types';
 
 describe('buildRound', () => {
   it.each(LEVEL_ORDER)('gives a full, varied %s game', level => {
@@ -67,5 +67,43 @@ describe('rankTitle', () => {
 describe('email bank', () => {
   it('has unique ids', () => {
     expect(new Set(ALL_EMAILS.map(e => e.id)).size).toBe(ALL_EMAILS.length);
+  });
+});
+
+describe('channels', () => {
+  it.each(LEVEL_ORDER)('has SMS and WhatsApp items at %s level', level => {
+    const counts = channelCounts(level);
+    expect(counts.sms).toBeGreaterThan(0);
+    expect(counts.whatsapp).toBeGreaterThan(0);
+  });
+
+  it('builds a round from one channel only', () => {
+    const round = buildRound('beginner', [], ['whatsapp']);
+    expect(round.length).toBeGreaterThan(0);
+    expect(round.every(e => channelOf(e) === 'whatsapp')).toBe(true);
+  });
+});
+
+describe('splitLinks', () => {
+  it('finds bare scam links and keeps the punctuation outside', () => {
+    const parts = splitLinks('Update now: gtb-bvn-update.xyz.');
+    expect(parts).toEqual([
+      { text: 'Update now: ' },
+      { text: 'gtb-bvn-update.xyz', url: 'http://gtb-bvn-update.xyz' },
+      { text: '.' },
+    ]);
+  });
+
+  it('finds full links with paths', () => {
+    const link = splitLinks('Pay here https://remita-pay.net/retry?rrr=29 now').find(p => p.url);
+    expect(link?.url).toBe('https://remita-pay.net/retry?rrr=29');
+  });
+
+  it('does not treat email addresses or amounts as links', () => {
+    expect(splitLinks('Write to help@kuda.com about NGN5,400.00').some(p => p.url)).toBe(false);
+  });
+
+  it('needs a whole top-level domain', () => {
+    expect(splitLinks('kuda.company').some(p => p.url)).toBe(false);
   });
 });

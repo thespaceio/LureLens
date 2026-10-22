@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react';
 import DOMPurify from 'dompurify';
 import { Paperclip } from 'lucide-react';
-import type { Email } from '@/types';
+import type { EmailMessage } from '@/types';
 
 interface EmailViewerProps {
-  email: Email;
+  email: EmailMessage;
   /** Called when a link is hovered, focused or clicked. Links never open. */
   onLinkInspect?: (url: string, clicked: boolean) => void;
   /** Outline every link (used when reviewing an email after answering). */
