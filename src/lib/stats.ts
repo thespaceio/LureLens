@@ -20,7 +20,7 @@ export function leaderboard(
   bestPerPlayer: boolean,
   limit = 20,
 ): GameSession[] {
-  let rows = sessions.filter(s => level === 'all' || s.level === level).slice().sort(sortForBoard);
+  let rows = sessions.filter(s => !s.practice && (level === 'all' || s.level === level)).slice().sort(sortForBoard);
   if (bestPerPlayer) {
     const seen = new Set<string>();
     rows = rows.filter(r => {
@@ -35,7 +35,7 @@ export function leaderboard(
 
 /** Position of a game among all games of its level (1-based). */
 export function rankOf(sessions: GameSession[], session: GameSession): { rank: number; of: number } {
-  const rows = sessions.filter(s => s.level === session.level).slice().sort(sortForBoard);
+  const rows = sessions.filter(s => !s.practice && s.level === session.level).slice().sort(sortForBoard);
   return { rank: rows.findIndex(s => s.id === session.id) + 1, of: rows.length };
 }
 
@@ -45,7 +45,7 @@ export function playerSessions(sessions: GameSession[], name: string): GameSessi
 
 export function bestScore(sessions: GameSession[], name: string, level: Level): number {
   return playerSessions(sessions, name)
-    .filter(s => s.level === level)
+    .filter(s => !s.practice && s.level === level)
     .reduce((best, s) => Math.max(best, s.score), 0);
 }
 

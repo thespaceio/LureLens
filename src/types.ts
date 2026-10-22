@@ -63,6 +63,8 @@ export interface GameSession {
   bestStreak: number;
   avgSeconds: number;
   answers: AnswerRecord[];
+  /** Played with a topic filter: counts for progress, not for the scoreboard. */
+  practice?: boolean;
 }
 
 export interface LevelConfig {

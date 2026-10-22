@@ -38,6 +38,10 @@ function prepareBody(html: string): string {
     ],
   });
   const doc = new DOMParser().parseFromString(`<div>${clean}</div>`, 'text/html');
+  // Never load remote images: they would leak plays to third parties and break offline.
+  doc.querySelectorAll('img').forEach(img => {
+    if (!(img.getAttribute('src') ?? '').startsWith('data:image/')) img.remove();
+  });
   doc.querySelectorAll('a').forEach(a => {
     const href = a.getAttribute('href') ?? '';
     a.removeAttribute('href');

@@ -79,14 +79,15 @@ function App() {
         bestStreak,
         avgSeconds: total ? Math.round((answers.reduce((s, a) => s + a.seconds, 0) / total) * 10) / 10 : 0,
         answers,
+        ...(game.categories.length > 0 ? { practice: true } : {}),
       };
-      const playedBefore = playerSessions(store.sessions, name).some(s => s.level === game.level);
+      const playedBefore = playerSessions(store.sessions, name).some(s => !s.practice && s.level === game.level);
       const previousBest = bestScore(store.sessions, name, game.level);
       store.saveSession(session);
       setResult({
         session,
         rank: rankOf([session, ...store.sessions], session),
-        personalBest: playedBefore && score > previousBest,
+        personalBest: !session.practice && playedBefore && score > previousBest,
       });
       setView('results');
       window.scrollTo(0, 0);
