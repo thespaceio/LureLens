@@ -1,6 +1,6 @@
 {
-  "name": "PhishGuard by Th3 SpaceIO",
-  "short_name": "PhishGuard",
+  "name": "LureLens by Th3 SpaceIO",
+  "short_name": "LureLens",
   "description": "Timed phishing-detection training game with three levels and a scoreboard.",
   "start_url": "./",
   "display": "standalone",

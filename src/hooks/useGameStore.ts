@@ -4,10 +4,31 @@ import { useCallback, useEffect, useState } from 'react';
 import { LEVELS } from '@/types';
 import type { GameSession } from '@/types';
 
-const SESSIONS_KEY = 'phishguard_sessions_v2';
-const PLAYER_KEY = 'phishguard_player_v2';
-const LEGACY_KEY = 'phishguard_data'; // old per-answer format from v0
+const SESSIONS_KEY = 'lurelens_sessions_v2';
+const PLAYER_KEY = 'lurelens_player_v2';
 const MAX_SESSIONS = 500;
+
+// Keys used before the game was renamed from PhishGuard to LureLens. Saved
+// games are copied across once so nobody loses their scores.
+const OLD_SESSIONS_KEY = 'phishguard_sessions_v2';
+const OLD_PLAYER_KEY = 'phishguard_player_v2';
+const LEGACY_KEY = 'phishguard_data'; // old per-answer format from v0
+
+function migrateOldKeys() {
+  try {
+    for (const [oldKey, newKey] of [
+      [OLD_SESSIONS_KEY, SESSIONS_KEY],
+      [OLD_PLAYER_KEY, PLAYER_KEY],
+    ]) {
+      const old = localStorage.getItem(oldKey);
+      if (old !== null && localStorage.getItem(newKey) === null) localStorage.setItem(newKey, old);
+      if (old !== null) localStorage.removeItem(oldKey);
+    }
+  } catch {
+    // Storage blocked (private mode). Nothing to migrate.
+  }
+}
+migrateOldKeys();
 
 function read<T>(key: string, fallback: T): T {
   try {

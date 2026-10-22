@@ -166,9 +166,9 @@ function App() {
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-40 border-b border-border bg-[#05080D]/80 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-          <button onClick={() => navigate('menu')} className="flex items-center gap-2 font-bold" aria-label="PhishGuard home">
+          <button onClick={() => navigate('menu')} className="flex items-center gap-2 font-bold" aria-label="LureLens home">
             <Logo />
-            <span className="hidden text-lg sm:inline">PhishGuard</span>
+            <span className="hidden text-lg sm:inline">LureLens</span>
           </button>
           <nav className="flex items-center gap-1">
             {NAV.map(item => (
@@ -216,10 +216,10 @@ function About() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // ABOUT</p>
-        <h1 className="mt-1 text-3xl font-bold sm:text-4xl">About PhishGuard</h1>
+        <h1 className="mt-1 text-3xl font-bold sm:text-4xl">About LureLens</h1>
       </div>
       <p className="text-muted-foreground">
-        PhishGuard is a phishing-awareness training game by Th3 SpaceIO. You get a few seconds per email to decide if it's
+        LureLens is a phishing-awareness training game by Th3 SpaceIO. You get a few seconds per email to decide if it's
         safe, then see exactly which signs gave it away. The scenarios are built around what people in Nigeria actually
         receive: bank and fintech alerts, BVN and NIN requests, grants, NYSC and JAMB scams, delivery fees, fake jobs and
         targeted attacks on businesses.

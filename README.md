@@ -1,4 +1,4 @@
-# PhishGuard
+# LureLens
 
 **A timed phishing-detection training game by [Th3 SpaceIO](https://th3spaceio.community).**
 
@@ -44,7 +44,7 @@ npm run lint
 
 **Netlify or Vercel:** build command `npm run build`, output folder `dist`.
 
-The app uses relative paths, so it works from a sub-path such as `username.github.io/PhishGuard/`.
+The app uses relative paths, so it works from a sub-path such as `username.github.io/LureLens/`.
 
 ## Project structure
 
