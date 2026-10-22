@@ -5,7 +5,7 @@ html {
 }
 
 ::selection {
-  background: rgba(0, 204, 106, 0.3);
+  background: rgba(198, 244, 50, 0.3);
 }
 
 ::-webkit-scrollbar {
@@ -14,11 +14,11 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #05080d;
+  background: #0F0822;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #26354f;
+  background: #3A2A63;
   border-radius: 6px;
 }
 

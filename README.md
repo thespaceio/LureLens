@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/lurelens-logo.svg">
+    <img src="brand/lurelens-logo-daylight.svg" alt="LureLens" width="360">
+  </picture>
+</p>
+
 # LureLens
 
 **A timed phishing-detection training game by [Th3 SpaceIO](https://th3spaceio.community).**
@@ -111,3 +118,7 @@ To change timers, points or emails per game, edit `LEVELS` in `src/types.ts`. Sc
 ---
 
 TH3 SPACEIO · LEARN. BUILD. SECURE.
+
+## Brand
+
+The logo, icons and social images live in [`brand/`](brand/README.md): two interlocking Ls for Lure and Lens, each with an "s" for SpaceIO, framing a lime lens. Colours: Midnight `#1B1035`, Lavender `#B9A6FF`, Lime `#C6F432`, Coral `#FF6B6B` for red flags only.

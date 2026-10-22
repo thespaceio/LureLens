@@ -16,11 +16,11 @@ interface ProgressDashboardProps {
 
 const PILL: Record<Level, string> = {
   beginner: 'text-primary border-primary',
-  intermediate: 'text-sky-400 border-sky-400',
-  advanced: 'text-violet-400 border-violet-400',
+  intermediate: 'text-lavender border-lavender',
+  advanced: 'text-muted-foreground border-muted-foreground',
 };
 
-const barColor = (acc: number) => (acc >= 70 ? '#00CC6A' : acc >= 50 ? '#F5A524' : '#FF3B30');
+const barColor = (acc: number) => (acc >= 70 ? '#C6F432' : acc >= 50 ? '#B9A6FF' : '#FF6B6B');
 
 function formatDateTime(iso: string) {
   const d = new Date(iso);
@@ -124,12 +124,12 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset }: Pro
               <div style={{ height: Math.max(200, chartData.length * 30 + 40) }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} layout="vertical" margin={{ left: 8, right: 16 }}>
-                    <CartesianGrid horizontal={false} stroke="rgba(167,176,188,0.15)" />
-                    <XAxis type="number" domain={[0, 100]} tickFormatter={v => `${v}%`} stroke="#A7B0BC" fontSize={12} />
-                    <YAxis type="category" dataKey="topic" width={150} stroke="#A7B0BC" fontSize={12} tickLine={false} />
+                    <CartesianGrid horizontal={false} stroke="rgba(207,198,232,0.15)" />
+                    <XAxis type="number" domain={[0, 100]} tickFormatter={v => `${v}%`} stroke="#CFC6E8" fontSize={12} />
+                    <YAxis type="category" dataKey="topic" width={150} stroke="#CFC6E8" fontSize={12} tickLine={false} />
                     <Tooltip
                       cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                      contentStyle={{ background: '#10203a', border: '1px solid #26354f', borderRadius: 8, color: '#fff' }}
+                      contentStyle={{ background: '#1B1035', border: '1px solid #3A2A63', borderRadius: 8, color: '#fff' }}
                       formatter={(v, _n, item) => [`${v}% (${item.payload.correct}/${item.payload.total})`, 'Accuracy']}
                     />
                     <Bar dataKey="accuracy" radius={[0, 4, 4, 0]} barSize={14} minPointSize={3}>
@@ -148,7 +148,7 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset }: Pro
                   weak.map(t => (
                     <li key={t.topic} className="flex justify-between gap-3 rounded-lg bg-background/50 px-3 py-2.5">
                       <span>{t.topic}</span>
-                      <span className="font-mono text-amber-400">{t.accuracy}% ({t.correct}/{t.total})</span>
+                      <span className="font-mono text-destructive">{t.accuracy}% ({t.correct}/{t.total})</span>
                     </li>
                   ))
                 ) : (

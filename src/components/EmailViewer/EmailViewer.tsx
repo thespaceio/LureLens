@@ -111,35 +111,35 @@ export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: Em
   const initial = (email.sender.name.trim()[0] ?? '?').toUpperCase();
 
   return (
-    <article className="overflow-hidden rounded-xl bg-[#F7F9FC] text-[#1A2333] shadow-2xl shadow-black/40">
-      <div className="flex items-center gap-1.5 border-b border-[#DDE3EC] bg-[#E9EEF5] px-4 py-2.5">
-        <span className="size-2.5 rounded-full bg-[#C5CEDB]" />
-        <span className="size-2.5 rounded-full bg-[#C5CEDB]" />
-        <span className="size-2.5 rounded-full bg-[#C5CEDB]" />
-        <span className="ml-2 truncate font-mono text-xs text-[#5B6779]">Inbox · ada.okafor@brightpath.ng</span>
+    <article className="overflow-hidden rounded-xl bg-[#F7F5FC] text-[#1E0F45] shadow-2xl shadow-black/40">
+      <div className="flex items-center gap-1.5 border-b border-[#DDD6EE] bg-[#E8E3F5] px-4 py-2.5">
+        <span className="size-2.5 rounded-full bg-[#C4B8E0]" />
+        <span className="size-2.5 rounded-full bg-[#C4B8E0]" />
+        <span className="size-2.5 rounded-full bg-[#C4B8E0]" />
+        <span className="ml-2 truncate font-mono text-xs text-[#4A3E6B]">Inbox · ada.okafor@brightpath.ng</span>
       </div>
 
-      <header className="border-b border-[#DDE3EC] px-4 py-4 sm:px-6">
+      <header className="border-b border-[#DDD6EE] px-4 py-4 sm:px-6">
         <h2 className="mb-3 text-lg font-semibold leading-snug [overflow-wrap:anywhere] sm:text-xl">
           {email.subject}
         </h2>
         <div className="flex items-start gap-3">
-          <div className="hidden size-10 shrink-0 place-items-center rounded-full bg-[#D6DEEA] font-bold text-[#34445E] sm:grid">
+          <div className="hidden size-10 shrink-0 place-items-center rounded-full bg-[#DDD6EE] font-bold text-[#3B1F7A] sm:grid">
             {initial}
           </div>
           <div className="min-w-0 flex-1 text-sm">
             <div className="[overflow-wrap:anywhere]">
               <strong>{email.sender.name}</strong>{' '}
-              <span className="font-mono text-[13px] text-[#5B6779]">&lt;{email.sender.email}&gt;</span>
+              <span className="font-mono text-[13px] text-[#4A3E6B]">&lt;{email.sender.email}&gt;</span>
             </div>
             {email.reply_to && (
               <div className="font-mono text-[13px] text-[#9A5B00] [overflow-wrap:anywhere]">
                 reply-to &lt;{email.reply_to}&gt;
               </div>
             )}
-            <div className="font-mono text-[13px] text-[#5B6779]">to me &lt;ada.okafor@brightpath.ng&gt;</div>
+            <div className="font-mono text-[13px] text-[#4A3E6B]">to me &lt;ada.okafor@brightpath.ng&gt;</div>
           </div>
-          <time className="hidden shrink-0 text-xs text-[#5B6779] sm:block" dateTime={email.date}>
+          <time className="hidden shrink-0 text-xs text-[#4A3E6B] sm:block" dateTime={email.date}>
             {formatDate(email.date)}
           </time>
         </div>
@@ -148,11 +148,11 @@ export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: Em
       <div ref={hostRef} className="min-h-[160px] bg-white" data-testid="email-body" />
 
       {email.attachments && email.attachments.length > 0 && (
-        <div className="flex flex-wrap gap-2 border-t border-[#DDE3EC] bg-white px-4 py-3 sm:px-6">
+        <div className="flex flex-wrap gap-2 border-t border-[#DDD6EE] bg-white px-4 py-3 sm:px-6">
           {email.attachments.map(name => (
             <span
               key={name}
-              className="inline-flex items-center gap-2 rounded-md border border-[#DDE3EC] bg-[#F7F9FC] px-3 py-1.5 font-mono text-xs [overflow-wrap:anywhere]"
+              className="inline-flex items-center gap-2 rounded-md border border-[#DDD6EE] bg-[#F7F5FC] px-3 py-1.5 font-mono text-xs [overflow-wrap:anywhere]"
             >
               <Paperclip className="size-3.5 shrink-0" />
               {name}

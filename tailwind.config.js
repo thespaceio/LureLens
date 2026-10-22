@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       colors: {
         border: "hsl(var(--border) / <alpha-value>)",
+        lavender: "hsl(var(--lavender) / <alpha-value>)",
         input: "hsl(var(--input) / <alpha-value>)",
         ring: "hsl(var(--ring) / <alpha-value>)",
         background: "hsl(var(--background) / <alpha-value>)",
@@ -50,7 +51,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Syne', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'Menlo', 'monospace'],
       },
       borderRadius: {

@@ -18,8 +18,8 @@ interface DifficultySelectorProps {
 
 const LEVEL_ACCENT: Record<Level, string> = {
   beginner: 'text-primary border-primary',
-  intermediate: 'text-sky-400 border-sky-400',
-  advanced: 'text-violet-400 border-violet-400',
+  intermediate: 'text-lavender border-lavender',
+  advanced: 'text-muted-foreground border-muted-foreground',
 };
 
 export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart }: DifficultySelectorProps) {
@@ -61,7 +61,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           You're <strong className="text-foreground">{PLAYER.name}</strong>, an analyst at {PLAYER.company} (
           <span className="font-mono text-sm">{PLAYER.domain}</span>). Emails land in your inbox one at a time. Decide
           which are <span className="rounded bg-primary/15 px-1.5 font-semibold text-primary">legitimate</span> and which
-          are <span className="rounded bg-destructive/15 px-1.5 font-semibold text-[#FF6A61]">phishing</span>. Faster
+          are <span className="rounded bg-destructive/15 px-1.5 font-semibold text-destructive">phishing</span>. Faster
           correct answers score more.
         </p>
       </motion.section>

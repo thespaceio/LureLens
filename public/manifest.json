@@ -4,8 +4,8 @@
   "description": "Timed phishing-detection training game with three levels and a scoreboard.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#05080D",
-  "theme_color": "#0A1628",
+  "background_color": "#0F0822",
+  "theme_color": "#1B1035",
   "orientation": "portrait-primary",
   "scope": "./",
   "lang": "en",
@@ -57,6 +57,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "./icons/maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": [
