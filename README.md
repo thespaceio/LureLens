@@ -52,6 +52,8 @@ npm test          # unit tests for scoring, rounds and the scoreboard
 npm run check:data  # checks src/data/emails.json (also runs in CI)
 ```
 
+Email content is reviewed for accuracy; see [docs/content-review.md](docs/content-review.md) before adding or editing emails.
+
 ## Deploy
 
 **GitHub Pages:** in the repository go to Settings → Pages → Source and choose **GitHub Actions**. Every push to `main` then builds and publishes the site through `.github/workflows/deploy.yml`.
