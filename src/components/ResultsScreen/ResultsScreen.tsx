@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, RotateCcw, Share2, Trophy, X } from 'lucide-react';
+import { Check, Copy, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
 import { rankTitle } from '@/lib/game';
+import { formatCode, resultLine } from '@/lib/classroom';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { Choice, GameSession, Level } from '@/types';
 
@@ -15,6 +16,7 @@ interface ResultsScreenProps {
   onPlayLevel: (level: Level) => void;
   onScoreboard: () => void;
   onProgress: () => void;
+  onClassroom: () => void;
 }
 
 const CHOICE: Record<Choice, string> = {
@@ -24,7 +26,7 @@ const CHOICE: Record<Choice, string> = {
   skip: 'Skipped',
 };
 
-export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlayLevel, onScoreboard, onProgress }: ResultsScreenProps) {
+export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom }: ResultsScreenProps) {
   const cfg = LEVELS[session.level];
   const nextLevel = LEVEL_ORDER[LEVEL_ORDER.indexOf(session.level) + 1];
   const [sharing, setSharing] = useState(false);
@@ -39,7 +41,9 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
         </p>
         <p className="mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank">
           <Trophy className="size-4" />
-          {session.practice ? (
+          {session.classCode ? (
+            <>Class {formatCode(session.classCode)} · saved to your progress, not the scoreboard</>
+          ) : session.practice ? (
             <>Practice round, saved to your progress but not the scoreboard</>
           ) : (
             <>#{rank.rank} of {rank.of} on the {cfg.label} scoreboard</>
@@ -62,10 +66,17 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
         ))}
       </div>
 
+      {session.classCode && <SendToFacilitator session={session} />}
+
       <div className="flex flex-wrap justify-center gap-2">
-        <Button onClick={onPlayAgain} className="gap-2 font-semibold">
-          <RotateCcw className="size-4" /> Play again
+        <Button onClick={onPlayAgain} className="gap-2 font-semibold" variant={session.classCode ? 'secondary' : 'default'}>
+          <RotateCcw className="size-4" /> {session.classCode ? 'Play a ranked round' : 'Play again'}
         </Button>
+        {session.classCode && (
+          <Button variant="outline" className="gap-2 bg-transparent" onClick={onClassroom}>
+            <Users className="size-4" /> Classroom
+          </Button>
+        )}
         <Button
           variant="secondary"
           className="gap-2"
@@ -115,6 +126,56 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
         </ol>
       </section>
     </motion.div>
+  );
+}
+
+/** The one line a class player sends back, with copy and share buttons. */
+function SendToFacilitator({ session }: { session: GameSession }) {
+  const line = resultLine(session);
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(line);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard blocked; the line is still on screen to select by hand.
+    }
+  };
+  const share = async () => {
+    try {
+      await navigator.share({ text: line });
+    } catch {
+      // The player closed the share sheet.
+    }
+  };
+
+  return (
+    <section className="space-y-3 rounded-xl border border-lavender/50 bg-card p-4 sm:p-5" aria-label="Send your result" data-testid="class-result">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <Send className="size-4 text-lavender" /> Send this to your facilitator
+      </h2>
+      <p className="select-all rounded-lg bg-background px-3 py-2.5 font-mono text-sm [overflow-wrap:anywhere]" data-testid="class-result-line">
+        {line}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={copy} className="gap-2 font-semibold">
+          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          {copied ? 'Copied' : 'Copy result'}
+        </Button>
+        {'share' in navigator && (
+          <Button variant="secondary" className="gap-2" onClick={share}>
+            <Share2 className="size-4" /> Share
+          </Button>
+        )}
+        <Button asChild variant="outline" className="bg-transparent">
+          <a href={`https://wa.me/?text=${encodeURIComponent(line)}`} target="_blank" rel="noopener noreferrer">
+            WhatsApp
+          </a>
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">Send it as it is: your facilitator pastes it into LureLens to see the class results.</p>
+    </section>
   );
 }
 

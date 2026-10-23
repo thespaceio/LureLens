@@ -12,10 +12,13 @@ export const MAX_SPEED_BONUS = 50;
 export const STREAK_START = 3;
 export const STREAK_BONUS = 50;
 
-export function shuffle<T>(items: T[]): T[] {
+/** A source of random numbers in [0, 1). Classroom rounds pass a seeded one. */
+export type Random = () => number;
+
+export function shuffle<T>(items: T[], rand: Random = Math.random): T[] {
   const copy = items.slice();
   for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rand() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
@@ -48,30 +51,35 @@ export function categoryCounts(level: Level): Partial<Record<CategoryId, number>
  * Pick a round of emails: up to `LEVELS[level].rounds`, roughly half phishing
  * (4–6 out of 10) so players can't win by counting answers.
  */
-export function buildRound(level: Level, categories: CategoryId[] = [], channels: Channel[] = []): Email[] {
+export function buildRound(
+  level: Level,
+  categories: CategoryId[] = [],
+  channels: Channel[] = [],
+  rand: Random = Math.random,
+): Email[] {
   const pool = emailsFor(level, categories, channels);
   const rounds = Math.min(LEVELS[level].rounds, pool.length);
-  const phish = shuffle(pool.filter(e => e.is_phishing));
-  const legit = shuffle(pool.filter(e => !e.is_phishing));
+  const phish = shuffle(pool.filter(e => e.is_phishing), rand);
+  const legit = shuffle(pool.filter(e => !e.is_phishing), rand);
 
-  let phishCount = Math.floor(rounds / 2) + Math.floor(Math.random() * 3) - 1;
+  let phishCount = Math.floor(rounds / 2) + Math.floor(rand() * 3) - 1;
   phishCount = Math.max(rounds - legit.length, Math.min(phishCount, phish.length, rounds));
   phishCount = Math.max(0, phishCount);
   const legitCount = Math.min(rounds - phishCount, legit.length);
 
   const round = [...phish.slice(0, phishCount), ...legit.slice(0, legitCount)];
-  if (channels.length === 0) mixInPhoneMessages(round, pool);
-  return shuffle(round);
+  if (channels.length === 0) mixInPhoneMessages(round, pool, rand);
+  return shuffle(round, rand);
 }
 
 /** Mixed rounds always include a few texts or chats, not just emails. */
 export const MIN_PHONE_MESSAGES = 2;
 
 /** Swap emails for unused SMS or WhatsApp items of the same answer, keeping the balance. */
-function mixInPhoneMessages(round: Email[], pool: Email[]) {
+function mixInPhoneMessages(round: Email[], pool: Email[], rand: Random) {
   const isPhone = (e: Email) => channelOf(e) !== 'email';
   const used = new Set(round.map(e => e.id));
-  const spare = shuffle(pool.filter(e => isPhone(e) && !used.has(e.id)));
+  const spare = shuffle(pool.filter(e => isPhone(e) && !used.has(e.id)), rand);
   let missing = MIN_PHONE_MESSAGES - round.filter(isPhone).length;
   for (let i = 0; i < round.length && missing > 0; i++) {
     if (isPhone(round[i])) continue;

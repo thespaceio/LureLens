@@ -30,6 +30,7 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
 - **Countdown timer** on every email. Running out of time counts as wrong.
 - **Scoring:** 100 points per correct answer, plus up to 50 for speed, times the level multiplier. From 3 correct in a row, each further correct answer adds +50.
 - **Emails, SMS and WhatsApp.** 110 scenarios: 80 emails, 15 text messages and 15 WhatsApp chats, including spoofed bank sender IDs, OTP tricks and hijacked friends asking for money. Every mixed round includes texts or chats.
+- **Classroom mode** for trainers and lecturers: create a class code, link or QR code, and everyone who joins plays the same 10 messages in the same order. Players send back a one-line result, you paste the lines in to see the class table and which messages most people missed, then step through each message on the projector and reveal the answer after the room has voted. No server or sign-up needed.
 - **Share your result** as a branded image card (works offline), straight to WhatsApp, LinkedIn or X.
 - **Feedback after every answer**, with the specific red flags or trust signals.
 - **Safe link inspection.** Hover over or tap a link to see where it really goes. Links in training emails never open.
@@ -72,10 +73,12 @@ src/
   types.ts                         shared types, LEVELS (timers, points) and CATEGORIES
   data/emails.json                 the email bank
   lib/game.ts                      picking emails and scoring rules
+  lib/classroom.ts                 class codes, seeded class rounds, result lines
   lib/stats.ts                     scoreboard and progress calculations
   hooks/useGameStore.ts            saved games and player name (localStorage)
   components/
     DifficultySelector/            start screen: name, level, topics
+    Classroom/                     class codes, QR invite, class results and debrief
     QuizInterface/                 the timed game
     EmailViewer/                   safe email rendering and link inspection
     FeedbackModal/                 feedback after each answer
@@ -119,6 +122,7 @@ To change timers, points or emails per game, edit `LEVELS` in `src/types.ts`. Sc
 
 ## Notes
 
+- A class code stores the level and a random seed, plus a check character tied to the message bank. If the messages change in a new version, old codes stop working instead of giving players a different round from the facilitator.
 - Scores are stored in the browser's `localStorage`, so the scoreboard is **per device**. That suits a lab or event laptop. A shared online scoreboard would need a backend such as Supabase or Firebase.
 - All emails are simulated. Brand names appear for education only, and the phishing domains are fictional.
 
