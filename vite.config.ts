@@ -49,9 +49,15 @@ function precacheServiceWorker(): Plugin {
   }
 }
 
+const pkg = JSON.parse(readFileSync(path.resolve(__dirname, "package.json"), "utf8")) as { version: string }
+
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
+  define: {
+    // Shown in the About page and added to mistake reports.
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   build: {
     // The email bank is bundled into the main chunk on purpose (works offline).
     chunkSizeWarningLimit: 700,

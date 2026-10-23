@@ -71,6 +71,10 @@ BrightPath Technologies (`brightpath.ng`), Zentrix Supplies and the people in th
 
 - Whether the made-up phishing domains (for example `kuda-verify.com.ng`) are registered by anyone. Links in the game never open, but avoid real company names in new fake domains where possible.
 
+## Reports from players
+
+Every explanation has a "Something wrong with this message?" link. It opens a GitHub issue (label `content`) or an email that already names the message id, level, channel and subject. To handle one: confirm the claim against the organisation's own website, fix `src/data/emails.json`, add a line under "Corrections made" above, and close the issue with the commit.
+
 ## Checking new emails
 
 1. For SMS and WhatsApp, use a `555 01xx` phone number and avoid unconfirmed USSD or short codes.
