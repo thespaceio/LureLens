@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, Info, Play, Trophy } from 'lucide-react';
+import { BarChart3, Info, Play, Trophy, Users } from 'lucide-react';
 import DifficultySelector from '@/components/DifficultySelector/DifficultySelector';
 import QuizInterface from '@/components/QuizInterface/QuizInterface';
 import type { QuizResult } from '@/components/QuizInterface/QuizInterface';
@@ -9,14 +9,33 @@ import Leaderboard from '@/components/Leaderboard/Leaderboard';
 import { Logo } from '@/components/Logo/Logo';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
+import { classRound, normalizeCode } from '@/lib/classroom';
+import type { DecodedClass } from '@/lib/classroom';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
 import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
 import './App.css';
 
 // The dashboard pulls in the charting library, so load it only when opened.
 const ProgressDashboard = lazy(() => import('@/components/ProgressDashboard/ProgressDashboard'));
+const Classroom = lazy(() => import('@/components/Classroom/Classroom'));
 
-type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'about';
+type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'about';
+
+/** A class code from an invite link (?class=7K2QX9), removed from the address bar once read. */
+function codeFromLink(): string | undefined {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('class');
+    if (code === null) return undefined;
+    params.delete('class');
+    const rest = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash}`);
+    return normalizeCode(code);
+  } catch {
+    return undefined;
+  }
+}
+const LINK_CODE = codeFromLink();
 
 interface Game {
   id: string;
@@ -24,6 +43,8 @@ interface Game {
   categories: CategoryId[];
   channels: Channel[];
   emails: Email[];
+  /** Set for classroom rounds. */
+  classCode?: string;
 }
 
 interface Result {
@@ -36,12 +57,13 @@ const NAV: { id: View; label: string; short: string; icon: typeof Play }[] = [
   { id: 'menu', label: 'Play', short: 'Play', icon: Play },
   { id: 'scoreboard', label: 'Scoreboard', short: 'Scores', icon: Trophy },
   { id: 'progress', label: 'Progress', short: 'Stats', icon: BarChart3 },
-  { id: 'about', label: 'About', short: '', icon: Info },
+  { id: 'classroom', label: 'Classroom', short: 'Class', icon: Users },
+  { id: 'about', label: 'About', short: 'About', icon: Info },
 ];
 
 function App() {
   const store = useGameStore();
-  const [view, setView] = useState<View>('menu');
+  const [view, setView] = useState<View>(LINK_CODE ? 'classroom' : 'menu');
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
@@ -58,6 +80,14 @@ function App() {
     if (emails.length === 0) return;
     setMenuLevel(level);
     setGame({ id: `${level}-${Date.now()}`, level, categories, channels, emails });
+    setView('quiz');
+    window.scrollTo(0, 0);
+  }, []);
+
+  const joinClass = useCallback((decoded: Extract<DecodedClass, { ok: true }>) => {
+    const emails = classRound(decoded);
+    if (emails.length === 0) return;
+    setGame({ id: `class-${decoded.code}-${Date.now()}`, level: decoded.level, categories: [], channels: [], emails, classCode: decoded.code });
     setView('quiz');
     window.scrollTo(0, 0);
   }, []);
@@ -80,7 +110,8 @@ function App() {
         bestStreak,
         avgSeconds: total ? Math.round((answers.reduce((s, a) => s + a.seconds, 0) / total) * 10) / 10 : 0,
         answers,
-        ...(game.categories.length > 0 || game.channels.length > 0 ? { practice: true } : {}),
+        ...(game.categories.length > 0 || game.channels.length > 0 || game.classCode ? { practice: true } : {}),
+        ...(game.classCode ? { classCode: game.classCode } : {}),
       };
       const playedBefore = playerSessions(store.sessions, name).some(s => !s.practice && s.level === game.level);
       const previousBest = bestScore(store.sessions, name, game.level);
@@ -116,6 +147,7 @@ function App() {
           <ResultsScreen
             {...result}
             onPlayAgain={() => startGame(result.session.level, game?.categories ?? [], game?.channels ?? [])}
+            onClassroom={() => navigate('classroom')}
             onPlayLevel={level => startGame(level)}
             onScoreboard={() => navigate('scoreboard')}
             onProgress={() => navigate('progress')}
@@ -134,6 +166,17 @@ function App() {
                 navigate('menu');
               }}
               onReset={store.clearAll}
+            />
+          </Suspense>
+        );
+      case 'classroom':
+        return (
+          <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
+            <Classroom
+              playerName={store.playerName}
+              onNameChange={store.setPlayerName}
+              initialCode={LINK_CODE}
+              onJoin={joinClass}
             />
           </Suspense>
         );
@@ -163,20 +206,20 @@ function App() {
           <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg" aria-label="LureLens home">
             <Logo size={34} wordmarkClassName="hidden sm:inline" />
           </button>
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5 md:gap-1">
             {NAV.map(item => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.id)}
                 aria-current={activeNav === item.id ? 'page' : undefined}
                 aria-label={item.label}
-                className={`flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition-colors sm:px-3 ${
+                className={`flex min-w-11 flex-col items-center gap-0.5 rounded-lg px-1.5 py-1.5 text-[11px] font-medium transition-colors md:flex-row md:gap-1.5 md:px-3 md:py-2 md:text-sm ${
                   activeNav === item.id ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-card hover:text-foreground'
                 }`}
               >
                 <item.icon className="size-4" />
-                <span className="hidden sm:inline">{item.label}</span>
-                {item.short && <span className="sm:hidden">{item.short}</span>}
+                <span className="hidden md:inline">{item.label}</span>
+                <span className="md:hidden">{item.short}</span>
               </button>
             ))}
           </nav>
@@ -239,6 +282,7 @@ function About() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>Links inside training emails never open.</li>
             <li>Scores are saved only in this browser, so the scoreboard is per device.</li>
+            <li>Classroom mode gives a group the same messages through a shared code, without sending anything to a server.</li>
             <li>All emails are simulated. Brand names are used for education only, and the phishing domains are fictional.</li>
           </ul>
         </section>

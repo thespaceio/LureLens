@@ -93,8 +93,10 @@ export interface GameSession {
   bestStreak: number;
   avgSeconds: number;
   answers: AnswerRecord[];
-  /** Played with a topic filter: counts for progress, not for the scoreboard. */
+  /** Played with a topic filter or in a class: counts for progress, not for the scoreboard. */
   practice?: boolean;
+  /** Set for classroom rounds: the class code, without the dash. */
+  classCode?: string;
 }
 
 export interface LevelConfig {

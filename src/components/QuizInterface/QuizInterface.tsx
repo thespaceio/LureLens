@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link2, Pause, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
+import { Pause, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailViewer from '@/components/EmailViewer/EmailViewer';
 import MessageViewer from '@/components/MessageViewer/MessageViewer';
 import FeedbackModal from '@/components/FeedbackModal/FeedbackModal';
-import { hostOf, scoreAnswer } from '@/lib/game';
+import LinkStatus from '@/components/LinkStatus/LinkStatus';
+import type { InspectedLink } from '@/components/LinkStatus/LinkStatus';
+import { scoreAnswer } from '@/lib/game';
 import { CHANNELS, LEVELS, channelOf } from '@/types';
 import type { AnswerRecord, Choice, Email, EmailMessage, Level, Points } from '@/types';
 
@@ -38,7 +40,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [last, setLast] = useState<LastAnswer | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(cfg.seconds);
-  const [link, setLink] = useState<{ url: string; clicked: boolean } | null>(null);
+  const [link, setLink] = useState<InspectedLink | null>(null);
   const [paused, setPaused] = useState(false);
 
   const deadline = useRef(0);
@@ -165,10 +167,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const pct = Math.max(0, Math.min(100, (secondsLeft / cfg.seconds) * 100));
   const danger = secondsLeft <= 5;
   const warn = !danger && secondsLeft <= cfg.seconds * 0.4;
-  // mailto: and other links without a web address have no host to highlight.
   const noun = CHANNELS[channelOf(email)].noun;
-  const host = link ? hostOf(link.url) : '';
-  const showHost = Boolean(host) && host !== link?.url;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4">
@@ -237,34 +236,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
             </Button>
           </div>
         )}
-        <div
-          className={`mt-2 flex min-h-10 items-start gap-2 rounded-lg px-3 py-2 text-xs ${
-            link ? 'bg-secondary text-foreground' : 'text-muted-foreground'
-          }`}
-          data-testid="link-status"
-          aria-live="polite"
-        >
-          <Link2 className="mt-0.5 size-3.5 shrink-0" />
-          {link ? (
-            <span className="min-w-0 [overflow-wrap:anywhere]">
-              <span className="text-muted-foreground">
-                {link.clicked ? 'Links are disabled in training. This one goes to: ' : 'Link goes to: '}
-              </span>
-              <span className="font-mono">
-                {showHost
-                  ? link.url.split(host).map((part, i, arr) => (
-                      <span key={i}>
-                        {part}
-                        {i < arr.length - 1 && <mark className="rounded bg-primary/20 px-0.5 text-primary">{host}</mark>}
-                      </span>
-                    ))
-                  : link.url}
-              </span>
-            </span>
-          ) : (
-            <span>Hover over or tap a link in the {noun} to see where it really goes.</span>
-          )}
-        </div>
+        <LinkStatus link={link} noun={noun} />
       </motion.div>
 
       {/* Answers */}
