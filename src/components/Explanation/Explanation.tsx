@@ -1,4 +1,5 @@
 import { Check, ShieldAlert, ShieldCheck, TriangleAlert } from 'lucide-react';
+import ReportMistake from '@/components/ReportMistake/ReportMistake';
 import type { Email } from '@/types';
 
 /** Red flags (or trust signals) and the "why it matters" text for a message. */
@@ -35,6 +36,8 @@ export function Explanation({ email, large = false }: { email: Email; large?: bo
         <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">Why it matters</h3>
         <p className={`${text} leading-relaxed`}>{email.explanation}</p>
       </section>
+
+      <ReportMistake email={email} />
     </div>
   );
 }

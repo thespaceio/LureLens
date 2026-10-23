@@ -32,7 +32,7 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
 - **Emails, SMS and WhatsApp.** 110 scenarios: 80 emails, 15 text messages and 15 WhatsApp chats, including spoofed bank sender IDs, OTP tricks and hijacked friends asking for money. Every mixed round includes texts or chats.
 - **Classroom mode** for trainers and lecturers: create a class code, link or QR code, and everyone who joins plays the same 10 messages in the same order. Players send back a one-line result, you paste the lines in to see the class table and which messages most people missed, then step through each message on the projector and reveal the answer after the room has voted. No server or sign-up needed.
 - **Share your result** as a branded image card (works offline), straight to WhatsApp, LinkedIn or X.
-- **Feedback after every answer**, with the specific red flags or trust signals.
+- **Feedback after every answer**, with the specific red flags or trust signals, and a **Report a mistake** link that opens a pre-filled GitHub issue (or an email) naming the exact message.
 - **Safe link inspection.** Hover over or tap a link to see where it really goes. Links in training emails never open.
 - **Scoreboard** with a top-3 podium, level tabs and best score per player.
 - **Progress dashboard** showing accuracy per level and per attack type, weak spots to practise, and recent games.

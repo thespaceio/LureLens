@@ -9,6 +9,7 @@ import Leaderboard from '@/components/Leaderboard/Leaderboard';
 import { Logo } from '@/components/Logo/Logo';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
+import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
 import { classRound, normalizeCode } from '@/lib/classroom';
 import type { DecodedClass } from '@/lib/classroom';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
@@ -287,6 +288,22 @@ function About() {
           </ul>
         </section>
       </div>
+      <section className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+        <h2 className="mb-2 font-semibold text-foreground">Found a mistake?</h2>
+        <p>
+          Every message is checked against the organisation's own website, but things change. If a domain, fact or answer
+          looks wrong, use the link under the explanation after you answer, or{' '}
+          <a href={NEW_ISSUE_URL} target="_blank" rel="noopener noreferrer" className="text-lavender underline underline-offset-2 hover:text-foreground">
+            open an issue on GitHub
+          </a>{' '}
+          or email{' '}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-lavender underline underline-offset-2 hover:text-foreground">
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </p>
+        <p className="mt-3 font-mono text-xs">LureLens {APP_VERSION}</p>
+      </section>
     </div>
   );
 }
