@@ -272,6 +272,7 @@ function About() {
               'Spot urgency, threats and too-good-to-be-true offers',
               'Find where a link really goes before clicking',
               'Recognise CEO fraud and changed bank details',
+              'Know when to stop and check through a number you trust',
               'Never share PINs, OTPs or MFA codes',
             ].map(t => (
               <li key={t} className="flex gap-2"><span className="text-primary">✓</span>{t}</li>

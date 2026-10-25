@@ -80,6 +80,10 @@ for (const e of emails) {
     if (flags.length) fail(id, 'legitimate emails should not list red flags');
   }
 
+  if (e.verify_first !== undefined && (typeof e.verify_first !== 'string' || e.verify_first.trim().length < 20)) {
+    fail(id, 'verify_first must say how to verify, in a sentence');
+  }
+
   // Safety: bodies are sanitised at runtime, but keep the source clean too.
   const body = channel === 'email' ? e.body ?? '' : '';
   if (/<script|<iframe|<object|<embed|<form/i.test(body)) fail(id, 'body contains a disallowed tag');

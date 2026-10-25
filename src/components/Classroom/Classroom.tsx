@@ -19,7 +19,7 @@ import {
   parseResults,
 } from '@/lib/classroom';
 import type { ClassResult, DecodedClass } from '@/lib/classroom';
-import { CHANNELS, LEVELS, LEVEL_ORDER, channelOf } from '@/types';
+import { CHANNELS, LEVELS, LEVEL_ORDER, channelOf, verifyTip } from '@/types';
 import type { Email, EmailMessage, Level } from '@/types';
 
 type JoinedClass = Extract<DecodedClass, { ok: true }>;
@@ -375,7 +375,9 @@ function ClassResults({
                 <span className="min-w-0 flex-1 truncate font-medium">{r.name}</span>
                 <span className="hidden font-mono text-xs tracking-[0.1em] sm:inline" aria-hidden>
                   {r.marks.map((m, j) => (
-                    <span key={j} className={m ? 'text-primary' : 'text-destructive'}>{m ? '✓' : '✗'}</span>
+                    <span key={j} className={m === 'right' ? 'text-primary' : m === 'safe' ? 'text-lavender' : 'text-destructive'}>
+                      {m === 'right' ? '✓' : m === 'safe' ? '☎' : '✗'}
+                    </span>
                   ))}
                 </span>
                 <span className="w-12 text-right text-muted-foreground">{r.correct}/{r.total}</span>
@@ -487,6 +489,12 @@ function Debrief({ host, onBack }: { host: HostState; onBack: () => void }) {
               </p>
             )}
           </div>
+          {email.verify_first && (
+            <p className="rounded-lg border border-lavender/40 bg-lavender/10 px-4 py-3 text-base">
+              <strong className="font-mono text-xs uppercase tracking-[0.12em] text-lavender">Verify first is right here · </strong>
+              {verifyTip(email)}
+            </p>
+          )}
           <Explanation email={email} large />
         </section>
       ) : (

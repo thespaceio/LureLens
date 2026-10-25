@@ -28,6 +28,7 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
   | Advanced | 20s | ×2 | CEO fraud, changed supplier bank details, hidden link destinations, `.pdf.html` and macro attachments, MFA-code theft, OAuth consent and QR phishing |
 
 - **Countdown timer** on every email. Running out of time counts as wrong.
+- **Verify first**, a third answer for "I'd check through the official app or a number I trust". On messages where that is the real-world best move (a supplier's new bank details, the CEO's urgent favour, a friend's WhatsApp asking for money, a genuine bank warning) it scores full base points and keeps the streak going. Elsewhere it is safe but slow: half the base points, no speed bonus, streak kept. Every verify answer shows how to check that kind of message.
 - **Scoring:** 100 points per correct answer, plus up to 50 for speed, times the level multiplier. From 3 correct in a row, each further correct answer adds +50.
 - **Emails, SMS and WhatsApp.** 110 scenarios: 80 emails, 15 text messages and 15 WhatsApp chats, including spoofed bank sender IDs, OTP tricks and hijacked friends asking for money. Every mixed round includes texts or chats.
 - **Classroom mode** for trainers and lecturers: create a class code, link or QR code, and everyone who joins plays the same 10 messages in the same order. Players send back a one-line result, you paste the lines in to see the class table and which messages most people missed, then step through each message on the projector and reveal the answer after the room has voted. No server or sign-up needed.
@@ -37,7 +38,7 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
 - **Scoreboard** with a top-3 podium, level tabs and best score per player.
 - **Progress dashboard** showing accuracy per level and per attack type, weak spots to practise, and recent games.
 - **Practice filters** for one channel (Email, SMS, WhatsApp) or one topic, such as Banking & Payments. Practice rounds count towards progress, not the scoreboard.
-- Keyboard shortcuts: `L` legitimate, `P` phishing, `S` skip, `Enter` next.
+- Keyboard shortcuts: `L` legitimate, `P` phishing, `V` verify first, `S` skip, `Enter` next.
 - **Pause** stops the clock and hides the email; switching apps pauses automatically.
 - Works on phones, and offline from the first visit (PWA).
 
@@ -108,7 +109,8 @@ Every email in `src/data/emails.json` uses the same fields:
   "attachments": ["optional_file.pdf"],
   "red_flags": [{ "description": "…", "location": "optional: where it appears" }],
   "trust_signals": [],
-  "explanation": "One or two sentences shown after answering."
+  "explanation": "One or two sentences shown after answering.",
+  "verify_first": "Optional. How to verify, for messages where checking through another channel is the best move."
 }
 ```
 

@@ -71,6 +71,10 @@ BrightPath Technologies (`brightpath.ng`), Zentrix Supplies and the people in th
 
 - Whether the made-up phishing domains (for example `kuda-verify.com.ng`) are registered by anyone. Links in the game never open, but avoid real company names in new fake domains where possible.
 
+## Verify first
+
+`verify_first` marks the few messages where checking through another channel is the real-world best move, because the sender can be a genuine account that has been hacked, so the message alone cannot settle it: the CEO's urgent favour, a supplier's new bank details (email and WhatsApp), a payroll account change, the MD's gift card text, a friend's WhatsApp asking for money, and the genuine bank text about a payment you did not make. The text says how to verify. Keep the list short: if most messages were marked, "Verify first" would become a free answer. Other messages use the general tip for their category in `src/types.ts`.
+
 ## Reports from players
 
 Every explanation has a "Something wrong with this message?" link. It opens a GitHub issue (label `content`) or an email that already names the message id, level, channel and subject. To handle one: confirm the claim against the organisation's own website, fix `src/data/emails.json`, add a line under "Corrections made" above, and close the issue with the commit.
