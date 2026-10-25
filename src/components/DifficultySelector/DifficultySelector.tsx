@@ -225,9 +225,14 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           <li>Intermediate scores <strong className="text-foreground">×1.5</strong>, Advanced <strong className="text-foreground">×2</strong>.</li>
           <li>From <strong className="text-foreground">3 correct in a row</strong>, every further correct answer adds <strong className="text-foreground">+50</strong>.</li>
           <li>Running out of time or skipping scores 0 and resets your streak.</li>
+          <li>
+            <strong className="text-foreground">Verify first</strong> means you'd check through the official app or a number
+            you trust. Where that is the real best move (a payment change, a boss or friend asking for money), it scores full
+            points. Elsewhere it is safe but slow: half points, and your streak is kept.
+          </li>
           <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the message. Switching apps pauses automatically.</li>
           <li>Channel or topic practice rounds count towards your progress but not the scoreboard.</li>
-          <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
+          <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">V</kbd> verify first, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
         </ul>
       </section>
     </div>

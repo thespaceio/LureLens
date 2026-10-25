@@ -87,28 +87,28 @@ describe('class codes', () => {
   });
 });
 
-function session(name: string, marks: boolean[], score: number, classCode = '7K2QX9'): GameSession {
+function session(name: string, marks: (boolean | 'verify')[], score: number, classCode = '7K2QX9'): GameSession {
   return {
     id: name,
     name,
     level: 'beginner',
     date: '2026-10-23T10:00:00Z',
     score,
-    correct: marks.filter(Boolean).length,
+    correct: marks.filter(m => m === true).length,
     total: marks.length,
     accuracy: 0,
     bestStreak: 0,
     avgSeconds: 0,
     practice: true,
     classCode,
-    answers: marks.map((correct, i) => ({
+    answers: marks.map((mark, i) => ({
       id: `m${i}`,
       subject: '',
       category: 'banking',
       topic: '',
       is_phishing: true,
-      choice: correct ? 'phishing' : 'legitimate',
-      correct,
+      choice: mark === 'verify' ? 'verify' : mark ? 'phishing' : 'legitimate',
+      correct: mark === true,
       seconds: 1,
       points: 0,
     })),
@@ -132,8 +132,18 @@ describe('class results', () => {
     ].join('\n');
     const { results, otherClass } = parseResults(chat, '7K2QX9');
     expect(results.map(r => r.name)).toEqual(['Tunde', 'Amaka Lagos']);
-    expect(results[0]).toMatchObject({ score: 450, correct: 2, total: 3, marks: [true, true, false] });
+    expect(results[0]).toMatchObject({ score: 450, correct: 2, total: 3, marks: ['right', 'right', 'wrong'] });
     expect(otherClass).toBe(1);
+  });
+
+  it('marks a "Verify first" answer as safe, not wrong', () => {
+    const careful = session('Kemi', [true, 'verify', false], 350);
+    expect(resultLine(careful)).toBe('LureLens class 7K2-QX9 · Kemi · 350 pts · 1/3 · ✓☎✗');
+    // Some phones add an emoji selector to ☎ when the line is copied back.
+    const pasted = resultLine(careful).replace('☎', '☎\uFE0F');
+    const { results } = parseResults(pasted, '7K2QX9');
+    expect(results[0].marks).toEqual(['right', 'safe', 'wrong']);
+    expect(messageAccuracy(results, 3)[1]).toEqual({ right: 0, answered: 1 });
   });
 
   it('keeps the latest line when a player sends twice', () => {

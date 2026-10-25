@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, MIN_PHONE_MESSAGES, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, splitLinks } from './game';
+import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, scoreVerify, MIN_PHONE_MESSAGES, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, splitLinks } from './game';
 import { LEVELS, LEVEL_ORDER, channelOf } from '@/types';
 
 describe('buildRound', () => {
@@ -44,6 +44,31 @@ describe('scoreAnswer', () => {
 
   it('never gives a speed bonus above the maximum, even with clock drift', () => {
     expect(scoreAnswer(true, 999, 'intermediate', 1).speed).toBe(Math.round(MAX_SPEED_BONUS * LEVELS.intermediate.multiplier));
+  });
+});
+
+describe('scoreVerify', () => {
+  it('gives full base points, no speed bonus, where checking first is right', () => {
+    expect(scoreVerify(true, 'advanced', 1)).toEqual({ base: BASE_POINTS * 2, speed: 0, streak: 0, total: BASE_POINTS * 2 });
+    expect(scoreVerify(true, 'beginner', 3).streak).toBe(STREAK_BONUS);
+  });
+
+  it('gives half the base points elsewhere, and never more than a quick correct answer', () => {
+    expect(scoreVerify(false, 'beginner', 5)).toEqual({ base: 50, speed: 0, streak: 0, total: 50 });
+    for (const level of LEVEL_ORDER) {
+      expect(scoreVerify(false, level, 0).total).toBeLessThan(scoreAnswer(true, 0, level, 1).total);
+    }
+  });
+});
+
+describe('verify first content', () => {
+  const marked = ALL_EMAILS.filter(e => e.verify_first);
+  it('marks a handful of messages where checking first is the real best move', () => {
+    expect(marked.length).toBeGreaterThanOrEqual(5);
+    expect(marked.length).toBeLessThan(ALL_EMAILS.length / 5);
+  });
+  it('includes genuine messages too, so Verify is not a phishing detector', () => {
+    expect(marked.some(e => !e.is_phishing)).toBe(true);
   });
 });
 

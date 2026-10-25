@@ -27,6 +27,12 @@ interface MessageBase {
   red_flags: RedFlag[];
   trust_signals: string[];
   explanation: string;
+  /**
+   * Set when checking through another channel is the real-world best move
+   * (the sender may be a genuinely hacked account): how to verify. "Verify
+   * first" then scores full points; elsewhere it scores half.
+   */
+  verify_first?: string;
 }
 
 export interface EmailMessage extends MessageBase {
@@ -60,7 +66,7 @@ export const CHANNELS: Record<Channel, { label: string; noun: string }> = {
   whatsapp: { label: 'WhatsApp', noun: 'WhatsApp message' },
 };
 
-export type Choice = 'phishing' | 'legitimate' | 'timeout' | 'skip';
+export type Choice = 'phishing' | 'legitimate' | 'verify' | 'timeout' | 'skip';
 
 export interface Points {
   base: number;
@@ -148,14 +154,41 @@ export const LEVELS: Record<Level, LevelConfig> = {
 
 export const LEVEL_ORDER: Level[] = ['beginner', 'intermediate', 'advanced'];
 
-export const CATEGORIES: Record<CategoryId, { label: string; description: string }> = {
-  banking: { label: 'Banking & Payments', description: 'Banks, fintech wallets, payments and invoices' },
-  workplace: { label: 'Work & Business', description: 'Colleagues, HR, documents, file sharing, jobs' },
-  accounts: { label: 'Accounts & Security', description: 'Password, sign-in, MFA and social media alerts' },
-  shopping: { label: 'Shopping & Delivery', description: 'Orders, couriers, rides and travel' },
-  government: { label: 'Government & Education', description: 'Grants, NYSC, JAMB, universities' },
-  offers: { label: 'Prizes, Bills & Subscriptions', description: 'Promos, 419 offers, utilities, telecom, streaming' },
+export const CATEGORIES: Record<CategoryId, { label: string; description: string; verify: string }> = {
+  banking: {
+    label: 'Banking & Payments',
+    description: 'Banks, fintech wallets, payments and invoices',
+    verify: 'Open your bank or wallet app yourself, or call the number on the back of your card.',
+  },
+  workplace: {
+    label: 'Work & Business',
+    description: 'Colleagues, HR, documents, file sharing, jobs',
+    verify: 'Ask the person directly on a number or channel you already use, or check with IT or HR.',
+  },
+  accounts: {
+    label: 'Accounts & Security',
+    description: 'Password, sign-in, MFA and social media alerts',
+    verify: 'Type the website address yourself or open the official app, and check your security settings there.',
+  },
+  shopping: {
+    label: 'Shopping & Delivery',
+    description: 'Orders, couriers, rides and travel',
+    verify: "Open the shop's or courier's official app and look up the order with your own order number.",
+  },
+  government: {
+    label: 'Government & Education',
+    description: 'Grants, NYSC, JAMB, universities',
+    verify: 'Type the official address yourself, for example jamb.gov.ng or portal.nysc.org.ng, and check there.',
+  },
+  offers: {
+    label: 'Prizes, Bills & Subscriptions',
+    description: 'Promos, 419 offers, utilities, telecom, streaming',
+    verify: "Check in the company's official app or account. If you never entered a promo, there is no prize.",
+  },
 };
+
+/** How to check a message through a channel you already trust. */
+export const verifyTip = (m: Email): string => m.verify_first ?? CATEGORIES[m.category].verify;
 
 /** The player's fictional workplace. Used in the intro text. */
 export const PLAYER = {

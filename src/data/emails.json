@@ -1885,7 +1885,8 @@
       }
     ],
     "trust_signals": [],
-    "explanation": "Hacked WhatsApp accounts are used to message every contact for money. The name is right because it is your friend's real account. Call them on their usual number before sending anything."
+    "explanation": "Hacked WhatsApp accounts are used to message every contact for money. The name is right because it is your friend's real account. Call them on their usual number before sending anything.",
+    "verify_first": "Call your friend on the number you already have, or ask someone close to them, before you send anything."
   },
   {
     "id": "ng-i-wp02",
@@ -2028,7 +2029,8 @@
       }
     ],
     "trust_signals": [],
-    "explanation": "This is CEO fraud (Business Email Compromise). No links, no malware, just pressure from \"the boss\". Always verify payment requests on a separate channel."
+    "explanation": "This is CEO fraud (Business Email Compromise). No links, no malware, just pressure from \"the boss\". Always verify payment requests on a separate channel.",
+    "verify_first": "Call the CEO on the number you already have or ask in person, and put any payment through the normal approval process."
   },
   {
     "id": "ng-a-p02",
@@ -2059,6 +2061,7 @@
     ],
     "trust_signals": [],
     "explanation": "Vendor email compromise: the supplier's real mailbox may be hacked, so the sender looks right. Always confirm bank-detail changes by phone using a number you already have.",
+    "verify_first": "Call the supplier on the phone number in your existing records, not one from this email, before changing any bank details.",
     "reply_to": "accounts.zentrix@zentrix-supplies.co"
   },
   {
@@ -2543,7 +2546,8 @@
       }
     ],
     "trust_signals": [],
-    "explanation": "The sender line can be faked, so an internal-looking address proves nothing on its own. The Reply-To is the giveaway here. Confirm payroll changes with HR in person or through the HR system."
+    "explanation": "The sender line can be faked, so an internal-looking address proves nothing on its own. The Reply-To is the giveaway here. Confirm payroll changes with HR in person or through the HR system.",
+    "verify_first": "Check with HR in person or in the HR system you normally use. Never update salary details from a link in an email."
   },
   {
     "id": "ng-a-p12",
@@ -2715,7 +2719,8 @@
       }
     ],
     "trust_signals": [],
-    "explanation": "CEO fraud moves to SMS and WhatsApp to avoid company email checks. Gift cards are untraceable, which is why attackers ask for them. Confirm through a known number or in person."
+    "explanation": "CEO fraud moves to SMS and WhatsApp to avoid company email checks. Gift cards are untraceable, which is why attackers ask for them. Confirm through a known number or in person.",
+    "verify_first": "Call the MD on their usual number or ask their office in person. No real request for gift cards arrives by text."
   },
   {
     "id": "ng-a-sp03",
@@ -2771,7 +2776,8 @@
       "No link",
       "Real banks send exactly this kind of code for card payments"
     ],
-    "explanation": "This text is genuine, and it is warning you: someone is trying to use your card. Never share the code, and call your bank using the number on your card to block it. Not every alarming text is a scam."
+    "explanation": "This text is genuine, and it is warning you: someone is trying to use your card. Never share the code, and call your bank using the number on your card to block it. Not every alarming text is a scam.",
+    "verify_first": "Do not share the code. Call your bank on the number on the back of your card and block the card."
   },
   {
     "id": "ng-a-sl02",
@@ -2829,7 +2835,8 @@
       }
     ],
     "trust_signals": [],
-    "explanation": "Payment fraud often moves to WhatsApp so the change avoids the paper trail at work. The invoice really exists, which is what makes this convincing. Call the supplier on the number you already have."
+    "explanation": "Payment fraud often moves to WhatsApp so the change avoids the paper trail at work. The invoice really exists, which is what makes this convincing. Call the supplier on the number you already have.",
+    "verify_first": "Call the supplier on the number already in your records and confirm the account with finance before paying."
   },
   {
     "id": "ng-a-wp02",

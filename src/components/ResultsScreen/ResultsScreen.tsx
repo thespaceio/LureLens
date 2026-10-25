@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Copy, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
+import { Check, Copy, Phone, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
 import { rankTitle } from '@/lib/game';
@@ -22,6 +22,7 @@ interface ResultsScreenProps {
 const CHOICE: Record<Choice, string> = {
   phishing: 'Phishing',
   legitimate: 'Legitimate',
+  verify: 'Verify first',
   timeout: 'No answer',
   skip: 'Skipped',
 };
@@ -108,10 +109,14 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
             <li key={a.id} className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
               <span
                 className={`grid size-7 shrink-0 place-items-center rounded-full ${
-                  a.correct ? 'bg-primary/15 text-primary' : 'bg-destructive/15 text-destructive'
+                  a.correct
+                    ? 'bg-primary/15 text-primary'
+                    : a.choice === 'verify'
+                      ? 'bg-lavender/15 text-lavender'
+                      : 'bg-destructive/15 text-destructive'
                 }`}
               >
-                {a.correct ? <Check className="size-4" /> : <X className="size-4" />}
+                {a.correct ? <Check className="size-4" /> : a.choice === 'verify' ? <Phone className="size-4" /> : <X className="size-4" />}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="font-medium [overflow-wrap:anywhere]">{a.subject}</div>
@@ -120,7 +125,7 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
                   you said {CHOICE[a.choice]} · {a.seconds}s
                 </div>
               </div>
-              <span className="font-mono text-sm text-muted-foreground">{a.correct ? `+${a.points}` : '0'}</span>
+              <span className="font-mono text-sm text-muted-foreground">{a.points ? `+${a.points}` : '0'}</span>
             </li>
           ))}
         </ol>

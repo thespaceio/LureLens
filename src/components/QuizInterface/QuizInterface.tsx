@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Pause, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
+import { Pause, Phone, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailViewer from '@/components/EmailViewer/EmailViewer';
 import MessageViewer from '@/components/MessageViewer/MessageViewer';
 import FeedbackModal from '@/components/FeedbackModal/FeedbackModal';
 import LinkStatus from '@/components/LinkStatus/LinkStatus';
 import type { InspectedLink } from '@/components/LinkStatus/LinkStatus';
-import { scoreAnswer } from '@/lib/game';
+import { scoreAnswer, scoreVerify } from '@/lib/game';
 import { CHANNELS, LEVELS, channelOf } from '@/types';
 import type { AnswerRecord, Choice, Email, EmailMessage, Level, Points } from '@/types';
 
@@ -56,9 +56,19 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       answered.current = true;
 
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
-      const correct = choice === (email.is_phishing ? 'phishing' : 'legitimate');
-      const newStreak = correct ? streak + 1 : 0;
-      const points = scoreAnswer(correct, left, level, newStreak);
+      let correct: boolean;
+      let newStreak: number;
+      let points: Points;
+      if (choice === 'verify') {
+        // Checking first is always safe: it never breaks the streak.
+        correct = Boolean(email.verify_first);
+        newStreak = correct ? streak + 1 : streak;
+        points = scoreVerify(correct, level, newStreak);
+      } else {
+        correct = choice === (email.is_phishing ? 'phishing' : 'legitimate');
+        newStreak = correct ? streak + 1 : 0;
+        points = scoreAnswer(correct, left, level, newStreak);
+      }
 
       setScore(s => s + points.total);
       setStreak(newStreak);
@@ -152,6 +162,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       const key = e.key.toLowerCase();
       if (key === 'l') answerRef.current('legitimate');
       else if (key === 'p') answerRef.current('phishing');
+      else if (key === 'v') answerRef.current('verify');
       else if (key === 's') answerRef.current('skip');
     };
     window.addEventListener('keydown', onKey);
@@ -262,6 +273,19 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           <ShieldAlert className="size-5" />
           Phishing
           <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">P</kbd>
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          className="col-span-2 h-12 gap-2 border-lavender/50 bg-lavender/10 text-sm font-semibold text-lavender hover:bg-lavender/20 hover:text-lavender sm:text-base"
+          onClick={() => answer('verify')}
+          disabled={phase !== 'answering' || paused}
+          data-testid="verify-button"
+        >
+          <Phone className="size-4" />
+          <span>Verify first</span>
+          <span className="hidden font-normal opacity-80 sm:inline">: check through the official app or a number I trust</span>
+          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">V</kbd>
         </Button>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">

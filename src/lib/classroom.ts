@@ -109,13 +109,17 @@ export function inviteLink(code: string, base = `${location.origin}${location.pa
 
 const RIGHT = '✓';
 const WRONG = '✗';
+/** Answered "Verify first" where it wasn't needed: safe, half points. */
+const SAFE = '☎';
+
+export type Mark = 'right' | 'wrong' | 'safe';
 
 const cleanName = (name: string) => name.replace(/[·\n\r]+/g, ' ').replace(/\s+/g, ' ').trim() || 'Player';
 
 /** One line a player sends to the facilitator, e.g. over WhatsApp. */
 export function resultLine(session: GameSession): string {
   const code = formatCode(session.classCode ?? '');
-  const marks = session.answers.map(a => (a.correct ? RIGHT : WRONG)).join('');
+  const marks = session.answers.map(a => (a.correct ? RIGHT : a.choice === 'verify' ? SAFE : WRONG)).join('');
   return `LureLens class ${code} · ${cleanName(session.name)} · ${session.score} pts · ${session.correct}/${session.total} · ${marks}`;
 }
 
@@ -124,11 +128,12 @@ export interface ClassResult {
   score: number;
   correct: number;
   total: number;
-  /** Right or wrong for each message, in round order. */
-  marks: boolean[];
+  /** Each message's outcome, in round order. */
+  marks: Mark[];
 }
 
-const LINE_RE = /LureLens class ([0-9A-Z]{3})-?([0-9A-Z]{3}) · (.+?) · (\d+) pts · (\d+)\/(\d+) · ([✓✗]+)/g;
+// Phones may add an emoji variation selector after ☎ when the line is pasted back.
+const LINE_RE = /LureLens class ([0-9A-Z]{3})-?([0-9A-Z]{3}) · (.+?) · (\d+) pts · (\d+)\/(\d+) · ((?:[✓✗]|☎\uFE0F?)+)/g;
 
 /**
  * Read result lines pasted from a chat. Forwarded-message prefixes and other
@@ -143,7 +148,7 @@ export function parseResults(text: string, code: string): { results: ClassResult
       continue;
     }
     const name = cleanName(m[3]);
-    const marks = [...m[7]].map(c => c === RIGHT);
+    const marks = [...m[7].replace(/\uFE0F/g, '')].map((c): Mark => (c === RIGHT ? 'right' : c === SAFE ? 'safe' : 'wrong'));
     byName.set(name.toLowerCase(), { name, score: Number(m[4]), correct: Number(m[5]), total: Number(m[6]), marks });
   }
   const results = [...byName.values()].sort((a, b) => b.score - a.score || b.correct - a.correct);
@@ -154,6 +159,6 @@ export function parseResults(text: string, code: string): { results: ClassResult
 export function messageAccuracy(results: ClassResult[], count: number): { right: number; answered: number }[] {
   return Array.from({ length: count }, (_, i) => {
     const answered = results.filter(r => r.marks.length > i);
-    return { right: answered.filter(r => r.marks[i]).length, answered: answered.length };
+    return { right: answered.filter(r => r.marks[i] === 'right').length, answered: answered.length };
   });
 }

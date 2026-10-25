@@ -1,8 +1,8 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 import Explanation from '@/components/Explanation/Explanation';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { CHANNELS, channelOf } from '@/types';
+import { CHANNELS, channelOf, verifyTip } from '@/types';
 import type { Choice, Email, Points } from '@/types';
 
 interface FeedbackModalProps {
@@ -19,23 +19,47 @@ interface FeedbackModalProps {
 const CHOICE_LABEL: Record<Choice, string> = {
   phishing: 'Phishing',
   legitimate: 'Legitimate',
+  verify: 'Verify first',
   timeout: 'No answer',
   skip: 'Skipped',
 };
 
 export function FeedbackModal({ open, email, choice, correct, points, streak, isLast, onNext }: FeedbackModalProps) {
   const isPhish = email.is_phishing;
-  const verdict = choice === 'timeout' ? "Time's up" : choice === 'skip' ? 'Skipped' : correct ? 'Correct' : 'Not quite';
+  const verified = choice === 'verify';
+  // Verifying where it wasn't needed is safe, so it gets its own colour, not red.
+  const tone = correct ? 'primary' : verified ? 'lavender' : 'destructive';
+  const verdict =
+    choice === 'timeout'
+      ? "Time's up"
+      : choice === 'skip'
+        ? 'Skipped'
+        : verified
+          ? correct
+            ? 'Good call: checking first is right here'
+            : 'Safe, but you could have decided'
+          : correct
+            ? 'Correct'
+            : 'Not quite';
 
   const breakdown = correct
     ? [
-        `+${points.base} correct`,
+        `+${points.base} ${verified ? 'for checking first' : 'correct'}`,
         points.speed ? `+${points.speed} speed` : '',
         points.streak ? `+${points.streak} streak (${streak} in a row)` : '',
       ].filter(Boolean).join(' · ')
-    : choice === 'timeout'
-      ? 'No answer in time. Streak reset.'
-      : '0 points. Streak reset.';
+    : verified
+      ? `+${points.total} (half points) for playing it safe. Streak kept.`
+      : choice === 'timeout'
+        ? 'No answer in time. Streak reset.'
+        : '0 points. Streak reset.';
+
+  const showTip = verified || Boolean(email.verify_first);
+  const tipLead = email.verify_first
+    ? verified
+      ? 'The sender may be a real account that has been hacked, so the message alone cannot settle it.'
+      : 'Even when you spot it, the safest move here is to check through another channel.'
+    : 'Checking is never wrong, but this one could be decided from the message itself. To check it:';
 
   return (
     <Dialog open={open} onOpenChange={o => !o && onNext()}>
@@ -45,12 +69,14 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
       >
         <div
           className={`border-b border-border px-6 pb-4 pt-6 ${
-            correct
-              ? 'bg-primary/10'
-              : 'bg-destructive/10'
+            tone === 'primary' ? 'bg-primary/10' : tone === 'lavender' ? 'bg-lavender/10' : 'bg-destructive/10'
           }`}
         >
-          <p className={`mb-1 font-mono text-xs uppercase tracking-[0.14em] ${correct ? 'text-primary' : 'text-destructive'}`}>
+          <p
+            className={`mb-1 font-mono text-xs uppercase tracking-[0.14em] ${
+              tone === 'primary' ? 'text-primary' : tone === 'lavender' ? 'text-lavender' : 'text-destructive'
+            }`}
+          >
             {verdict}
           </p>
           <DialogTitle className="text-xl font-semibold">
@@ -71,7 +97,16 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
           </div>
         </div>
 
-        <div className="px-6 py-5">
+        <div className="space-y-5 px-6 py-5">
+          {showTip && (
+            <section className="rounded-lg border border-lavender/40 bg-lavender/10 px-4 py-3 text-sm" data-testid="verify-tip">
+              <h3 className="mb-1 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-lavender">
+                <Phone className="size-4" /> How to verify
+              </h3>
+              <p className="text-muted-foreground">{tipLead}</p>
+              <p className="mt-1 font-medium">{verifyTip(email)}</p>
+            </section>
+          )}
           <Explanation email={email} />
         </div>
 
