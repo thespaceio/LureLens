@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Play } from 'lucide-react';
+import { Globe, MonitorSmartphone, Play } from 'lucide-react';
+import OnlineBoard from '@/components/Online/OnlineBoard';
+import { ONLINE } from '@/lib/online';
 import { Button } from '@/components/ui/button';
 import { leaderboard } from '@/lib/stats';
 import { LEVELS, LEVEL_ORDER } from '@/types';
@@ -26,6 +28,7 @@ function formatDate(iso: string) {
 export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) {
   const [level, setLevel] = useState<Level | 'all'>('all');
   const [bestOnly, setBestOnly] = useState(true);
+  const [source, setSource] = useState<'device' | 'online'>(ONLINE ? 'online' : 'device');
   const rows = leaderboard(sessions, level, bestOnly, 20);
   const games = sessions.filter(s => level === 'all' || s.level === level).length;
   const me = playerName.trim().toLowerCase();
@@ -37,12 +40,37 @@ export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) 
         <div>
           <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // SCOREBOARD</p>
           <h1 className="mt-1 text-3xl font-bold sm:text-4xl">Top phish hunters</h1>
-          <p className="mt-1 text-muted-foreground">Highest scores on this device. Ties go to accuracy, then speed.</p>
+          <p className="mt-1 text-muted-foreground">
+            {source === 'online'
+              ? 'Best scores posted by players everywhere.'
+              : 'Highest scores on this device. Ties go to accuracy, then speed.'}
+          </p>
         </div>
         <Button onClick={onPlay} className="gap-2 font-semibold">
           <Play className="size-4" /> Play now
         </Button>
       </div>
+
+      {ONLINE && (
+        <div className="flex gap-1 rounded-xl border border-border bg-card p-1 sm:w-fit" role="group" aria-label="Scoreboard">
+          {([
+            ['online', 'Online', Globe],
+            ['device', 'This device', MonitorSmartphone],
+          ] as const).map(([id, label, Icon]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={source === id}
+              onClick={() => setSource(id)}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:flex-none ${
+                source === id ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Icon className="size-4" /> {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Level">
@@ -61,6 +89,7 @@ export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) 
             </button>
           ))}
         </div>
+        {source === 'device' && (
         <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
           <input
             type="checkbox"
@@ -70,9 +99,12 @@ export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) 
           />
           Best score per player
         </label>
+        )}
       </div>
 
-      {rows.length === 0 ? (
+      {source === 'online' ? (
+        <OnlineBoard level={level} playerName={playerName} />
+      ) : rows.length === 0 ? (
         <div className="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
           <p>No scores yet{level === 'all' ? '' : ` for ${LEVELS[level].label}`}. Be the first on the board.</p>
           <Button onClick={onPlay} className="mt-4">Start playing</Button>

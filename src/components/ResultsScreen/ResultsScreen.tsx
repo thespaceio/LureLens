@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Award, Check, Copy, Phone, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
+import PostScore from '@/components/Online/PostScore';
+import { ONLINE } from '@/lib/online';
+import type { PostedScore } from '@/lib/online';
 import { rankTitle } from '@/lib/game';
 import { formatCode, resultLine } from '@/lib/classroom';
 import { LEVELS, LEVEL_ORDER } from '@/types';
@@ -18,6 +21,7 @@ interface ResultsScreenProps {
   onScoreboard: () => void;
   onProgress: () => void;
   onClassroom: () => void;
+  onPosted: (posted: PostedScore) => void;
 }
 
 const CHOICE: Record<Choice, string> = {
@@ -28,7 +32,7 @@ const CHOICE: Record<Choice, string> = {
   skip: 'Skipped',
 };
 
-export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom }: ResultsScreenProps) {
+export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom, onPosted }: ResultsScreenProps) {
   const cfg = LEVELS[session.level];
   const nextLevel = LEVEL_ORDER[LEVEL_ORDER.indexOf(session.level) + 1];
   const [sharing, setSharing] = useState(false);
@@ -87,6 +91,8 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
       )}
 
       {session.classCode && <SendToFacilitator session={session} />}
+
+      {ONLINE && !session.practice && <PostScore session={session} onPosted={onPosted} />}
 
       <div className="flex flex-wrap justify-center gap-2">
         <Button onClick={onPlayAgain} className="gap-2 font-semibold" variant={session.classCode ? 'secondary' : 'default'}>

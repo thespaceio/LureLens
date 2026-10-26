@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis
 import { Play, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CertificatePanel from '@/components/Certificate/CertificatePanel';
+import type { PostedScore } from '@/lib/online';
 import { accuracyOf } from '@/lib/game';
 import { playerNames, playerSessions, topicStats } from '@/lib/stats';
 import { LEVELS, LEVEL_ORDER } from '@/types';
@@ -13,6 +14,7 @@ interface ProgressDashboardProps {
   playerName: string;
   onPlay: (level?: Level) => void;
   onReset: () => void;
+  onPosted?: (sessionId: string, posted: PostedScore) => void;
 }
 
 const PILL: Record<Level, string> = {
@@ -30,7 +32,7 @@ function formatDateTime(iso: string) {
     : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
 
-export function ProgressDashboard({ sessions, playerName, onPlay, onReset }: ProgressDashboardProps) {
+export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPosted }: ProgressDashboardProps) {
   const names = playerNames(sessions);
   const [chosen, setChosen] = useState<string>('');
   const current = playerName.trim();
@@ -92,7 +94,7 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset }: Pro
             ))}
           </div>
 
-          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} />
+          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} onPosted={onPosted} />
 
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-4 font-semibold">Levels</h2>

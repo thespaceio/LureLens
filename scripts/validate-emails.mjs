@@ -101,6 +101,13 @@ for (const level of LEVELS) {
   if (share < 0.4 || share > 0.6) fail(level, `${phish} of ${pool.length} are phishing; keep it between 40% and 60%`);
 }
 
+// The online scoreboard's answer key must match the messages.
+const { messagesSql, OUT } = await import('./supabase-messages.mjs');
+const { existsSync, readFileSync: readKey } = await import('node:fs');
+if (!existsSync(OUT) || readKey(OUT, 'utf8') !== messagesSql()) {
+  fail('supabase/messages.sql', 'out of date: run `npm run supabase:messages` and run the new file in Supabase');
+}
+
 if (errors.length) {
   console.error(`emails.json has ${errors.length} problem(s):\n- ${errors.join('\n- ')}`);
   process.exit(1);

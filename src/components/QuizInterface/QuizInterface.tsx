@@ -55,7 +55,10 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       if (phase !== 'answering' || answered.current || pausedRef.current || !email) return;
       answered.current = true;
 
-      const left = Math.max(0, (deadline.current - performance.now()) / 1000);
+      // Time is kept to a tenth of a second, the same precision the online
+      // scoreboard uses to check the score.
+      const spent = Math.min(cfg.seconds, Math.round((cfg.seconds - Math.max(0, (deadline.current - performance.now()) / 1000)) * 10) / 10);
+      const left = cfg.seconds - spent;
       let correct: boolean;
       let newStreak: number;
       let points: Points;
@@ -84,7 +87,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           is_phishing: email.is_phishing,
           choice,
           correct,
-          seconds: Math.round((cfg.seconds - left) * 10) / 10,
+          seconds: spent,
           points: points.total,
         },
       ]);

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0 (not released yet)
+
+### New
+- **Online scoreboard.** After a ranked game, players can tap "Post to the online scoreboard" to see how they rank against everyone, this week or all time. Nothing is sent unless they tap it, and only the player name, scores and dates are stored. The server works the score out from the answers, so made-up scores can't be posted.
+- **Checkable certificates.** "Make it checkable online" registers a certificate, and anyone can confirm it on the new **Check a certificate** page. The LinkedIn link now points to that check.
+
+### Changed
+- The game keeps answer times to a tenth of a second, the same precision the server checks, so both always show the same score.
+
 ## 2.0.0 (26 October 2026)
 
 PhishGuard is now **LureLens**: a new name, a new brand, and the move from a side project to a phishing-awareness app built for real classrooms, teams and communities. Saved scores and progress carry over automatically, and old PhishGuard links redirect to the new site.
