@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Play, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CertificatePanel from '@/components/Certificate/CertificatePanel';
 import { accuracyOf } from '@/lib/game';
 import { playerNames, playerSessions, topicStats } from '@/lib/stats';
 import { LEVELS, LEVEL_ORDER } from '@/types';
@@ -90,6 +91,8 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset }: Pro
               </div>
             ))}
           </div>
+
+          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} />
 
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-4 font-semibold">Levels</h2>

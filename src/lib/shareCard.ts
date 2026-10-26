@@ -24,17 +24,28 @@ export function shareText(session: GameSession): string {
 }
 
 /** Wait for the brand fonts, but never longer than a moment (offline or blocked fonts fall back). */
-async function fontsReady(): Promise<void> {
+export async function fontsReady(): Promise<void> {
   if (!('fonts' in document)) return;
   const loads = ['800 72px Syne', '600 28px Inter', '500 22px "JetBrains Mono"'].map(f => document.fonts.load(f).catch(() => []));
   await Promise.race([Promise.all(loads), new Promise(r => setTimeout(r, 1500))]);
 }
 
-function drawMark(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+export interface MarkColours {
+  ls: string;
+  ring: string;
+  /** The background, used to cut the "s" hallmarks out of the Ls. */
+  ground: string;
+}
+
+const DARK_MARK: MarkColours = { ls: C.lavender, ring: C.lime, ground: C.ground };
+/** The daylight mark, for light backgrounds such as the printable certificate. */
+export const DAYLIGHT_MARK: MarkColours = { ls: '#3B1F7A', ring: '#4D7C0F', ground: '#FFFFFF' };
+
+export function drawMark(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, colours: MarkColours = DARK_MARK) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(size / 120, size / 120);
-  ctx.strokeStyle = C.lavender;
+  ctx.strokeStyle = colours.ls;
   ctx.lineWidth = 20;
   ctx.lineJoin = 'miter';
   ctx.lineCap = 'butt';
@@ -48,7 +59,7 @@ function drawMark(ctx: CanvasRenderingContext2D, x: number, y: number, size: num
   ctx.stroke();
   // The "s" hallmarks are cut out in the background colour.
   const s = new Path2D(S_PATH);
-  ctx.fillStyle = C.ground;
+  ctx.fillStyle = colours.ground;
   ctx.fill(s);
   ctx.save();
   ctx.translate(60, 60);
@@ -56,7 +67,7 @@ function drawMark(ctx: CanvasRenderingContext2D, x: number, y: number, size: num
   ctx.translate(-60, -60);
   ctx.fill(s);
   ctx.restore();
-  ctx.strokeStyle = C.lime;
+  ctx.strokeStyle = colours.ring;
   ctx.lineWidth = 8;
   ctx.beginPath();
   ctx.arc(60, 60, 15, 0, Math.PI * 2);
@@ -65,7 +76,7 @@ function drawMark(ctx: CanvasRenderingContext2D, x: number, y: number, size: num
 }
 
 /** Shrink a font size until the text fits the width. */
-function fit(ctx: CanvasRenderingContext2D, text: string, font: (px: number) => string, start: number, maxWidth: number): number {
+export function fit(ctx: CanvasRenderingContext2D, text: string, font: (px: number) => string, start: number, maxWidth: number): number {
   let px = start;
   ctx.font = font(px);
   while (px > 24 && ctx.measureText(text).width > maxWidth) {

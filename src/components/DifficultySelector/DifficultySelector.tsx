@@ -232,6 +232,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           </li>
           <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the message. Switching apps pauses automatically.</li>
           <li>Channel or topic practice rounds count towards your progress but not the scoreboard.</li>
+          <li>Score <strong className="text-foreground">80% or more on every level</strong> to earn a LureLens certificate (see Progress).</li>
           <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">V</kbd> verify first, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
         </ul>
       </section>
