@@ -75,6 +75,10 @@ export function useGameStore() {
     setSessions(prev => [session, ...prev].slice(0, MAX_SESSIONS));
   }, []);
 
+  const updateSession = useCallback((id: string, patch: Partial<GameSession>) => {
+    setSessions(prev => prev.map(s => (s.id === id ? { ...s, ...patch } : s)));
+  }, []);
+
   const clearAll = useCallback(() => {
     setSessions([]);
     try {
@@ -84,7 +88,7 @@ export function useGameStore() {
     }
   }, []);
 
-  return { sessions, playerName, setPlayerName, saveSession, clearAll };
+  return { sessions, playerName, setPlayerName, saveSession, updateSession, clearAll };
 }
 
 export type GameStore = ReturnType<typeof useGameStore>;

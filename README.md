@@ -125,10 +125,14 @@ Every email in `src/data/emails.json` uses the same fields:
 
 To change timers, points or emails per game, edit `LEVELS` in `src/types.ts`. Scoring constants are at the top of `src/lib/game.ts`.
 
+## Online scoreboard (optional)
+
+With a free Supabase project, LureLens adds an online scoreboard (players choose to post each game), online certificates and a public certificate check. Scores are recomputed by the server from the answers. Setup, moderation and privacy: [docs/online.md](docs/online.md).
+
 ## Notes
 
 - A class code stores the level and a random seed, plus a check character tied to the message bank. If the messages change in a new version, old codes stop working instead of giving players a different round from the facilitator.
-- Scores are stored in the browser's `localStorage`, so the scoreboard is **per device**. That suits a lab or event laptop. A shared online scoreboard would need a backend such as Supabase or Firebase.
+- Scores are stored in the browser's `localStorage`, so the **This device** scoreboard works with no account or server. The online scoreboard is separate and opt-in (see above).
 - All emails are simulated. Brand names appear for education only, and the phishing domains are fictional.
 
 ---

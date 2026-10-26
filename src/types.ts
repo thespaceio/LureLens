@@ -103,6 +103,10 @@ export interface GameSession {
   practice?: boolean;
   /** Set for classroom rounds: the class code, without the dash. */
   classCode?: string;
+  /** Set once this game has been posted online: the server's id for it. */
+  onlineId?: string;
+  /** The server's score and rank, when posted to the online scoreboard. */
+  online?: { score: number; rank: number | null; of: number | null };
 }
 
 export interface LevelConfig {

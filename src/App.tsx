@@ -14,6 +14,7 @@ import { accuracyOf, buildRound } from '@/lib/game';
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
 import { classRound, normalizeCode } from '@/lib/classroom';
 import { certificateProgress } from '@/lib/certificate';
+import { ONLINE } from '@/lib/online';
 import type { DecodedClass } from '@/lib/classroom';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
 import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
@@ -22,24 +23,27 @@ import './App.css';
 // The dashboard pulls in the charting library, so load it only when opened.
 const ProgressDashboard = lazy(() => import('@/components/ProgressDashboard/ProgressDashboard'));
 const Classroom = lazy(() => import('@/components/Classroom/Classroom'));
+const CertificateCheck = lazy(() => import('@/components/Online/CertificateCheck'));
 
-type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'about';
+type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about';
 
-/** A class code from an invite link (?class=7K2QX9), removed from the address bar once read. */
-function codeFromLink(): string | undefined {
+/** Reads ?class=… or ?cert=… from a link, and removes it from the address bar. */
+function paramFromLink(name: string): string | undefined {
   try {
     const params = new URLSearchParams(window.location.search);
-    const code = params.get('class');
-    if (code === null) return undefined;
-    params.delete('class');
+    const value = params.get(name);
+    if (value === null) return undefined;
+    params.delete(name);
     const rest = params.toString();
     window.history.replaceState(null, '', `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash}`);
-    return normalizeCode(code);
+    return value;
   } catch {
     return undefined;
   }
 }
-const LINK_CODE = codeFromLink();
+const LINK_CODE = ((c: string | undefined) => (c === undefined ? undefined : normalizeCode(c)))(paramFromLink('class'));
+/** A certificate reference from a check link (?cert=LL-XXXX-XXXX), e.g. from LinkedIn. */
+const LINK_CERT = ONLINE ? paramFromLink('cert')?.trim().toUpperCase() : undefined;
 
 interface Game {
   id: string;
@@ -69,12 +73,12 @@ const NAV: { id: View; label: string; short: string; icon: typeof Play }[] = [
 
 function App() {
   const store = useGameStore();
-  const [view, setView] = useState<View>(LINK_CODE ? 'classroom' : 'menu');
+  const [view, setView] = useState<View>(LINK_CERT ? 'check' : LINK_CODE ? 'classroom' : 'menu');
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
   // Returning players see what changed, once. Not over an invite link.
-  const [whatsNew, setWhatsNew] = useState(() => !LINK_CODE && shouldShowWhatsNew(store.sessions.length > 0 || Boolean(store.playerName)));
+  const [whatsNew, setWhatsNew] = useState(() => !LINK_CODE && !LINK_CERT && shouldShowWhatsNew(store.sessions.length > 0 || Boolean(store.playerName)));
   const closeWhatsNew = () => {
     markWhatsNewSeen();
     setWhatsNew(false);
@@ -162,6 +166,11 @@ function App() {
             {...result}
             onPlayAgain={() => startGame(result.session.level, game?.categories ?? [], game?.channels ?? [])}
             onClassroom={() => navigate('classroom')}
+            onPosted={posted => {
+              const patch = { onlineId: posted.id, online: { score: posted.score, rank: posted.rank, of: posted.of } };
+              store.updateSession(result.session.id, patch);
+              setResult(r => (r ? { ...r, session: { ...r.session, ...patch } } : r));
+            }}
             onPlayLevel={level => startGame(level)}
             onScoreboard={() => navigate('scoreboard')}
             onProgress={() => navigate('progress')}
@@ -180,6 +189,12 @@ function App() {
                 navigate('menu');
               }}
               onReset={store.clearAll}
+              onPosted={(sessionId, posted) =>
+                store.updateSession(sessionId, {
+                  onlineId: posted.id,
+                  ...(posted.rank !== null ? { online: { score: posted.score, rank: posted.rank, of: posted.of } } : {}),
+                })
+              }
             />
           </Suspense>
         );
@@ -194,8 +209,14 @@ function App() {
             />
           </Suspense>
         );
+      case 'check':
+        return (
+          <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
+            <CertificateCheck initialReference={LINK_CERT} />
+          </Suspense>
+        );
       case 'about':
-        return <About />;
+        return <About onCheck={() => navigate('check')} />;
       case 'menu':
       default:
         return (
@@ -211,7 +232,7 @@ function App() {
     }
   };
 
-  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view;
+  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view === 'check' ? 'about' : view;
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -270,7 +291,7 @@ function App() {
   );
 }
 
-function About() {
+function About({ onCheck }: { onCheck: () => void }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -308,10 +329,31 @@ function About() {
             <li>Scores are saved only in this browser, so the scoreboard is per device.</li>
             <li>Classroom mode gives a group the same messages through a shared code, without sending anything to a server.</li>
             <li>Score 80% or more on every level to earn a LureLens certificate you can print or add to LinkedIn.</li>
+            {ONLINE && (
+              <li>
+                The online scoreboard only gets a game when you tap "Post to the online scoreboard". It stores the player name
+                you chose, your scores and dates, nothing else.
+              </li>
+            )}
             <li>All emails are simulated. Brand names are used for education only, and the phishing domains are fictional.</li>
           </ul>
         </section>
       </div>
+      {ONLINE && (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+          <div>
+            <h2 className="mb-1 font-semibold text-foreground">Check a certificate</h2>
+            <p>Confirm a LureLens certificate from the reference printed on it.</p>
+          </div>
+          <button
+            type="button"
+            onClick={onCheck}
+            className="rounded-lg border border-border px-4 py-2 font-medium text-foreground hover:border-primary/60"
+          >
+            Check a certificate
+          </button>
+        </section>
+      )}
       <section className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
         <h2 className="mb-2 font-semibold text-foreground">Found a mistake?</h2>
         <p>

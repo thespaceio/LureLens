@@ -99,8 +99,10 @@ export function scoreAnswer(
   if (!correct) return { base: 0, speed: 0, streak: 0, total: 0 };
   const cfg = LEVELS[level];
   const ratio = Math.max(0, Math.min(1, secondsLeft / cfg.seconds));
-  const base = Math.round(BASE_POINTS * cfg.multiplier);
-  const speed = Math.round(MAX_SPEED_BONUS * ratio * cfg.multiplier);
+  // The tiny nudge makes x.5 round up even when floating point gives x.4999…,
+  // so the game always agrees with the online scoreboard's exact maths.
+  const base = Math.round(BASE_POINTS * cfg.multiplier + 1e-9);
+  const speed = Math.round(MAX_SPEED_BONUS * ratio * cfg.multiplier + 1e-9);
   const streak = streakAfterAnswer >= STREAK_START ? STREAK_BONUS : 0;
   return { base, speed, streak, total: base + speed + streak };
 }

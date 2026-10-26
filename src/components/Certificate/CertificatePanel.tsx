@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CERTIFICATE_ACCURACY, certificateProgress, drawCertificate, formatCertificateDate } from '@/lib/certificate';
 import { SITE_URL } from '@/lib/shareCard';
+import { ONLINE, certificateLink } from '@/lib/online';
+import type { PostedScore } from '@/lib/online';
+import OnlineCertificate from '@/components/Certificate/OnlineCertificate';
+import { isRegistered } from '@/lib/certificateOnline';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { GameSession, Level } from '@/types';
 
@@ -11,10 +15,12 @@ interface CertificatePanelProps {
   sessions: GameSession[];
   name: string;
   onPlay: (level: Level) => void;
+  /** A game was posted online (to back the certificate). */
+  onPosted?: (sessionId: string, posted: PostedScore) => void;
 }
 
 /** Progress towards the certificate, and the certificate itself once earned. */
-export function CertificatePanel({ sessions, name, onPlay }: CertificatePanelProps) {
+export function CertificatePanel({ sessions, name, onPlay, onPosted }: CertificatePanelProps) {
   const progress = useMemo(() => certificateProgress(sessions, name), [sessions, name]);
 
   return (
@@ -23,7 +29,7 @@ export function CertificatePanel({ sessions, name, onPlay }: CertificatePanelPro
         <Award className="size-5 text-primary" /> LureLens certificate
       </h2>
       {progress.earned ? (
-        <EarnedCertificate progress={progress} name={name} />
+        <EarnedCertificate progress={progress} name={name} onPosted={onPosted} />
       ) : (
         <>
           <p className="mb-4 text-sm text-muted-foreground">
@@ -64,7 +70,16 @@ export function CertificatePanel({ sessions, name, onPlay }: CertificatePanelPro
   );
 }
 
-function EarnedCertificate({ progress, name }: { progress: ReturnType<typeof certificateProgress>; name: string }) {
+function EarnedCertificate({
+  progress,
+  name,
+  onPosted,
+}: {
+  progress: ReturnType<typeof certificateProgress>;
+  name: string;
+  onPosted?: (sessionId: string, posted: PostedScore) => void;
+}) {
+  const [online, setOnline] = useState(() => isRegistered(progress.reference));
   const [displayName, setDisplayName] = useState(name);
   const [shownName, setShownName] = useState(name);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -119,7 +134,7 @@ function EarnedCertificate({ progress, name }: { progress: ReturnType<typeof cer
     issueYear: String(earned.getFullYear()),
     issueMonth: String(earned.getMonth() + 1),
     certId: progress.reference ?? '',
-    certUrl: SITE_URL,
+    certUrl: online && progress.reference ? certificateLink(progress.reference) : SITE_URL,
   });
 
   return (
@@ -167,6 +182,9 @@ function EarnedCertificate({ progress, name }: { progress: ReturnType<typeof cer
           </a>
         </Button>
       </div>
+      {ONLINE && onPosted && (
+        <OnlineCertificate progress={progress} displayName={displayName} onPosted={onPosted} onRegistered={() => setOnline(true)} />
+      )}
       <p className="text-xs text-muted-foreground">
         The image is A4 landscape, ready to print. "Add to LinkedIn" fills in the Licenses &amp; certifications form on your profile.
       </p>
