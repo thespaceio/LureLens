@@ -3,19 +3,27 @@ import { APP_VERSION } from '@/lib/report';
 // Shown once to returning players after an update.
 const SEEN_KEY = 'lurelens_seen_version';
 
-/** True when this browser played an earlier version and hasn't seen this one's notes. */
-export function shouldShowWhatsNew(hasHistory: boolean): boolean {
+/**
+ * What to show this browser:
+ * - 'none': new player, or already seen this version's note
+ * - 'update': played 2.0 or later and saw its note; show what's new since
+ * - 'renamed': played back when the game was PhishGuard (before 2.0), so the
+ *   note also explains the rename and everything 2.0 added
+ */
+export type WhatsNewKind = 'none' | 'update' | 'renamed';
+
+export function whatsNewFor(hasHistory: boolean): WhatsNewKind {
   try {
     const seen = localStorage.getItem(SEEN_KEY);
-    if (seen === APP_VERSION) return false;
+    if (seen === APP_VERSION) return 'none';
     if (!hasHistory) {
       // New players start on this version: nothing to announce.
       localStorage.setItem(SEEN_KEY, APP_VERSION);
-      return false;
+      return 'none';
     }
-    return true;
+    return seen === null ? 'renamed' : 'update';
   } catch {
-    return false;
+    return 'none';
   }
 }
 
