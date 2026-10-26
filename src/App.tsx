@@ -8,7 +8,7 @@ import ResultsScreen from '@/components/ResultsScreen/ResultsScreen';
 import Leaderboard from '@/components/Leaderboard/Leaderboard';
 import { Logo } from '@/components/Logo/Logo';
 import WhatsNew from '@/components/WhatsNew/WhatsNew';
-import { markWhatsNewSeen, shouldShowWhatsNew } from '@/lib/whatsNew';
+import { markWhatsNewSeen, whatsNewFor } from '@/lib/whatsNew';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
@@ -78,10 +78,12 @@ function App() {
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
   // Returning players see what changed, once. Not over an invite link.
-  const [whatsNew, setWhatsNew] = useState(() => !LINK_CODE && !LINK_CERT && shouldShowWhatsNew(store.sessions.length > 0 || Boolean(store.playerName)));
+  const [whatsNew, setWhatsNew] = useState(() =>
+    LINK_CODE || LINK_CERT ? 'none' : whatsNewFor(store.sessions.length > 0 || Boolean(store.playerName)),
+  );
   const closeWhatsNew = () => {
     markWhatsNewSeen();
-    setWhatsNew(false);
+    setWhatsNew('none');
   };
 
   const navigate = (next: View) => {
@@ -276,11 +278,12 @@ function App() {
       </main>
 
       <WhatsNew
-        open={whatsNew}
+        open={whatsNew !== 'none'}
+        renamed={whatsNew === 'renamed'}
         onClose={closeWhatsNew}
-        onClassroom={() => {
+        onScoreboard={() => {
           closeWhatsNew();
-          navigate('classroom');
+          navigate('scoreboard');
         }}
       />
 

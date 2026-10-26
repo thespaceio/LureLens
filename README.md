@@ -11,7 +11,7 @@
 
 **Play it:** [lurelens.netlify.app](https://lurelens.netlify.app/) · [GitHub Pages mirror](https://thespaceio.github.io/LureLens/)
 
-**Version 2.0** · see the [changelog](CHANGELOG.md) for what's new.
+**Version 2.1** · see the [changelog](CHANGELOG.md) for what's new.
 
 LureLens was previously called PhishGuard. Old links to `phishguard-by-faith.netlify.app` redirect here.
 

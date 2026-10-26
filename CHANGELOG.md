@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 (not released yet)
+## 2.1.0 (26 October 2026)
 
 ### New
 - **Online scoreboard.** After a ranked game, players can tap "Post to the online scoreboard" to see how they rank against everyone, this week or all time. Nothing is sent unless they tap it, and only the player name, scores and dates are stored. The server works the score out from the answers, so made-up scores can't be posted.
@@ -8,6 +8,7 @@
 
 ### Changed
 - The game keeps answer times to a tenth of a second, the same precision the server checks, so both always show the same score.
+- The "What's new" note now shows what changed since your last visit, and still explains the rename to anyone returning from the PhishGuard days.
 
 ## 2.0.0 (26 October 2026)
 
