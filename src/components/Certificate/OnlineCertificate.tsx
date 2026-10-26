@@ -13,11 +13,15 @@ export function OnlineCertificate({
   displayName,
   onPosted,
   onRegistered,
+  signedIn,
+  onSignIn,
 }: {
   progress: CertificateProgress;
   displayName: string;
   onPosted: (sessionId: string, posted: PostedScore) => void;
   onRegistered: () => void;
+  signedIn: boolean;
+  onSignIn?: () => void;
 }) {
   const reference = progress.reference!;
   const [registeredName, setRegisteredName] = useState<string | undefined>(() => readRegistered()[reference]);
@@ -42,7 +46,7 @@ export function OnlineCertificate({
         onPosted(g.id, posted);
         ids.push(posted.id);
       }
-      await registerCertificate(reference, displayName.trim() || 'Player', ids);
+      await registerCertificate(reference, displayName.trim() || null, ids);
       saveRegistered(reference, displayName.trim());
       setRegisteredName(displayName.trim());
       setState('idle');
@@ -91,7 +95,19 @@ export function OnlineCertificate({
       <p className="flex items-center gap-2 text-sm font-medium">
         <Globe className="size-4 text-lavender" /> Make it checkable online
       </p>
-      {oldGames.length > 0 ? (
+      {!signedIn ? (
+        <>
+          <p className="text-sm text-muted-foreground">
+            Sign in so employers and trainers can confirm your certificate from its reference. It will be tied to your
+            account.
+          </p>
+          {onSignIn && (
+            <Button size="sm" className="gap-1.5 font-semibold" onClick={onSignIn} data-testid="certificate-sign-in">
+              <Globe className="size-4" /> Sign in to make it checkable
+            </Button>
+          )}
+        </>
+      ) : oldGames.length > 0 ? (
         <p className="text-sm text-muted-foreground">
           One of your passing games was played on an older version of LureLens, so the server can't check it. Pass that level
           again to make your certificate checkable online.
@@ -99,8 +115,8 @@ export function OnlineCertificate({
       ) : (
         <>
           <p className="text-sm text-muted-foreground">
-            Employers and trainers can then confirm it with the reference. This posts your three passing games (your player
-            name, scores and dates) and the name on the certificate. Ranked games also appear on the online scoreboard.
+            Employers and trainers can then confirm it with the reference. This posts your three passing games under your
+            username, with the name on the certificate. Ranked games also appear on the online scoreboard.
           </p>
           <Button size="sm" className="gap-1.5 font-semibold" onClick={register} disabled={state === 'working'} data-testid="certificate-register">
             {state === 'working' ? <Loader2 className="size-4 animate-spin" /> : <Globe className="size-4" />}

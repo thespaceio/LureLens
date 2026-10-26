@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Play, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,11 @@ interface DifficultySelectorProps {
   initialLevel?: Level;
   onNameChange: (name: string) => void;
   onStart: (level: Level, categories: CategoryId[], channels: Channel[]) => void;
+  /** Signed in: play under the account's username. */
+  lockedName?: string;
+  onAccount?: () => void;
+  /** Shown under the start button, e.g. the live top players. */
+  extra?: ReactNode;
 }
 
 const LEVEL_ACCENT: Record<Level, string> = {
@@ -22,7 +28,7 @@ const LEVEL_ACCENT: Record<Level, string> = {
   advanced: 'text-muted-foreground border-muted-foreground',
 };
 
-export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart }: DifficultySelectorProps) {
+export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart, lockedName, onAccount, extra }: DifficultySelectorProps) {
   const [level, setLevel] = useState<Level>(initialLevel ?? 'beginner');
   const [categories, setCategories] = useState<CategoryId[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -47,7 +53,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
     setChannels(prev => (prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]));
 
   const start = () => {
-    if (!playerName.trim()) {
+    if (!lockedName && !playerName.trim()) {
       setNameError(true);
       document.getElementById('player-name')?.focus();
       return;
@@ -71,9 +77,27 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
         </p>
       </motion.section>
 
+      {lockedName ? (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground" data-testid="playing-as">
+          Playing as <strong className="rounded-md bg-card px-2 py-1 text-base text-foreground">{lockedName}</strong>
+          {onAccount && (
+            <button type="button" onClick={onAccount} className="text-lavender underline underline-offset-2 hover:text-foreground">
+              Account
+            </button>
+          )}
+        </p>
+      ) : (
       <div className="max-w-sm space-y-2">
         <label htmlFor="player-name" className="text-sm text-muted-foreground">
           Your name for the scoreboard
+          {onAccount && (
+            <>
+              {' '}·{' '}
+              <button type="button" onClick={onAccount} className="text-lavender underline underline-offset-2 hover:text-foreground">
+                or sign in to reserve it
+              </button>
+            </>
+          )}
         </label>
         <Input
           id="player-name"
@@ -90,6 +114,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
         />
         {nameError && <p className="text-sm text-destructive">Enter a name to start.</p>}
       </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-3" role="radiogroup" aria-label="Difficulty">
         {LEVEL_ORDER.map((id, i) => {
@@ -217,6 +242,8 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           {rounds} messages · {LEVELS[level].seconds}s each
         </p>
       </div>
+
+      {extra}
 
       <section className="rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground">
         <h2 className="mb-2 font-semibold text-foreground">How scoring works</h2>

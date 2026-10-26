@@ -1,39 +1,51 @@
-# Online scoreboard and certificate check
+# Online features: accounts, live scoreboard, certificate checks
 
-LureLens works fully offline without this. When the two Supabase settings are filled in, it adds:
+LureLens works fully offline without any of this. With the Supabase project connected (`src/onlineConfig.ts`), it adds:
 
-- an **Online** tab on the scoreboard (each player's best posted game, this week or all time),
-- a **Post to the online scoreboard** button after ranked games (nothing is sent unless the player taps it),
-- **Make it checkable online** on the certificate, and a **Check a certificate** page (`?cert=LL-XXXX-XXXX`), which the LinkedIn "Add to profile" link points to.
+- **Accounts** (email sign-in with a 6-digit code): a reserved public username, an optional full name for certificates, an optional school or organisation, and game history synced between devices. Guests can still play; their scores stay on their device.
+- **The online scoreboard**, live: each player's best posted game, this week or all time. Signed-in players tap "Post to the online scoreboard" after a ranked game. New scores appear on open scoreboards within seconds.
+- **"Top players this week"** on the home screen, and a **big-screen view** for projectors at `https://lurelens.netlify.app/?live`.
+- **Checkable certificates** tied to an account, and a public **Check a certificate** page (`?cert=LL-XXXX-XXXX`), which the LinkedIn "Add to profile" link points to.
+- A **privacy notice** at `?privacy`, and **account deletion** on the Account page.
 
 ## How it works
 
-Everything lives in one Supabase project (free plan). The browser calls four database functions in `supabase/schema.sql` and nothing else; the tables themselves are closed.
+Everything is in `supabase/schema.sql`, which is safe to run again after changes.
 
-- `submit_score` receives the **answers**, not a score. It checks every message against the answer key (`messages` table), recomputes the score with the same rules as the game, and refuses bad names, wrong answer counts and floods (10 games per name per 10 minutes, 120 games a minute overall).
-- `leaderboard` returns each player's best visible game.
-- `register_certificate` accepts a certificate only when it is backed by three posted games, one per level, each 80% or more, all under the same player name.
-- `check_certificate` returns the certificate and its three results.
+| Who | Can |
+|---|---|
+| Anyone (public key) | read the scoreboard (`leaderboard`), check a certificate (`check_certificate`) |
+| Signed-in player | post a game (`submit_score`), register a certificate (`register_certificate`), edit their profile (`save_profile`), read their own profile, read and add their own game history (`games`), delete their account (`delete_my_account`) |
 
-Stored: the player name a person chooses, scores, dates, and the name they put on a certificate. No emails, phone numbers or IP addresses.
+- `submit_score` receives the **answers**, not a score. It checks them against the answer key (`messages`), recomputes the score with the game's rules, files it under the account's username, and limits floods (10 games per account per 10 minutes, 120 a minute overall).
+- Names (usernames and certificate names) accept letters from any language, including Yoruba and Igbo (ọ ẹ ṣ ụ ị and tone marks), plus numbers, spaces and `. ' _ -`. A short list of offensive words and reserved names (admin, lurelens, th3spaceio, ...) is refused.
+- Every new ranked game triggers `realtime.send(...)` on the public channel `scoreboard` with just the level, no names. Open scoreboards reload when they hear it, and refresh every minute anyway.
+- Deleting an account removes the user, profile, history, posted scores and certificates (cascading deletes).
 
-`supabase/schema.test.ts` runs the SQL in an in-memory Postgres in CI and fails if the server and the game ever score a game differently.
+`supabase/schema.test.ts` runs the SQL in an in-memory Postgres in CI, with stand-ins for Supabase's `auth` and `realtime`, and fails if the server and the game ever score differently or access rules break.
 
-## Setting it up
+## The live project
 
-1. Create a Supabase project (Region: West EU (London), Plan: Free).
-2. SQL Editor → New query → paste `supabase/schema.sql` → Run.
-3. New query → paste `supabase/messages.sql` → Run.
-4. Project Settings → API: copy the Project URL and the anon/publishable key into `src/onlineConfig.ts` (or set `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY` at build time). Never use the `service_role`/secret key in the app.
+**LureLens** (`rxyhvpdbfuboukqgbych`, region eu-west-1) in the Supabase organization **Th3 SpaceIO**, free plan.
 
-The live project is **LureLens** (`rxyhvpdbfuboukqgbych`, region eu-west-1) in the Supabase organization **Th3 SpaceIO**, free plan. Its schema and answer key were applied on 26 October 2026.
+### Dashboard settings (one-time)
 
-### About Supabase's security advisor
+1. **Authentication → URL Configuration**
+   - Site URL: `https://lurelens.netlify.app`
+   - Redirect URLs: `https://lurelens.netlify.app/**`, `https://thespaceio.github.io/LureLens/**`, `http://localhost:5173/**`
+2. **Authentication → Emails → Templates**: in both **Magic link** and **Confirm signup**, use the code template below so the email contains the 6-digit code (the app asks for the code, which works even when the email opens in another browser).
+3. **Authentication → Emails → SMTP settings**: connect an email service (Resend, Brevo, ...). Without it Supabase only emails members of the Supabase team, a few times an hour. Then raise the email rate limit under **Authentication → Rate Limits** to suit (for example 100 an hour).
+4. **Realtime → Settings**: keep public channels allowed (the scoreboard signal uses the public channel `scoreboard`). If live updates don't arrive, the board still refreshes every minute.
 
-The advisor lists two notes for this project. Both are intended:
+Email template (subject: `Your LureLens sign-in code`):
 
-- *RLS enabled, no policy* on `scores`, `messages` and `certificates`: the tables are deliberately closed to browsers.
-- *Public can execute SECURITY DEFINER function* for `submit_score`, `leaderboard`, `register_certificate` and `check_certificate`: these four are the public way in, and each checks its input. The helper `lurelens_clean_name` is not callable from outside.
+```html
+<h2>Your LureLens sign-in code</h2>
+<p>Enter this code in LureLens:</p>
+<p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
+<p>Or <a href="{{ .ConfirmationURL }}">sign in with this link</a> on the device where you are playing.</p>
+<p>If you didn't ask for this, you can ignore this email.</p>
+```
 
 ## When the messages change
 
@@ -43,19 +55,17 @@ The advisor lists two notes for this project. Both are intended:
 npm run supabase:messages
 ```
 
-Then run the new `supabase/messages.sql` in the SQL Editor. Until you do, games that include a new message are refused with "This game has messages the online scoreboard does not know yet."
+Then run the new `supabase/messages.sql` in the SQL Editor.
 
 ## Moderation
 
 In the Supabase Table Editor:
 
-- **Remove a name from the scoreboard:** open `scores`, filter by `name`, set `hidden` to true (or delete the rows).
-- **Withdraw a certificate:** open `certificates`, set `hidden` to true.
+- **Remove a game from the scoreboard:** `scores` → set `hidden` to true (or delete the row).
+- **Rename an offensive username:** `profiles` → edit `username` (the scoreboard shows the new name at once).
+- **Withdraw a certificate:** `certificates` → set `hidden` to true.
+- **Remove a player entirely:** Authentication → Users → delete the user (removes everything of theirs).
 
-Or in the SQL Editor, for example:
+## About Supabase's security advisor
 
-```sql
-update scores set hidden = true where lower(name) = 'some name';
-```
-
-To change the list of refused words, edit `lurelens_clean_name` in `supabase/schema.sql` and run the file again.
+Expected notes: *RLS enabled, no policy* on `scores`, `messages` and `certificates` (closed on purpose), and *SECURITY DEFINER function executable* for the public functions listed above (they are the intended way in, and each checks its input).

@@ -105,6 +105,10 @@ export interface GameSession {
   classCode?: string;
   /** Set once this game has been posted online: the server's id for it. */
   onlineId?: string;
+  /** The account this game belongs to, when played signed in (or added to an account). */
+  userId?: string;
+  /** True once this game is saved in the account's history online. */
+  synced?: boolean;
   /** The server's score and rank, when posted to the online scoreboard. */
   online?: { score: number; rank: number | null; of: number | null };
 }

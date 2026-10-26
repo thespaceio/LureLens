@@ -17,10 +17,14 @@ interface CertificatePanelProps {
   onPlay: (level: Level) => void;
   /** A game was posted online (to back the certificate). */
   onPosted?: (sessionId: string, posted: PostedScore) => void;
+  signedIn?: boolean;
+  /** The account's full name, used as the certificate name by default. */
+  fullName?: string | null;
+  onSignIn?: () => void;
 }
 
 /** Progress towards the certificate, and the certificate itself once earned. */
-export function CertificatePanel({ sessions, name, onPlay, onPosted }: CertificatePanelProps) {
+export function CertificatePanel({ sessions, name, onPlay, onPosted, signedIn = false, fullName = null, onSignIn }: CertificatePanelProps) {
   const progress = useMemo(() => certificateProgress(sessions, name), [sessions, name]);
 
   return (
@@ -29,7 +33,7 @@ export function CertificatePanel({ sessions, name, onPlay, onPosted }: Certifica
         <Award className="size-5 text-primary" /> LureLens certificate
       </h2>
       {progress.earned ? (
-        <EarnedCertificate progress={progress} name={name} onPosted={onPosted} />
+        <EarnedCertificate progress={progress} name={fullName || name} onPosted={onPosted} signedIn={signedIn} onSignIn={onSignIn} />
       ) : (
         <>
           <p className="mb-4 text-sm text-muted-foreground">
@@ -74,10 +78,14 @@ function EarnedCertificate({
   progress,
   name,
   onPosted,
+  signedIn,
+  onSignIn,
 }: {
   progress: ReturnType<typeof certificateProgress>;
   name: string;
   onPosted?: (sessionId: string, posted: PostedScore) => void;
+  signedIn: boolean;
+  onSignIn?: () => void;
 }) {
   const [online, setOnline] = useState(() => isRegistered(progress.reference));
   const [displayName, setDisplayName] = useState(name);
@@ -183,7 +191,7 @@ function EarnedCertificate({
         </Button>
       </div>
       {ONLINE && onPosted && (
-        <OnlineCertificate progress={progress} displayName={displayName} onPosted={onPosted} onRegistered={() => setOnline(true)} />
+        <OnlineCertificate progress={progress} displayName={displayName} onPosted={onPosted} onRegistered={() => setOnline(true)} signedIn={signedIn} onSignIn={onSignIn} />
       )}
       <p className="text-xs text-muted-foreground">
         The image is A4 landscape, ready to print. "Add to LinkedIn" fills in the Licenses &amp; certifications form on your profile.

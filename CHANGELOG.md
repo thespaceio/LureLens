@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.0 (not released yet)
+
+### New
+- **Accounts.** Sign in with your email and a 6-digit code, no password. Choose a public username that nobody else can use, and optionally add your full name (for certificates) and your school or organisation.
+- **Your progress on every device.** Signed-in games are saved to your account and appear on any device you sign in on. Games played before signing in can be added to your account.
+- **Live online scoreboard.** New scores appear within seconds, with a "Live" indicator. Posting needs an account, so names can't be impersonated.
+- **Top players this week** on the home screen, and a **big-screen view** for projectors at classes and events (`?live`), with a QR code to join.
+- **Certificates tied to your account**, using your full name, and shown as account-backed on the check page.
+- **Privacy notice** (`?privacy`), and **delete my account**, which removes everything stored online.
+
+### Fixed
+- Names written with Yoruba and Igbo letters (ọ, ẹ, ṣ, ụ, ị and tone marks) were refused online. They're now accepted everywhere.
+
 ## 2.1.0 (26 October 2026)
 
 ### New

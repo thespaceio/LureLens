@@ -15,6 +15,9 @@ interface ProgressDashboardProps {
   onPlay: (level?: Level) => void;
   onReset: () => void;
   onPosted?: (sessionId: string, posted: PostedScore) => void;
+  signedIn?: boolean;
+  fullName?: string | null;
+  onSignIn?: () => void;
 }
 
 const PILL: Record<Level, string> = {
@@ -32,7 +35,7 @@ function formatDateTime(iso: string) {
     : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
 
-export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPosted }: ProgressDashboardProps) {
+export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPosted, signedIn = false, fullName = null, onSignIn }: ProgressDashboardProps) {
   const names = playerNames(sessions);
   const [chosen, setChosen] = useState<string>('');
   const current = playerName.trim();
@@ -94,7 +97,7 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
             ))}
           </div>
 
-          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} onPosted={onPosted} />
+          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} onPosted={onPosted} signedIn={signedIn} fullName={fullName} onSignIn={onSignIn} />
 
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-4 font-semibold">Levels</h2>
