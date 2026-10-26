@@ -48,16 +48,8 @@ describe('scoreAnswer', () => {
 });
 
 describe('scoreVerify', () => {
-  it('gives full base points, no speed bonus, where checking first is right', () => {
-    expect(scoreVerify(true, 'advanced', 1)).toEqual({ base: BASE_POINTS * 2, speed: 0, streak: 0, total: BASE_POINTS * 2 });
-    expect(scoreVerify(true, 'beginner', 3).streak).toBe(STREAK_BONUS);
-  });
-
-  it('gives half the base points elsewhere, and never more than a quick correct answer', () => {
-    expect(scoreVerify(false, 'beginner', 5)).toEqual({ base: 50, speed: 0, streak: 0, total: 50 });
-    for (const level of LEVEL_ORDER) {
-      expect(scoreVerify(false, level, 0).total).toBeLessThan(scoreAnswer(true, 0, level, 1).total);
-    }
+  it('always scores 0 points', () => {
+    expect(scoreVerify()).toEqual({ base: 0, speed: 0, streak: 0, total: 0 });
   });
 });
 

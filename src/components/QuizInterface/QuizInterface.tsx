@@ -63,7 +63,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         // Checking first is always safe: it never breaks the streak.
         correct = Boolean(email.verify_first);
         newStreak = correct ? streak + 1 : streak;
-        points = scoreVerify(correct, level, newStreak);
+        points = scoreVerify();
       } else {
         correct = choice === (email.is_phishing ? 'phishing' : 'legitimate');
         newStreak = correct ? streak + 1 : 0;

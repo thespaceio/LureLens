@@ -106,19 +106,12 @@ export function scoreAnswer(
 }
 
 /**
- * "Verify first": full base points (no speed bonus) where checking through
- * another channel is the real-world best move, counted as correct and
- * extending the streak. Elsewhere it is safe but slow: half the base points,
- * not counted as correct, streak kept as it was.
+ * "Verify first" never scores points: points reward deciding. It is still
+ * safe, so it never resets the streak, and on messages where checking
+ * through another channel is the real-world best move it counts as correct.
  */
-export function scoreVerify(best: boolean, level: Level, streakAfterAnswer: number): Points {
-  const base = Math.round(BASE_POINTS * LEVELS[level].multiplier);
-  if (!best) {
-    const half = Math.round(base / 2);
-    return { base: half, speed: 0, streak: 0, total: half };
-  }
-  const streak = streakAfterAnswer >= STREAK_START ? STREAK_BONUS : 0;
-  return { base, speed: 0, streak, total: base + streak };
+export function scoreVerify(): Points {
+  return { base: 0, speed: 0, streak: 0, total: 0 };
 }
 
 export function accuracyOf(correct: number, total: number): number {

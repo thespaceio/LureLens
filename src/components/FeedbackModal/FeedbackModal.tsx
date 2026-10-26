@@ -42,17 +42,19 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
             ? 'Correct'
             : 'Not quite';
 
-  const breakdown = correct
+  const breakdown = verified
+    ? correct
+      ? '0 points, but it counts as correct and your streak keeps growing.'
+      : '0 points for playing it safe. Streak kept.'
+    : correct
     ? [
-        `+${points.base} ${verified ? 'for checking first' : 'correct'}`,
+        `+${points.base} correct`,
         points.speed ? `+${points.speed} speed` : '',
         points.streak ? `+${points.streak} streak (${streak} in a row)` : '',
       ].filter(Boolean).join(' · ')
-    : verified
-      ? `+${points.total} (half points) for playing it safe. Streak kept.`
-      : choice === 'timeout'
-        ? 'No answer in time. Streak reset.'
-        : '0 points. Streak reset.';
+    : choice === 'timeout'
+      ? 'No answer in time. Streak reset.'
+      : '0 points. Streak reset.';
 
   const showTip = verified || Boolean(email.verify_first);
   const tipLead = email.verify_first
@@ -83,7 +85,7 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
             This {CHANNELS[channelOf(email)].noun} was {isPhish ? 'phishing' : 'legitimate'}
           </DialogTitle>
           <DialogDescription className="mt-1 font-mono text-xs text-muted-foreground">
-            {correct ? `+${points.total} points · ` : ''}
+            {correct && !verified ? `+${points.total} points · ` : ''}
             {breakdown}
           </DialogDescription>
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
