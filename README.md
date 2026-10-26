@@ -125,9 +125,9 @@ Every email in `src/data/emails.json` uses the same fields:
 
 To change timers, points or emails per game, edit `LEVELS` in `src/types.ts`. Scoring constants are at the top of `src/lib/game.ts`.
 
-## Online scoreboard (optional)
+## Online features (optional)
 
-With a free Supabase project, LureLens adds an online scoreboard (players choose to post each game), online certificates and a public certificate check. Scores are recomputed by the server from the answers. Setup, moderation and privacy: [docs/online.md](docs/online.md).
+With a free Supabase project, LureLens adds email sign-in with profiles and synced progress, a live online scoreboard (players choose to post each game), a big-screen view for events, checkable certificates and a privacy notice with account deletion. Scores are recomputed by the server from the answers. Setup, moderation and privacy: [docs/online.md](docs/online.md).
 
 ## Notes
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Globe, Loader2 } from 'lucide-react';
+import { Check, Globe, Loader2, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OnlineError, postScore } from '@/lib/online';
 import type { PostedScore } from '@/lib/online';
@@ -7,7 +7,17 @@ import { LEVELS } from '@/types';
 import type { GameSession } from '@/types';
 
 /** "Post to the online scoreboard" on the results screen. Nothing is sent until the player taps it. */
-export function PostScore({ session, onPosted }: { session: GameSession; onPosted: (posted: PostedScore) => void }) {
+export function PostScore({
+  session,
+  onPosted,
+  signedIn,
+  onSignIn,
+}: {
+  session: GameSession;
+  onPosted: (posted: PostedScore) => void;
+  signedIn: boolean;
+  onSignIn: () => void;
+}) {
   const [state, setState] = useState<'idle' | 'posting' | 'error'>('idle');
   const [error, setError] = useState('');
   const level = LEVELS[session.level].label;
@@ -30,6 +40,22 @@ export function PostScore({ session, onPosted }: { session: GameSession; onPoste
     );
   }
 
+  if (!signedIn) {
+    return (
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 sm:p-5" aria-label="Online scoreboard" data-testid="online-post">
+        <div className="min-w-0">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Globe className="size-4 text-lavender" /> See how you rank everywhere
+          </h2>
+          <p className="text-sm text-muted-foreground">Sign in with your email to post this score to the live online scoreboard.</p>
+        </div>
+        <Button onClick={onSignIn} className="gap-2 font-semibold" data-testid="sign-in-to-post">
+          <UserRound className="size-4" /> Sign in to post
+        </Button>
+      </section>
+    );
+  }
+
   const post = async () => {
     setState('posting');
     try {
@@ -48,7 +74,7 @@ export function PostScore({ session, onPosted }: { session: GameSession; onPoste
             <Globe className="size-4 text-lavender" /> See how you rank everywhere
           </h2>
           <p className="text-sm text-muted-foreground">
-            Posts your player name <strong className="text-foreground">{session.name}</strong>, this score and the date. Nothing else.
+            Posts this score and the date under your username. Your history stays private.
           </p>
         </div>
         <Button onClick={post} disabled={state === 'posting'} className="gap-2 font-semibold" data-testid="online-post-button">

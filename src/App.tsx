@@ -1,6 +1,6 @@
-import { Suspense, lazy, useCallback, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, Info, Play, Trophy, Users } from 'lucide-react';
+import { BarChart3, Info, Play, Trophy, UserRound, Users } from 'lucide-react';
 import DifficultySelector from '@/components/DifficultySelector/DifficultySelector';
 import QuizInterface from '@/components/QuizInterface/QuizInterface';
 import type { QuizResult } from '@/components/QuizInterface/QuizInterface';
@@ -8,6 +8,9 @@ import ResultsScreen from '@/components/ResultsScreen/ResultsScreen';
 import Leaderboard from '@/components/Leaderboard/Leaderboard';
 import { Logo } from '@/components/Logo/Logo';
 import WhatsNew from '@/components/WhatsNew/WhatsNew';
+import TopPlayers from '@/components/Online/TopPlayers';
+import { isReady, useAuth } from '@/hooks/authContext';
+import { pullGames, pushGames } from '@/lib/sync';
 import { markWhatsNewSeen, whatsNewFor } from '@/lib/whatsNew';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
@@ -24,8 +27,11 @@ import './App.css';
 const ProgressDashboard = lazy(() => import('@/components/ProgressDashboard/ProgressDashboard'));
 const Classroom = lazy(() => import('@/components/Classroom/Classroom'));
 const CertificateCheck = lazy(() => import('@/components/Online/CertificateCheck'));
+const Account = lazy(() => import('@/components/Account/Account'));
+const Privacy = lazy(() => import('@/components/Privacy/Privacy'));
+const LiveBoard = lazy(() => import('@/components/Online/LiveBoard'));
 
-type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about';
+type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about' | 'account' | 'privacy' | 'live';
 
 /** Reads ?class=… or ?cert=… from a link, and removes it from the address bar. */
 function paramFromLink(name: string): string | undefined {
@@ -44,6 +50,9 @@ function paramFromLink(name: string): string | undefined {
 const LINK_CODE = ((c: string | undefined) => (c === undefined ? undefined : normalizeCode(c)))(paramFromLink('class'));
 /** A certificate reference from a check link (?cert=LL-XXXX-XXXX), e.g. from LinkedIn. */
 const LINK_CERT = ONLINE ? paramFromLink('cert')?.trim().toUpperCase() : undefined;
+/** ?live opens the big-screen scoreboard (for projectors); ?privacy the privacy notice. */
+const LINK_LIVE = ONLINE && paramFromLink('live') !== undefined;
+const LINK_PRIVACY = paramFromLink('privacy') !== undefined;
 
 interface Game {
   id: string;
@@ -71,15 +80,27 @@ const NAV: { id: View; label: string; short: string; icon: typeof Play }[] = [
   { id: 'about', label: 'About', short: 'About', icon: Info },
 ];
 
+const RETURN_LABEL: Partial<Record<View, string>> = {
+  results: 'Back to your results',
+  progress: 'Back to your certificate',
+  scoreboard: 'Back to the scoreboard',
+};
+
 function App() {
   const store = useGameStore();
-  const [view, setView] = useState<View>(LINK_CERT ? 'check' : LINK_CODE ? 'classroom' : 'menu');
+  const auth = useAuth();
+  const signedIn = isReady(auth);
+  const username = auth.profile?.username ?? '';
+  const [view, setView] = useState<View>(
+    LINK_LIVE ? 'live' : LINK_PRIVACY ? 'privacy' : LINK_CERT ? 'check' : LINK_CODE ? 'classroom' : 'menu',
+  );
+  const [returnTo, setReturnTo] = useState<View | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
   // Returning players see what changed, once. Not over an invite link.
   const [whatsNew, setWhatsNew] = useState(() =>
-    LINK_CODE || LINK_CERT ? 'none' : whatsNewFor(store.sessions.length > 0 || Boolean(store.playerName)),
+    LINK_CODE || LINK_CERT || LINK_LIVE || LINK_PRIVACY ? 'none' : whatsNewFor(store.sessions.length > 0 || Boolean(store.playerName)),
   );
   const closeWhatsNew = () => {
     markWhatsNewSeen();
@@ -92,6 +113,62 @@ function App() {
     setView(next);
     window.scrollTo(0, 0);
   };
+
+  /** Sends the player to sign in, and back here afterwards. */
+  const signIn = (from: View) => {
+    setReturnTo(from);
+    setView('account');
+    window.scrollTo(0, 0);
+  };
+
+  // Signed in: the player name is the account's username.
+  const { setPlayerName, mergeSessions, updateSessions, removeSessions } = store;
+  useEffect(() => {
+    if (signedIn && username && store.playerName !== username) setPlayerName(username);
+  }, [signedIn, username, store.playerName, setPlayerName]);
+
+  // On sign-in, bring the account's games onto this device.
+  useEffect(() => {
+    if (!signedIn || !auth.userId) return;
+    const userId = auth.userId;
+    pullGames()
+      .then(remote => mergeSessions(remote.map(g => ({ ...g, userId, synced: true }))))
+      .catch(() => {
+        // Offline: the games arrive next time.
+      });
+  }, [signedIn, auth.userId, mergeSessions]);
+
+  // Upload games that aren't in the account yet (new ones, or ones added from this device).
+  const [onlineTick, setOnlineTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setOnlineTick(n => n + 1);
+    window.addEventListener('online', bump);
+    return () => window.removeEventListener('online', bump);
+  }, []);
+  const pending = signedIn ? store.sessions.filter(s => s.userId === auth.userId && !s.synced) : [];
+  const pendingKey = pending.map(s => s.id).join(',');
+  useEffect(() => {
+    if (!signedIn || !auth.userId || !pendingKey) return;
+    const games = store.sessions.filter(s => pendingKey.split(',').includes(s.id));
+    pushGames(auth.userId, games)
+      .then(ids => updateSessions(ids, { synced: true }))
+      .catch(() => {
+        // Stays pending; retried when back online or on the next visit.
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedIn, auth.userId, pendingKey, onlineTick, updateSessions]);
+
+  // On sign-out (or account deletion), the account's games leave this device.
+  const lastUser = useRef<string | null>(null);
+  useEffect(() => {
+    if (auth.status === 'signedIn' && auth.userId) lastUser.current = auth.userId;
+    if (auth.status === 'signedOut' && lastUser.current) {
+      const gone = lastUser.current;
+      lastUser.current = null;
+      removeSessions(s => s.userId === gone);
+      setPlayerName('');
+    }
+  }, [auth.status, auth.userId, removeSessions, setPlayerName]);
 
   const startGame = useCallback((level: Level, categories: CategoryId[] = [], channels: Channel[] = []) => {
     const emails = buildRound(level, categories, channels);
@@ -113,7 +190,7 @@ function App() {
   const finishGame = useCallback(
     ({ answers, score, bestStreak }: QuizResult) => {
       if (!game) return;
-      const name = store.playerName.trim() || 'Player';
+      const name = (signedIn ? username : store.playerName.trim()) || 'Player';
       const correct = answers.filter(a => a.correct).length;
       const total = answers.length;
       const session: GameSession = {
@@ -130,6 +207,7 @@ function App() {
         answers,
         ...(game.categories.length > 0 || game.channels.length > 0 || game.classCode ? { practice: true } : {}),
         ...(game.classCode ? { classCode: game.classCode } : {}),
+        ...(signedIn && auth.userId ? { userId: auth.userId, synced: false } : {}),
       };
       const playedBefore = playerSessions(store.sessions, name).some(s => !s.practice && s.level === game.level);
       const previousBest = bestScore(store.sessions, name, game.level);
@@ -144,7 +222,7 @@ function App() {
       setView('results');
       window.scrollTo(0, 0);
     },
-    [game, store],
+    [game, store, signedIn, username, auth.userId],
   );
 
   const content = () => {
@@ -168,8 +246,15 @@ function App() {
             {...result}
             onPlayAgain={() => startGame(result.session.level, game?.categories ?? [], game?.channels ?? [])}
             onClassroom={() => navigate('classroom')}
+            signedIn={signedIn}
+            onSignIn={() => signIn('results')}
             onPosted={posted => {
-              const patch = { onlineId: posted.id, online: { score: posted.score, rank: posted.rank, of: posted.of } };
+              const patch = {
+                onlineId: posted.id,
+                online: { score: posted.score, rank: posted.rank, of: posted.of },
+                // A game played before signing in now belongs to the account.
+                ...(result.session.userId ? {} : { userId: auth.userId ?? undefined, name: posted.name, synced: false }),
+              };
               store.updateSession(result.session.id, patch);
               setResult(r => (r ? { ...r, session: { ...r.session, ...patch } } : r));
             }}
@@ -179,7 +264,14 @@ function App() {
           />
         ) : null;
       case 'scoreboard':
-        return <Leaderboard sessions={store.sessions} playerName={store.playerName} onPlay={() => navigate('menu')} />;
+        return (
+          <Leaderboard
+            sessions={store.sessions}
+            playerName={store.playerName}
+            onPlay={() => navigate('menu')}
+            onBigScreen={() => navigate('live')}
+          />
+        );
       case 'progress':
         return (
           <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
@@ -191,6 +283,9 @@ function App() {
                 navigate('menu');
               }}
               onReset={store.clearAll}
+              signedIn={signedIn}
+              fullName={auth.profile?.full_name ?? null}
+              onSignIn={() => signIn('progress')}
               onPosted={(sessionId, posted) =>
                 store.updateSession(sessionId, {
                   onlineId: posted.id,
@@ -205,6 +300,7 @@ function App() {
           <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
             <Classroom
               playerName={store.playerName}
+              lockedName={signedIn ? username : undefined}
               onNameChange={store.setPlayerName}
               initialCode={LINK_CODE}
               onJoin={joinClass}
@@ -217,8 +313,34 @@ function App() {
             <CertificateCheck initialReference={LINK_CERT} />
           </Suspense>
         );
+      case 'account':
+        return (
+          <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
+            <Account
+              sessions={store.sessions}
+              onClaim={ids => updateSessions(ids, { userId: auth.userId ?? undefined, name: username, synced: false })}
+              onPrivacy={() => navigate('privacy')}
+              returnLabel={returnTo ? RETURN_LABEL[returnTo] : undefined}
+              onReturn={
+                returnTo && (returnTo !== 'results' || result)
+                  ? () => {
+                      const to = returnTo;
+                      setReturnTo(null);
+                      navigate(to);
+                    }
+                  : undefined
+              }
+            />
+          </Suspense>
+        );
+      case 'privacy':
+        return (
+          <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
+            <Privacy />
+          </Suspense>
+        );
       case 'about':
-        return <About onCheck={() => navigate('check')} />;
+        return <About onCheck={() => navigate('check')} onPrivacy={() => navigate('privacy')} />;
       case 'menu':
       default:
         return (
@@ -229,12 +351,35 @@ function App() {
             initialLevel={menuLevel}
             onNameChange={store.setPlayerName}
             onStart={startGame}
+            lockedName={signedIn ? username : undefined}
+            onAccount={() => navigate('account')}
+            extra={ONLINE ? <TopPlayers onOpen={() => navigate('scoreboard')} /> : null}
           />
         );
     }
   };
 
-  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view === 'check' ? 'about' : view;
+  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view === 'check' || view === 'privacy' ? 'about' : view;
+  const nav = ONLINE
+    ? [
+        ...NAV,
+        {
+          id: 'account' as View,
+          label: signedIn ? username : 'Sign in',
+          short: signedIn ? 'Me' : 'Sign in',
+          icon: UserRound,
+        },
+      ]
+    : NAV;
+
+  // The big-screen scoreboard fills the whole window, without the menu.
+  if (view === 'live') {
+    return (
+      <Suspense fallback={<p className="p-8 text-center text-muted-foreground">Loading…</p>}>
+        <LiveBoard onExit={() => navigate('scoreboard')} />
+      </Suspense>
+    );
+  }
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -244,18 +389,18 @@ function App() {
             <Logo size={34} wordmarkClassName="hidden sm:inline" />
           </button>
           <nav className="flex items-center gap-0.5 md:gap-1">
-            {NAV.map(item => (
+            {nav.map(item => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.id)}
                 aria-current={activeNav === item.id ? 'page' : undefined}
-                aria-label={item.label}
+                aria-label={item.id === 'account' && signedIn ? `Your account, ${username}` : item.label}
                 className={`flex min-w-11 flex-col items-center gap-0.5 rounded-lg px-1.5 py-1.5 text-[11px] font-medium transition-colors md:flex-row md:gap-1.5 md:px-3 md:py-2 md:text-sm ${
                   activeNav === item.id ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-card hover:text-foreground'
                 }`}
               >
                 <item.icon className="size-4" />
-                <span className="hidden md:inline">{item.label}</span>
+                <span className="hidden max-w-[9rem] truncate md:inline">{item.label}</span>
                 <span className="md:hidden">{item.short}</span>
               </button>
             ))}
@@ -294,7 +439,7 @@ function App() {
   );
 }
 
-function About({ onCheck }: { onCheck: () => void }) {
+function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => void }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -329,13 +474,16 @@ function About({ onCheck }: { onCheck: () => void }) {
           <h2 className="mb-3 font-semibold">Good to know</h2>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>Links inside training emails never open.</li>
-            <li>Scores are saved only in this browser, so the scoreboard is per device.</li>
+            <li>Without an account, scores stay in this browser. With one, your games follow you between devices.</li>
             <li>Classroom mode gives a group the same messages through a shared code, without sending anything to a server.</li>
             <li>Score 80% or more on every level to earn a LureLens certificate you can print or add to LinkedIn.</li>
             {ONLINE && (
               <li>
-                The online scoreboard only gets a game when you tap "Post to the online scoreboard". It stores the player name
-                you chose, your scores and dates, nothing else.
+                Games only reach the public online scoreboard when you tap "Post to the online scoreboard". See the{' '}
+                <button type="button" onClick={onPrivacy} className="text-lavender underline underline-offset-2 hover:text-foreground">
+                  privacy notice
+                </button>{' '}
+                for what an account stores.
               </li>
             )}
             <li>All emails are simulated. Brand names are used for education only, and the phishing domains are fictional.</li>
@@ -373,6 +521,10 @@ function About({ onCheck }: { onCheck: () => void }) {
         </p>
         <p className="mt-3 font-mono text-xs">
           LureLens {APP_VERSION} ·{' '}
+          <button type="button" onClick={onPrivacy} className="text-lavender underline underline-offset-2 hover:text-foreground">
+            Privacy
+          </button>{' '}
+          ·{' '}
           <a
             href="https://github.com/thespaceio/LureLens/blob/main/CHANGELOG.md"
             target="_blank"

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Tv } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OnlineError, fetchBoard } from '@/lib/online';
+import { useScoreboardUpdates } from '@/lib/live';
+import LiveDot from '@/components/Online/LiveDot';
 import type { BoardRow } from '@/lib/online';
 import { LEVELS } from '@/types';
 import type { Level } from '@/types';
@@ -19,12 +21,12 @@ function formatDate(iso: string) {
 }
 
 /** The shared scoreboard: each player's best posted game. */
-export function OnlineBoard({ level, playerName }: { level: Level | 'all'; playerName: string }) {
+export function OnlineBoard({ level, onBigScreen }: { level: Level | 'all'; onBigScreen?: () => void }) {
   const [days, setDays] = useState<7 | null>(7);
   const [reload, setReload] = useState(0);
   const key = `${level}|${days}|${reload}`;
   const [result, setResult] = useState<{ key: string; rows?: BoardRow[]; error?: string } | null>(null);
-  const me = playerName.trim().toLowerCase();
+  const live = useScoreboardUpdates(() => setReload(n => n + 1));
 
   useEffect(() => {
     let cancelled = false;
@@ -36,8 +38,10 @@ export function OnlineBoard({ level, playerName }: { level: Level | 'all'; playe
     };
   }, [level, days, key]);
 
-  // Until the answer for the current tab arrives, show loading.
-  const current = result?.key === key ? result : null;
+  // Until the answer for the current tab arrives, show loading. A live
+  // refresh of the same tab keeps showing the old rows meanwhile.
+  const sameTab = (k: string) => k.split('|').slice(0, 2).join('|') === `${level}|${days}`;
+  const current = result && (result.key === key || sameTab(result.key)) ? result : null;
   const rows = current?.rows ?? null;
   const error = current?.error ?? '';
 
@@ -62,9 +66,17 @@ export function OnlineBoard({ level, playerName }: { level: Level | 'all'; playe
             </button>
           ))}
         </div>
-        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setReload(n => n + 1)} disabled={!rows && !error}>
-          <RefreshCw className="size-4" /> Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <LiveDot status={live} />
+          {onBigScreen && (
+            <Button variant="ghost" size="sm" className="gap-1.5" onClick={onBigScreen} data-testid="big-screen-button">
+              <Tv className="size-4" /> Big screen
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setReload(n => n + 1)} disabled={!rows && !error}>
+            <RefreshCw className="size-4" /> Refresh
+          </Button>
+        </div>
       </div>
 
       {error ? (
@@ -82,7 +94,7 @@ export function OnlineBoard({ level, playerName }: { level: Level | 'all'; playe
         <div className="rounded-xl border border-border bg-card px-6 py-10 text-center text-muted-foreground">
           <p>
             No online scores {days ? 'this week' : 'yet'}
-            {level === 'all' ? '' : ` for ${LEVELS[level].label}`}. Finish a ranked game and post your score to be the first.
+            {level === 'all' ? '' : ` for ${LEVELS[level].label}`}. Sign in, finish a ranked game and post your score to be the first.
           </p>
         </div>
       ) : (
@@ -103,7 +115,7 @@ export function OnlineBoard({ level, playerName }: { level: Level | 'all'; playe
               {rows.map((r, i) => (
                 <tr
                   key={`${r.name}-${r.level}`}
-                  className={`border-t border-border first:border-t-0 ${r.name.trim().toLowerCase() === me ? 'bg-primary/10' : ''}`}
+                  className={`border-t border-border first:border-t-0 ${r.is_me ? 'bg-primary/10' : ''}`}
                 >
                   <td className="px-4 py-3 font-mono font-bold">
                     {i < 3 ? <span className={`grid size-6 place-items-center rounded-full text-xs text-primary-foreground ${MEDAL[i]}`}>{i + 1}</span> : i + 1}

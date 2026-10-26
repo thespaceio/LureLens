@@ -1,38 +1,40 @@
 // The online scoreboard and certificate check (Supabase, see supabase/schema.sql).
-// Plain fetch calls to four database functions; nothing else is sent.
-import { SUPABASE_KEY, SUPABASE_URL } from '@/onlineConfig';
+// Calls the database functions through the Supabase client, which adds the
+// player's sign-in when there is one.
+import { ONLINE, getSupabase } from '@/lib/supabase';
 import type { GameSession, Level } from '@/types';
 
-export const ONLINE = Boolean(SUPABASE_URL && SUPABASE_KEY);
+export { ONLINE };
 
 export class OnlineError extends Error {}
 
-async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
-  if (!ONLINE) throw new OnlineError('The online scoreboard is not set up.');
+/** Turns a Supabase error into a message written for players. */
+export function friendlyError(error: { code?: string; message?: string } | null | undefined, fallback?: string): OnlineError {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return new OnlineError("You're offline. Try again when you're connected.");
+  }
+  // Messages from our own checks (code 22023) are written for players.
+  if (error?.code === '22023' && error.message) return new OnlineError(error.message);
+  if (error?.code === '42501') return new OnlineError('Sign in to do that.');
+  if (!error?.code && /fetch|network/i.test(error?.message ?? '')) {
+    return new OnlineError("Couldn't reach LureLens online. Check your connection and try again.");
+  }
+  return new OnlineError(fallback ?? 'Something went wrong online. Try again in a moment.');
+}
+
+export async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
+  if (!ONLINE) throw new OnlineError('Online features are not set up.');
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     throw new OnlineError("You're offline. Try again when you're connected.");
   }
-  const headers: Record<string, string> = { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' };
-  // Older "anon" keys are JWTs and also go in Authorization; new publishable keys don't.
-  if (SUPABASE_KEY.startsWith('eyJ')) headers.Authorization = `Bearer ${SUPABASE_KEY}`;
-  let res: Response;
+  let sb;
   try {
-    res = await fetch(`${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/rpc/${fn}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(args),
-    });
+    sb = await getSupabase();
   } catch {
-    throw new OnlineError("Couldn't reach the online scoreboard. Check your connection and try again.");
+    throw new OnlineError("Couldn't load the online features. Check your connection and try again.");
   }
-  const text = await res.text();
-  const data = text ? (JSON.parse(text) as unknown) : null;
-  if (!res.ok) {
-    const message = (data as { message?: string } | null)?.message;
-    // Messages from our own checks (code 22023) are written for players.
-    const ours = (data as { code?: string } | null)?.code === '22023';
-    throw new OnlineError(ours && message ? message : 'The online scoreboard had a problem. Try again in a moment.');
-  }
+  const { data, error } = await sb.rpc(fn, args);
+  if (error) throw friendlyError(error);
   return data as T;
 }
 
@@ -67,13 +69,15 @@ export interface BoardRow {
   best_streak: number;
   avg_seconds: number;
   played_at: string;
+  /** The signed-in player's own row. */
+  is_me: boolean;
 }
 
 export function fetchBoard(level: Level | 'all', days: number | null, limit = 20): Promise<BoardRow[]> {
   return rpc<BoardRow[]>('leaderboard', { p_level: level === 'all' ? null : level, p_days: days, p_limit: limit });
 }
 
-export function registerCertificate(reference: string, displayName: string, scoreIds: string[]): Promise<{ reference: string }> {
+export function registerCertificate(reference: string, displayName: string | null, scoreIds: string[]): Promise<{ reference: string; display_name: string }> {
   return rpc('register_certificate', { p_reference: reference, p_display_name: displayName, p_score_ids: scoreIds });
 }
 
@@ -81,6 +85,8 @@ export interface CheckedCertificate {
   reference: string;
   display_name: string;
   player_name: string;
+  /** Registered by a signed-in account (2.2 and later). */
+  account?: boolean;
   completed_on: string;
   levels: Record<Level, { accuracy: number; score: number; played_at: string }>;
 }

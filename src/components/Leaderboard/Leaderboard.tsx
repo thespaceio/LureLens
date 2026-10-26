@@ -11,6 +11,7 @@ interface LeaderboardProps {
   sessions: GameSession[];
   playerName: string;
   onPlay: () => void;
+  onBigScreen?: () => void;
 }
 
 const PILL: Record<Level, string> = {
@@ -25,7 +26,7 @@ function formatDate(iso: string) {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) {
+export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: LeaderboardProps) {
   const [level, setLevel] = useState<Level | 'all'>('all');
   const [bestOnly, setBestOnly] = useState(true);
   const [source, setSource] = useState<'device' | 'online'>(ONLINE ? 'online' : 'device');
@@ -103,7 +104,7 @@ export function Leaderboard({ sessions, playerName, onPlay }: LeaderboardProps) 
       </div>
 
       {source === 'online' ? (
-        <OnlineBoard level={level} playerName={playerName} />
+        <OnlineBoard level={level} onBigScreen={onBigScreen} />
       ) : rows.length === 0 ? (
         <div className="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
           <p>No scores yet{level === 'all' ? '' : ` for ${LEVELS[level].label}`}. Be the first on the board.</p>

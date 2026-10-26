@@ -1,15 +1,20 @@
--- LureLens online scoreboard and certificate check, for Supabase (Postgres).
+-- LureLens online features, for Supabase (Postgres): accounts and profiles,
+-- synced game history, the online scoreboard (live), and certificate checks.
 --
--- Paste this whole file into Supabase: SQL Editor → New query → Run.
+-- Apply the whole file (SQL Editor → New query → Run, or as a migration).
 -- It is safe to run again after changes. Then run supabase/messages.sql.
 --
--- Security model: the tables are closed. Browsers (using the public
--- publishable/anon key) can only call the four functions at the bottom, and
--- the functions check everything. Scores are worked out on the server from
--- the answers, so a made-up score can't be posted.
+-- Security model
+-- - Anyone (the public "anon" key) can read the scoreboard and check a
+--   certificate, through functions. Nothing else.
+-- - Signed-in players can post games, register certificates, edit their own
+--   profile, read and add their own game history, and delete their account.
+-- - Scores are worked out on the server from the answers, so a made-up score
+--   can't be posted.
 --
--- Stored: the name a player chooses, their scores and dates, and for
--- certificates the name they put on it. No emails, phone numbers or IPs.
+-- Personal data: email (held by Supabase Auth, never exposed), username
+-- (public), optional full name (only on certificates), optional organisation
+-- (private), game history (private). Deleting an account deletes all of it.
 
 -- ---------------------------------------------------------------------------
 -- Tables
@@ -23,6 +28,16 @@ create table if not exists public.messages (
   is_phishing boolean not null,
   verify_first boolean not null default false
 );
+
+create table if not exists public.profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  username text not null,
+  full_name text,
+  organisation text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create unique index if not exists profiles_username on public.profiles (lower(username));
 
 create table if not exists public.scores (
   id uuid primary key default gen_random_uuid(),
@@ -41,33 +56,96 @@ create table if not exists public.scores (
   -- set to true to take an entry off the scoreboard (moderation)
   hidden boolean not null default false
 );
+-- Games posted from 2.2 on belong to an account. Older guest games have none.
+alter table public.scores add column if not exists user_id uuid references auth.users (id) on delete cascade;
 
 create index if not exists scores_board on public.scores (level, score desc) where ranked and not hidden;
 create index if not exists scores_by_name on public.scores (lower(name), created_at desc);
+create index if not exists scores_by_user on public.scores (user_id, created_at desc);
 create index if not exists scores_recent on public.scores (created_at desc);
 
 create table if not exists public.certificates (
   reference text primary key check (reference ~ '^LL-[0-9A-Z]{4}-[0-9A-Z]{4}$'),
   display_name text not null,
   player_name text not null,
-  beginner_id uuid not null references public.scores (id),
-  intermediate_id uuid not null references public.scores (id),
-  advanced_id uuid not null references public.scores (id),
+  beginner_id uuid not null,
+  intermediate_id uuid not null,
+  advanced_id uuid not null,
   completed_on timestamptz not null,
   created_at timestamptz not null default now(),
   -- set to true to withdraw a certificate
   hidden boolean not null default false
 );
+alter table public.certificates add column if not exists user_id uuid references auth.users (id) on delete cascade;
+-- Deleting a game (or an account) removes certificates that rest on it.
+alter table public.certificates
+  drop constraint if exists certificates_beginner_id_fkey,
+  drop constraint if exists certificates_intermediate_id_fkey,
+  drop constraint if exists certificates_advanced_id_fkey;
+alter table public.certificates
+  add constraint certificates_beginner_id_fkey foreign key (beginner_id) references public.scores (id) on delete cascade,
+  add constraint certificates_intermediate_id_fkey foreign key (intermediate_id) references public.scores (id) on delete cascade,
+  add constraint certificates_advanced_id_fkey foreign key (advanced_id) references public.scores (id) on delete cascade;
 
--- Row level security on, and no policies: nobody reads or writes the tables
--- directly. Everything goes through the functions below.
+-- A signed-in player's own game history, synced between their devices.
+-- `data` is the game as the app saves it (src/types.ts GameSession).
+create table if not exists public.games (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  id text not null check (char_length(id) between 1 and 64),
+  played_at timestamptz not null,
+  data jsonb not null check (pg_column_size(data) < 65536),
+  created_at timestamptz not null default now(),
+  primary key (user_id, id)
+);
+create index if not exists games_by_user on public.games (user_id, played_at desc);
+
+-- ---------------------------------------------------------------------------
+-- Access: tables closed except a player's own profile and history.
+-- ---------------------------------------------------------------------------
+
 alter table public.messages enable row level security;
 alter table public.scores enable row level security;
 alter table public.certificates enable row level security;
-revoke all on public.messages, public.scores, public.certificates from anon, authenticated;
+alter table public.profiles enable row level security;
+alter table public.games enable row level security;
+revoke all on public.messages, public.scores, public.certificates, public.profiles, public.games from anon, authenticated;
+
+grant select on public.profiles to authenticated;
+drop policy if exists "Players read their own profile" on public.profiles;
+create policy "Players read their own profile" on public.profiles
+  for select to authenticated using ((select auth.uid()) = id);
+
+grant select, insert, delete on public.games to authenticated;
+drop policy if exists "Players read their own games" on public.games;
+create policy "Players read their own games" on public.games
+  for select to authenticated using ((select auth.uid()) = user_id);
+drop policy if exists "Players add their own games" on public.games;
+create policy "Players add their own games" on public.games
+  for insert to authenticated with check ((select auth.uid()) = user_id);
+drop policy if exists "Players delete their own games" on public.games;
+create policy "Players delete their own games" on public.games
+  for delete to authenticated using ((select auth.uid()) = user_id);
+
+-- Keep history to a sensible size per player.
+create or replace function public.lurelens_games_limit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if (select count(*) from games where user_id = new.user_id) >= 2000 then
+    raise exception 'Your history is full (2,000 games).' using errcode = '22023';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists games_limit on public.games;
+create trigger games_limit before insert on public.games for each row execute function public.lurelens_games_limit();
 
 -- ---------------------------------------------------------------------------
--- Name checks
+-- Name and text checks. Letters from any language are allowed, including
+-- Yoruba and Igbo (ọ ẹ ṣ ụ ị and tone marks).
 -- ---------------------------------------------------------------------------
 
 create or replace function public.lurelens_clean_name(p_name text, p_max integer)
@@ -77,13 +155,13 @@ immutable
 set search_path = public
 as $$
 declare
-  v text := regexp_replace(btrim(coalesce(p_name, '')), '\s+', ' ', 'g');
+  v text := normalize(regexp_replace(btrim(coalesce(p_name, '')), '\s+', ' ', 'g'), NFC);
   v_letters text;
 begin
   if char_length(v) < 1 or char_length(v) > p_max then
     raise exception 'Names must be between 1 and % characters.', p_max using errcode = '22023';
   end if;
-  if v !~ '^[A-Za-zÀ-ÖØ-öø-ÿ0-9 .''_-]+$' then
+  if v !~ '^[[:alpha:][:digit:] .''_̀-ͯ-]+$' or v !~ '[[:alpha:][:digit:]]' then
     raise exception 'Names can only use letters, numbers, spaces and . '' _ -' using errcode = '22023';
   end if;
   v_letters := lower(regexp_replace(v, '[^A-Za-z]', '', 'g'));
@@ -95,8 +173,97 @@ begin
 end;
 $$;
 
+-- Free text such as a school or organisation name.
+create or replace function public.lurelens_clean_text(p_text text, p_max integer)
+returns text
+language plpgsql
+immutable
+set search_path = public
+as $$
+declare
+  v text := normalize(regexp_replace(btrim(coalesce(p_text, '')), '\s+', ' ', 'g'), NFC);
+begin
+  if v = '' then
+    return null;
+  end if;
+  if char_length(v) > p_max then
+    raise exception 'Keep it under % characters.', p_max using errcode = '22023';
+  end if;
+  if v ~ '[<>{}\\]' or v ~ '[[:cntrl:]]' then
+    raise exception 'That contains characters that are not allowed.' using errcode = '22023';
+  end if;
+  return v;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Profiles
+-- ---------------------------------------------------------------------------
+
+create or replace function public.save_profile(p_username text, p_full_name text default null, p_organisation text default null)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+  v_username text;
+  v_full text;
+  v_org text := lurelens_clean_text(p_organisation, 80);
+  v_row profiles%rowtype;
+begin
+  if v_uid is null then
+    raise exception 'Sign in first.' using errcode = '22023';
+  end if;
+  v_username := lurelens_clean_name(p_username, 24);
+  if char_length(v_username) < 2 then
+    raise exception 'Usernames need at least 2 characters.' using errcode = '22023';
+  end if;
+  if lower(v_username) in ('admin', 'administrator', 'lurelens', 'th3spaceio', 'th3 spaceio', 'spaceio', 'moderator', 'support', 'system', 'guest', 'player') then
+    raise exception 'That username is reserved. Try another.' using errcode = '22023';
+  end if;
+  if nullif(btrim(coalesce(p_full_name, '')), '') is not null then
+    v_full := lurelens_clean_name(p_full_name, 48);
+  end if;
+
+  begin
+    insert into profiles (id, username, full_name, organisation)
+    values (v_uid, v_username, v_full, v_org)
+    on conflict (id) do update
+      set username = excluded.username, full_name = excluded.full_name,
+          organisation = excluded.organisation, updated_at = now()
+    returning * into v_row;
+  exception when unique_violation then
+    raise exception 'That username is taken. Try another.' using errcode = '22023';
+  end;
+
+  return jsonb_build_object('username', v_row.username, 'full_name', v_row.full_name, 'organisation', v_row.organisation);
+end;
+$$;
+
+-- Deletes the signed-in player's account and everything tied to it:
+-- profile, history, posted scores and certificates.
+create or replace function public.delete_my_account()
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then
+    raise exception 'Sign in first.' using errcode = '22023';
+  end if;
+  delete from auth.users where id = v_uid;
+  return true;
+end;
+$$;
+
 -- ---------------------------------------------------------------------------
 -- Post a game. Mirrors the scoring in src/lib/game.ts and LEVELS in src/types.ts.
+-- p_name is ignored: the name is the account's username.
 -- ---------------------------------------------------------------------------
 
 create or replace function public.submit_score(
@@ -112,7 +279,8 @@ security definer
 set search_path = public
 as $$
 declare
-  v_name text := lurelens_clean_name(p_name, 24);
+  v_uid uuid := auth.uid();
+  v_name text;
   v_limit numeric;
   v_mult numeric;
   v_rounds constant integer := 10;
@@ -133,6 +301,14 @@ declare
   v_rank integer;
   v_of integer;
 begin
+  if v_uid is null then
+    raise exception 'Sign in to post to the online scoreboard.' using errcode = '22023';
+  end if;
+  select username into v_name from profiles where id = v_uid;
+  if v_name is null then
+    raise exception 'Choose a username in your profile first.' using errcode = '22023';
+  end if;
+
   case p_level
     when 'beginner' then v_limit := 30; v_mult := 1;
     when 'intermediate' then v_limit := 25; v_mult := 1.5;
@@ -141,8 +317,8 @@ begin
   end case;
 
   -- Light flood protection.
-  if (select count(*) from scores where lower(name) = lower(v_name) and created_at > now() - interval '10 minutes') >= 10 then
-    raise exception 'Too many games posted under this name. Try again in a few minutes.' using errcode = '22023';
+  if (select count(*) from scores where user_id = v_uid and created_at > now() - interval '10 minutes') >= 10 then
+    raise exception 'Too many games posted in a short time. Try again in a few minutes.' using errcode = '22023';
   end if;
   if (select count(*) from scores where created_at > now() - interval '1 minute') >= 120 then
     raise exception 'The scoreboard is busy. Try again in a minute.' using errcode = '22023';
@@ -202,20 +378,21 @@ begin
   end if;
   v_accuracy := round(v_right * 100.0 / v_rounds)::integer;
 
-  insert into scores (name, level, score, correct, total, accuracy, best_streak, avg_seconds, ranked, played_at)
-  values (v_name, p_level, v_score, v_right, v_rounds, v_accuracy, v_best, round(v_time / v_rounds, 1), coalesce(p_ranked, true), v_played)
+  insert into scores (user_id, name, level, score, correct, total, accuracy, best_streak, avg_seconds, ranked, played_at)
+  values (v_uid, v_name, p_level, v_score, v_right, v_rounds, v_accuracy, v_best, round(v_time / v_rounds, 1), coalesce(p_ranked, true), v_played)
   returning id into v_id;
 
   if coalesce(p_ranked, true) then
     select count(*) + 1 into v_rank
     from (
-      select lower(name) as player, max(score) as best
+      select coalesce(user_id::text, 'guest:' || lower(name)) as player, max(score) as best
       from scores
-      where level = p_level and ranked and not hidden and lower(name) <> lower(v_name)
-      group by lower(name)
+      where level = p_level and ranked and not hidden
+      group by 1
     ) b
-    where b.best > v_score;
-    select count(distinct lower(name)) into v_of from scores where level = p_level and ranked and not hidden;
+    where b.best > v_score and b.player <> v_uid::text;
+    select count(distinct coalesce(user_id::text, 'guest:' || lower(name))) into v_of
+    from scores where level = p_level and ranked and not hidden;
   end if;
 
   return jsonb_build_object(
@@ -227,35 +404,62 @@ $$;
 
 -- ---------------------------------------------------------------------------
 -- The online scoreboard: each player's best game, optionally within the last
--- p_days days. p_level null = every level.
+-- p_days days. p_level null = every level. Names are current usernames.
 -- ---------------------------------------------------------------------------
 
-create or replace function public.leaderboard(p_level text default null, p_days integer default null, p_limit integer default 20)
+drop function if exists public.leaderboard(text, integer, integer);
+create function public.leaderboard(p_level text default null, p_days integer default null, p_limit integer default 20)
 returns table (
   name text, level text, score integer, correct integer, total integer, accuracy integer,
-  best_streak integer, avg_seconds numeric, played_at timestamptz
+  best_streak integer, avg_seconds numeric, played_at timestamptz, is_me boolean
 )
 language sql
 stable
 security definer
 set search_path = public
 as $$
-  select b.name, b.level, b.score, b.correct, b.total, b.accuracy, b.best_streak, b.avg_seconds, b.played_at
+  select coalesce(p.username, b.name), b.level, b.score, b.correct, b.total, b.accuracy, b.best_streak,
+         b.avg_seconds, b.played_at, coalesce(b.user_id = auth.uid(), false)
   from (
-    select distinct on (lower(s.name), s.level) s.*
+    select distinct on (coalesce(s.user_id::text, 'guest:' || lower(s.name)), s.level) s.*
     from scores s
     where s.ranked and not s.hidden
       and (p_level is null or s.level = p_level)
       and (p_days is null or s.created_at >= now() - make_interval(days => p_days))
-    order by lower(s.name), s.level, s.score desc, s.accuracy desc, s.avg_seconds asc, s.created_at asc
+    order by coalesce(s.user_id::text, 'guest:' || lower(s.name)), s.level,
+             s.score desc, s.accuracy desc, s.avg_seconds asc, s.created_at asc
   ) b
+  left join profiles p on p.id = b.user_id
   order by b.score desc, b.accuracy desc, b.avg_seconds asc, b.played_at asc
   limit least(greatest(coalesce(p_limit, 20), 1), 100);
 $$;
 
+-- Live updates: every new ranked game sends a small public signal on the
+-- "scoreboard" channel (just the level, no names). Open scoreboards reload.
+create or replace function public.lurelens_announce_score()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.ranked and not new.hidden then
+    begin
+      perform realtime.send(jsonb_build_object('level', new.level), 'new_score', 'scoreboard', false);
+    exception when others then
+      null; -- live updates must never stop a game from being posted
+    end;
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists scores_announce on public.scores;
+create trigger scores_announce after insert on public.scores for each row execute function public.lurelens_announce_score();
+
 -- ---------------------------------------------------------------------------
--- Certificates: registered from three posted games (one per level, each 80%+,
--- same player name), so the online check shows server-checked results.
+-- Certificates: registered by a signed-in player from three of their own
+-- posted games (one per level, each 80%+), so the online check shows
+-- server-checked results.
 -- ---------------------------------------------------------------------------
 
 create or replace function public.register_certificate(p_reference text, p_display_name text, p_score_ids uuid[])
@@ -265,13 +469,23 @@ security definer
 set search_path = public
 as $$
 declare
-  v_display text := lurelens_clean_name(p_display_name, 48);
+  v_uid uuid := auth.uid();
+  v_profile profiles%rowtype;
+  v_display text;
   v_ref text := upper(btrim(coalesce(p_reference, '')));
   v_b scores%rowtype;
   v_i scores%rowtype;
   v_a scores%rowtype;
   v_existing certificates%rowtype;
 begin
+  if v_uid is null then
+    raise exception 'Sign in to make your certificate checkable online.' using errcode = '22023';
+  end if;
+  select * into v_profile from profiles where id = v_uid;
+  if v_profile.id is null then
+    raise exception 'Choose a username in your profile first.' using errcode = '22023';
+  end if;
+  v_display := lurelens_clean_name(coalesce(nullif(btrim(coalesce(p_display_name, '')), ''), v_profile.full_name, v_profile.username), 48);
   if v_ref !~ '^LL-[0-9A-Z]{4}-[0-9A-Z]{4}$' then
     raise exception 'That is not a certificate reference.' using errcode = '22023';
   end if;
@@ -279,31 +493,29 @@ begin
     raise exception 'A certificate needs one game from each level.' using errcode = '22023';
   end if;
 
-  select * into v_b from scores where id = any (p_score_ids) and level = 'beginner' and not hidden;
-  select * into v_i from scores where id = any (p_score_ids) and level = 'intermediate' and not hidden;
-  select * into v_a from scores where id = any (p_score_ids) and level = 'advanced' and not hidden;
+  select * into v_b from scores where id = any (p_score_ids) and level = 'beginner' and user_id = v_uid and not hidden;
+  select * into v_i from scores where id = any (p_score_ids) and level = 'intermediate' and user_id = v_uid and not hidden;
+  select * into v_a from scores where id = any (p_score_ids) and level = 'advanced' and user_id = v_uid and not hidden;
   if v_b.id is null or v_i.id is null or v_a.id is null then
-    raise exception 'A certificate needs one posted game from each level.' using errcode = '22023';
+    raise exception 'A certificate needs one of your posted games from each level.' using errcode = '22023';
   end if;
   if least(v_b.accuracy, v_i.accuracy, v_a.accuracy) < 80 then
     raise exception 'Each level needs at least 80%% accuracy.' using errcode = '22023';
   end if;
-  if lower(v_b.name) <> lower(v_i.name) or lower(v_b.name) <> lower(v_a.name) then
-    raise exception 'All three games must be played under the same name.' using errcode = '22023';
-  end if;
 
   select * into v_existing from certificates where reference = v_ref;
   if found then
-    if (v_existing.beginner_id, v_existing.intermediate_id, v_existing.advanced_id) <> (v_b.id, v_i.id, v_a.id) then
+    if v_existing.user_id is distinct from v_uid
+       or (v_existing.beginner_id, v_existing.intermediate_id, v_existing.advanced_id) <> (v_b.id, v_i.id, v_a.id) then
       raise exception 'This reference is already registered.' using errcode = '22023';
     end if;
     update certificates set display_name = v_display where reference = v_ref;
   else
-    insert into certificates (reference, display_name, player_name, beginner_id, intermediate_id, advanced_id, completed_on)
-    values (v_ref, v_display, v_b.name, v_b.id, v_i.id, v_a.id, greatest(v_b.played_at, v_i.played_at, v_a.played_at));
+    insert into certificates (reference, user_id, display_name, player_name, beginner_id, intermediate_id, advanced_id, completed_on)
+    values (v_ref, v_uid, v_display, v_profile.username, v_b.id, v_i.id, v_a.id, greatest(v_b.played_at, v_i.played_at, v_a.played_at));
   end if;
 
-  return jsonb_build_object('reference', v_ref);
+  return jsonb_build_object('reference', v_ref, 'display_name', v_display);
 end;
 $$;
 
@@ -317,7 +529,8 @@ as $$
   select jsonb_build_object(
     'reference', c.reference,
     'display_name', c.display_name,
-    'player_name', c.player_name,
+    'player_name', coalesce(p.username, c.player_name),
+    'account', c.user_id is not null,
     'completed_on', c.completed_on,
     'levels', jsonb_build_object(
       'beginner', jsonb_build_object('accuracy', b.accuracy, 'score', b.score, 'played_at', b.played_at),
@@ -329,16 +542,30 @@ as $$
   join scores b on b.id = c.beginner_id
   join scores i on i.id = c.intermediate_id
   join scores a on a.id = c.advanced_id
+  left join profiles p on p.id = c.user_id
   where c.reference = upper(btrim(coalesce(p_reference, ''))) and not c.hidden;
 $$;
 
--- Only these functions are callable from the browser.
+-- ---------------------------------------------------------------------------
+-- Who can call what
+-- ---------------------------------------------------------------------------
+
 revoke execute on function public.lurelens_clean_name(text, integer) from public, anon, authenticated;
-revoke execute on function public.submit_score(text, text, jsonb, timestamptz, boolean) from public;
+revoke execute on function public.lurelens_clean_text(text, integer) from public, anon, authenticated;
+revoke execute on function public.lurelens_announce_score() from public, anon, authenticated;
+revoke execute on function public.lurelens_games_limit() from public, anon, authenticated;
+revoke execute on function public.submit_score(text, text, jsonb, timestamptz, boolean) from public, anon;
 revoke execute on function public.leaderboard(text, integer, integer) from public;
-revoke execute on function public.register_certificate(text, text, uuid[]) from public;
+revoke execute on function public.register_certificate(text, text, uuid[]) from public, anon;
 revoke execute on function public.check_certificate(text) from public;
-grant execute on function public.submit_score(text, text, jsonb, timestamptz, boolean) to anon, authenticated;
+revoke execute on function public.save_profile(text, text, text) from public, anon;
+revoke execute on function public.delete_my_account() from public, anon;
+
+-- Everyone: read the board, check a certificate.
 grant execute on function public.leaderboard(text, integer, integer) to anon, authenticated;
-grant execute on function public.register_certificate(text, text, uuid[]) to anon, authenticated;
 grant execute on function public.check_certificate(text) to anon, authenticated;
+-- Signed-in players only.
+grant execute on function public.submit_score(text, text, jsonb, timestamptz, boolean) to authenticated;
+grant execute on function public.register_certificate(text, text, uuid[]) to authenticated;
+grant execute on function public.save_profile(text, text, text) to authenticated;
+grant execute on function public.delete_my_account() to authenticated;

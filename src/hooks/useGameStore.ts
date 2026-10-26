@@ -79,6 +79,25 @@ export function useGameStore() {
     setSessions(prev => prev.map(s => (s.id === id ? { ...s, ...patch } : s)));
   }, []);
 
+  const updateSessions = useCallback((ids: string[], patch: Partial<GameSession>) => {
+    const wanted = new Set(ids);
+    setSessions(prev => prev.map(s => (wanted.has(s.id) ? { ...s, ...patch } : s)));
+  }, []);
+
+  /** Adds games from the account that this device doesn't have yet. */
+  const mergeSessions = useCallback((incoming: GameSession[]) => {
+    setSessions(prev => {
+      const have = new Set(prev.map(s => s.id));
+      const added = incoming.filter(s => isSession(s) && !have.has(s.id));
+      if (added.length === 0) return prev;
+      return [...prev, ...added].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAX_SESSIONS);
+    });
+  }, []);
+
+  const removeSessions = useCallback((predicate: (s: GameSession) => boolean) => {
+    setSessions(prev => prev.filter(s => !predicate(s)));
+  }, []);
+
   const clearAll = useCallback(() => {
     setSessions([]);
     try {
@@ -88,7 +107,7 @@ export function useGameStore() {
     }
   }, []);
 
-  return { sessions, playerName, setPlayerName, saveSession, updateSession, clearAll };
+  return { sessions, playerName, setPlayerName, saveSession, updateSession, updateSessions, mergeSessions, removeSessions, clearAll };
 }
 
 export type GameStore = ReturnType<typeof useGameStore>;

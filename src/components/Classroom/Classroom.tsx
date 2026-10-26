@@ -26,6 +26,8 @@ type JoinedClass = Extract<DecodedClass, { ok: true }>;
 
 interface ClassroomProps {
   playerName: string;
+  /** Signed in: the name is the account's username and can't be edited here. */
+  lockedName?: string;
   onNameChange: (name: string) => void;
   /** Code from an invite link, filled in for the player. */
   initialCode?: string;
@@ -92,7 +94,7 @@ function accuracyTone(right: number, answered: number): string {
   return 'border-destructive/60 bg-destructive/10 text-destructive';
 }
 
-export function Classroom({ playerName, onNameChange, initialCode, onJoin }: ClassroomProps) {
+export function Classroom({ playerName, lockedName, onNameChange, initialCode, onJoin }: ClassroomProps) {
   const [host, setHost] = useState<HostState | null>(readHost);
   const [debrief, setDebrief] = useState(false);
 
@@ -128,14 +130,14 @@ export function Classroom({ playerName, onNameChange, initialCode, onJoin }: Cla
       ) : null}
 
       <div className={`grid gap-4 ${host ? '' : 'md:grid-cols-2'}`}>
-        <JoinCard playerName={playerName} onNameChange={onNameChange} initialCode={initialCode} onJoin={onJoin} />
+        <JoinCard playerName={playerName} lockedName={lockedName} onNameChange={onNameChange} initialCode={initialCode} onJoin={onJoin} />
         {!host && <HostCard onCreate={code => setHost({ code, pasted: '' })} />}
       </div>
     </div>
   );
 }
 
-function JoinCard({ playerName, onNameChange, initialCode, onJoin }: ClassroomProps) {
+function JoinCard({ playerName, lockedName, onNameChange, initialCode, onJoin }: ClassroomProps) {
   const [code, setCode] = useState(initialCode ? formatCode(initialCode) : '');
   const [error, setError] = useState<string | null>(null);
 
@@ -167,17 +169,23 @@ function JoinCard({ playerName, onNameChange, initialCode, onJoin }: ClassroomPr
       <div className="space-y-3">
         <div className="space-y-1.5">
           <label htmlFor="class-name" className="text-sm text-muted-foreground">Your name</label>
-          <Input
-            id="class-name"
-            value={playerName}
-            maxLength={24}
-            placeholder="e.g. Faith"
-            className="h-11 bg-background"
-            onChange={e => {
-              onNameChange(e.target.value);
-              setError(null);
-            }}
-          />
+          {lockedName ? (
+            <p id="class-name" className="flex h-11 items-center rounded-md border border-border bg-background/50 px-3 font-medium">
+              {lockedName}
+            </p>
+          ) : (
+            <Input
+              id="class-name"
+              value={playerName}
+              maxLength={24}
+              placeholder="e.g. Faith"
+              className="h-11 bg-background"
+              onChange={e => {
+                onNameChange(e.target.value);
+                setError(null);
+              }}
+            />
+          )}
         </div>
         <div className="space-y-1.5">
           <label htmlFor="class-code" className="text-sm text-muted-foreground">Class code</label>
