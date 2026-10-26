@@ -227,8 +227,8 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
           <li>Running out of time or skipping scores 0 and resets your streak.</li>
           <li>
             <strong className="text-foreground">Verify first</strong> means you'd check through the official app or a number
-            you trust. Where that is the real best move (a payment change, a boss or friend asking for money), it scores full
-            points. Elsewhere it is safe but slow: half points, and your streak is kept.
+            you trust. It scores 0 points but never resets your streak. Where checking really is the best move (a payment
+            change, a boss or friend asking for money), it also counts as correct.
           </li>
           <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the message. Switching apps pauses automatically.</li>
           <li>Channel or topic practice rounds count towards your progress but not the scoreboard.</li>

@@ -30,7 +30,7 @@ interface MessageBase {
   /**
    * Set when checking through another channel is the real-world best move
    * (the sender may be a genuinely hacked account): how to verify. "Verify
-   * first" then scores full points; elsewhere it scores half.
+   * first" then counts as correct (it always scores 0 points).
    */
   verify_first?: string;
 }
