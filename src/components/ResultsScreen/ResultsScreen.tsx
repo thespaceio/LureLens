@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Copy, Phone, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
+import { Award, Check, Copy, Phone, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
 import { rankTitle } from '@/lib/game';
@@ -12,6 +12,7 @@ interface ResultsScreenProps {
   session: GameSession;
   rank: { rank: number; of: number };
   personalBest: boolean;
+  newCertificate?: boolean;
   onPlayAgain: () => void;
   onPlayLevel: (level: Level) => void;
   onScoreboard: () => void;
@@ -27,7 +28,7 @@ const CHOICE: Record<Choice, string> = {
   skip: 'Skipped',
 };
 
-export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom }: ResultsScreenProps) {
+export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom }: ResultsScreenProps) {
   const cfg = LEVELS[session.level];
   const nextLevel = LEVEL_ORDER[LEVEL_ORDER.indexOf(session.level) + 1];
   const [sharing, setSharing] = useState(false);
@@ -66,6 +67,24 @@ export function ResultsScreen({ session, rank, personalBest, onPlayAgain, onPlay
           </div>
         ))}
       </div>
+
+      {newCertificate && (
+        <section
+          className="flex flex-col items-center gap-3 rounded-xl border-2 border-primary bg-primary/10 p-5 text-center sm:flex-row sm:text-left"
+          data-testid="certificate-earned"
+        >
+          <Award className="size-10 shrink-0 text-primary" />
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">You've earned your LureLens certificate</h2>
+            <p className="text-sm text-muted-foreground">
+              You've now scored at least 80% at every level. Download it, print it or add it to LinkedIn.
+            </p>
+          </div>
+          <Button onClick={onProgress} className="shrink-0 gap-2 font-semibold">
+            <Award className="size-4" /> Get your certificate
+          </Button>
+        </section>
+      )}
 
       {session.classCode && <SendToFacilitator session={session} />}
 

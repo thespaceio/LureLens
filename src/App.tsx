@@ -11,6 +11,7 @@ import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
 import { classRound, normalizeCode } from '@/lib/classroom';
+import { certificateProgress } from '@/lib/certificate';
 import type { DecodedClass } from '@/lib/classroom';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
 import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
@@ -52,6 +53,8 @@ interface Result {
   session: GameSession;
   rank: { rank: number; of: number };
   personalBest: boolean;
+  /** This game completed the certificate. */
+  newCertificate: boolean;
 }
 
 const NAV: { id: View; label: string; short: string; icon: typeof Play }[] = [
@@ -116,11 +119,13 @@ function App() {
       };
       const playedBefore = playerSessions(store.sessions, name).some(s => !s.practice && s.level === game.level);
       const previousBest = bestScore(store.sessions, name, game.level);
+      const hadCertificate = certificateProgress(store.sessions, name).earned;
       store.saveSession(session);
       setResult({
         session,
         rank: rankOf([session, ...store.sessions], session),
         personalBest: !session.practice && playedBefore && score > previousBest,
+        newCertificate: !hadCertificate && certificateProgress([session, ...store.sessions], name).earned,
       });
       setView('results');
       window.scrollTo(0, 0);
@@ -285,6 +290,7 @@ function About() {
             <li>Links inside training emails never open.</li>
             <li>Scores are saved only in this browser, so the scoreboard is per device.</li>
             <li>Classroom mode gives a group the same messages through a shared code, without sending anything to a server.</li>
+            <li>Score 80% or more on every level to earn a LureLens certificate you can print or add to LinkedIn.</li>
             <li>All emails are simulated. Brand names are used for education only, and the phishing domains are fictional.</li>
           </ul>
         </section>
