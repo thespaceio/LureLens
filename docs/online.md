@@ -26,6 +26,15 @@ Stored: the player name a person chooses, scores, dates, and the name they put o
 3. New query → paste `supabase/messages.sql` → Run.
 4. Project Settings → API: copy the Project URL and the anon/publishable key into `src/onlineConfig.ts` (or set `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY` at build time). Never use the `service_role`/secret key in the app.
 
+The live project is **LureLens** (`rxyhvpdbfuboukqgbych`, region eu-west-1) in the Supabase organization **Th3 SpaceIO**, free plan. Its schema and answer key were applied on 26 October 2026.
+
+### About Supabase's security advisor
+
+The advisor lists two notes for this project. Both are intended:
+
+- *RLS enabled, no policy* on `scores`, `messages` and `certificates`: the tables are deliberately closed to browsers.
+- *Public can execute SECURITY DEFINER function* for `submit_score`, `leaderboard`, `register_certificate` and `check_certificate`: these four are the public way in, and each checks its input. The helper `lurelens_clean_name` is not callable from outside.
+
 ## When the messages change
 
 `npm run check:data` fails until the answer key is regenerated:
