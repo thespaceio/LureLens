@@ -7,6 +7,8 @@ import type { QuizResult } from '@/components/QuizInterface/QuizInterface';
 import ResultsScreen from '@/components/ResultsScreen/ResultsScreen';
 import Leaderboard from '@/components/Leaderboard/Leaderboard';
 import { Logo } from '@/components/Logo/Logo';
+import WhatsNew from '@/components/WhatsNew/WhatsNew';
+import { markWhatsNewSeen, shouldShowWhatsNew } from '@/lib/whatsNew';
 import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
@@ -71,6 +73,12 @@ function App() {
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
+  // Returning players see what changed, once. Not over an invite link.
+  const [whatsNew, setWhatsNew] = useState(() => !LINK_CODE && shouldShowWhatsNew(store.sessions.length > 0 || Boolean(store.playerName)));
+  const closeWhatsNew = () => {
+    markWhatsNewSeen();
+    setWhatsNew(false);
+  };
 
   const navigate = (next: View) => {
     if (view === 'quiz' && next !== 'quiz' && !window.confirm("Leave this game? This round won't be saved.")) return;
@@ -246,6 +254,15 @@ function App() {
         </AnimatePresence>
       </main>
 
+      <WhatsNew
+        open={whatsNew}
+        onClose={closeWhatsNew}
+        onClassroom={() => {
+          closeWhatsNew();
+          navigate('classroom');
+        }}
+      />
+
       <footer className="border-t border-border px-4 py-6 text-center font-mono text-[11px] tracking-[0.18em] text-muted-foreground">
         TH3 SPACEIO · LEARN. BUILD. SECURE.
       </footer>
@@ -309,7 +326,17 @@ function About() {
           </a>
           .
         </p>
-        <p className="mt-3 font-mono text-xs">LureLens {APP_VERSION}</p>
+        <p className="mt-3 font-mono text-xs">
+          LureLens {APP_VERSION} ·{' '}
+          <a
+            href="https://github.com/thespaceio/LureLens/blob/main/CHANGELOG.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-lavender underline underline-offset-2 hover:text-foreground"
+          >
+            What's new
+          </a>
+        </p>
       </section>
     </div>
   );
