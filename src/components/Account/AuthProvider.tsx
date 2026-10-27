@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       if (error.status === 429) {
         throw new OnlineError(
-          'Too many quick joins from this internet connection right now. Wait a few minutes, switch to mobile data, or sign in with email.',
+          'Too many quick joins from this internet connection right now. Wait a minute and try again, or switch to mobile data.',
         );
       }
       if (/disabled|not enabled/i.test(error.message)) throw new OnlineError("Quick join isn't switched on yet. Sign in with email instead.");
