@@ -4,6 +4,7 @@
 
 ### New
 - **Accounts.** Sign in with your email and a 6-digit code, no password. Choose a public username that nobody else can use, and optionally add your full name (for certificates) and your school or organisation.
+- **Quick join.** In a class or at an event, players can join with just a username and post to the live scoreboard straight away, no email needed. The account stays on that device until they add an email to keep it.
 - **Your progress on every device.** Signed-in games are saved to your account and appear on any device you sign in on. Games played before signing in can be added to your account.
 - **Live online scoreboard.** New scores appear within seconds, with a "Live" indicator. Posting needs an account, so names can't be impersonated.
 - **Top players this week** on the home screen, and a **big-screen view** for projectors at classes and events (`?live`), with a QR code to join.
