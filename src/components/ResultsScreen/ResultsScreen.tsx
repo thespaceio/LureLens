@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Check, Copy, Phone, RotateCcw, Send, Share2, Trophy, Users, X } from 'lucide-react';
+import { Award, Check, Copy, Loader2, Phone, RotateCcw, Send, Share2, Trophy, UserRound, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
 import PostScore from '@/components/Online/PostScore';
-import { ONLINE } from '@/lib/online';
+import { ONLINE, OnlineError, postClassResult } from '@/lib/online';
 import type { PostedScore } from '@/lib/online';
 import { rankTitle } from '@/lib/game';
 import { formatCode, resultLine } from '@/lib/classroom';
@@ -22,6 +22,8 @@ interface ResultsScreenProps {
   onProgress: () => void;
   onClassroom: () => void;
   onPosted: (posted: PostedScore) => void;
+  /** A classroom game reached its class board. */
+  onClassPosted: (posted: PostedScore) => void;
   signedIn: boolean;
   onSignIn: () => void;
 }
@@ -34,7 +36,7 @@ const CHOICE: Record<Choice, string> = {
   skip: 'Skipped',
 };
 
-export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom, onPosted, signedIn, onSignIn }: ResultsScreenProps) {
+export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom, onPosted, onClassPosted, signedIn, onSignIn }: ResultsScreenProps) {
   const cfg = LEVELS[session.level];
   const nextLevel = LEVEL_ORDER[LEVEL_ORDER.indexOf(session.level) + 1];
   const [sharing, setSharing] = useState(false);
@@ -50,7 +52,7 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
         <p className="mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank">
           <Trophy className="size-4" />
           {session.classCode ? (
-            <>Class {formatCode(session.classCode)} · saved to your progress, not the scoreboard</>
+            <>Class {formatCode(session.classCode)} · {ONLINE ? 'for your class board' : 'saved to your progress, not the scoreboard'}</>
           ) : session.practice ? (
             <>Practice round, saved to your progress but not the scoreboard</>
           ) : (
@@ -92,7 +94,20 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
         </section>
       )}
 
-      {session.classCode && <SendToFacilitator session={session} />}
+      {session.classCode &&
+        (ONLINE ? (
+          <>
+            <ClassBoardSend session={session} signedIn={signedIn} onSignIn={onSignIn} onPosted={onClassPosted} />
+            <details className="rounded-xl border border-border bg-card px-4 py-3 text-sm">
+              <summary className="cursor-pointer text-muted-foreground">No internet? Send your result line to your facilitator instead</summary>
+              <div className="pt-3">
+                <SendToFacilitator session={session} />
+              </div>
+            </details>
+          </>
+        ) : (
+          <SendToFacilitator session={session} />
+        ))}
 
       {ONLINE && !session.practice && <PostScore session={session} onPosted={onPosted} signedIn={signedIn} onSignIn={onSignIn} />}
 
@@ -158,6 +173,98 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
         </ol>
       </section>
     </motion.div>
+  );
+}
+
+/**
+ * Sends a classroom game to the class board: straight away when signed in,
+ * otherwise after signing in or quick joining.
+ */
+function ClassBoardSend({
+  session,
+  signedIn,
+  onSignIn,
+  onPosted,
+}: {
+  session: GameSession;
+  signedIn: boolean;
+  onSignIn: () => void;
+  onPosted: (posted: PostedScore) => void;
+}) {
+  const [state, setState] = useState<{ sending: boolean; error: string }>({ sending: false, error: '' });
+  const started = useRef(false);
+
+  const send = async () => {
+    started.current = true;
+    setState({ sending: true, error: '' });
+    try {
+      onPosted(await postClassResult(session));
+      setState({ sending: false, error: '' });
+    } catch (e) {
+      setState({ sending: false, error: e instanceof OnlineError ? e.message : 'Something went wrong. Try again.' });
+    }
+  };
+
+  // Signed in: the result goes to the class board without a tap. Joining the
+  // class is the player's choice to share it with the facilitator.
+  useEffect(() => {
+    if (signedIn && !session.classBoard && !started.current) {
+      const t = window.setTimeout(() => void send(), 0);
+      return () => window.clearTimeout(t);
+    }
+  });
+
+  if (session.classBoard) {
+    const { rank, of } = session.classBoard;
+    return (
+      <section className="flex items-center gap-3 rounded-xl border border-primary/50 bg-card p-4" data-testid="class-posted">
+        <Check className="size-5 shrink-0 text-primary" />
+        <p className="text-sm">
+          On your class board
+          {rank && of ? (
+            <>
+              : <strong>#{rank}</strong> of {of} so far
+            </>
+          ) : null}
+          . Your facilitator can see it now.
+        </p>
+      </section>
+    );
+  }
+
+  if (!signedIn) {
+    return (
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-lavender/50 bg-card p-4 sm:p-5" data-testid="class-sign-in">
+        <div className="min-w-0">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Send className="size-4 text-lavender" /> Put this on your class board
+          </h2>
+          <p className="text-sm text-muted-foreground">Sign in or quick join (no email needed) and your result goes to your facilitator.</p>
+        </div>
+        <Button onClick={onSignIn} className="gap-2 font-semibold">
+          <UserRound className="size-4" /> Sign in or quick join
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-2 rounded-xl border border-lavender/50 bg-card p-4 sm:p-5" data-testid="class-sending">
+      <p className="flex items-center gap-2 text-sm">
+        {state.error ? <Send className="size-4 text-lavender" /> : <Loader2 className="size-4 animate-spin text-lavender" />}
+        {state.error ? "Your result didn't reach the class board." : 'Sending your result to the class board…'}
+      </p>
+      {state.error && (
+        <>
+          <p className="text-sm text-destructive" role="alert">
+            {state.error}
+          </p>
+          <Button onClick={() => void send()} disabled={state.sending} className="gap-2 font-semibold">
+            {state.sending && <Loader2 className="size-4 animate-spin" />} Try again
+          </Button>
+        </>
+      )}
+    </section>
   );
 }
 

@@ -1,7 +1,8 @@
 // Live scoreboard updates. The database sends a tiny public "new_score"
 // signal (just the level) on the "scoreboard" channel whenever a ranked game
-// is posted; open scoreboards reload when they hear it. A slow refresh every
-// minute covers networks that block live connections.
+// is posted, and "new_class_result" on "class:<code>" for class results; open
+// boards reload when they hear it. A slower refresh covers networks that block
+// live connections.
 import { useEffect, useRef, useState } from 'react';
 import { ONLINE, getSupabase } from '@/lib/supabase';
 
@@ -9,6 +10,18 @@ export type LiveStatus = 'connecting' | 'live' | 'polling';
 
 /** Calls `onChange` when the scoreboard may have changed. Returns the connection status. */
 export function useScoreboardUpdates(onChange: () => void, pollMs = 60_000): LiveStatus {
+  return useLiveSignal('scoreboard', 'new_score', onChange, pollMs);
+}
+
+/**
+ * Calls `onChange` when a class's board may have changed: the database signals
+ * "new_class_result" on "class:<code>". Pass null to listen to nothing.
+ */
+export function useClassUpdates(code: string | null, onChange: () => void, pollMs = 20_000): LiveStatus {
+  return useLiveSignal(code ? `class:${code}` : null, 'new_class_result', onChange, pollMs);
+}
+
+function useLiveSignal(topic: string | null, event: string, onChange: () => void, pollMs: number): LiveStatus {
   const [status, setStatus] = useState<LiveStatus>('connecting');
   const latest = useRef(onChange);
   useEffect(() => {
@@ -16,7 +29,7 @@ export function useScoreboardUpdates(onChange: () => void, pollMs = 60_000): Liv
   });
 
   useEffect(() => {
-    if (!ONLINE) return;
+    if (!ONLINE || !topic) return;
     let cancelled = false;
     let debounce = 0;
     let remove = () => {};
@@ -30,8 +43,8 @@ export function useScoreboardUpdates(onChange: () => void, pollMs = 60_000): Liv
       .then(sb => {
         if (cancelled) return;
         const channel = sb
-          .channel('scoreboard', { config: { private: false } })
-          .on('broadcast', { event: 'new_score' }, changed)
+          .channel(topic, { config: { private: false } })
+          .on('broadcast', { event }, changed)
           .subscribe(state => {
             if (cancelled) return;
             if (state === 'SUBSCRIBED') setStatus('live');
@@ -54,7 +67,7 @@ export function useScoreboardUpdates(onChange: () => void, pollMs = 60_000): Liv
       document.removeEventListener('visibilitychange', onVisible);
       remove();
     };
-  }, [pollMs]);
+  }, [topic, event, pollMs]);
 
   return status;
 }

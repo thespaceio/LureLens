@@ -62,6 +62,11 @@ export function Privacy() {
             <strong className="text-foreground">Online scores:</strong> only games you choose to post appear on the public
             scoreboard, with your username, score, accuracy and date.
           </li>
+          <li>
+            <strong className="text-foreground">Class results:</strong> when you play a class round while signed in, your
+            username, score and how you answered each message go to that class's board for your facilitator. Anyone with the
+            class code can see the board for a day. Class rounds never appear on the public scoreboard.
+          </li>
         </ul>
         <p>
           We use this information to run your account, the scoreboard and certificates (our legal basis is your consent and

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.0 (not released yet)
+
+### New
+- **Live class board.** In Classroom mode, signed-in players' results go straight to the facilitator's class board as they finish, with no result lines to paste. The facilitator's panel and the debrief update live, showing how the class answered each message.
+- **Class big screen.** "Big screen" in Classroom mode (or `?live&class=<code>`) shows just that room's players, ranked as they finish, with the class code and a QR code to join.
+- Players joining a class are prompted to sign in or quick join first, and come back to the class with their code still filled in.
+
+### Changed
+- Result lines still work for players without internet: they send their line and the facilitator pastes it in. Pasted players appear alongside online ones.
+
 ## 2.2.0 (27 October 2026)
 
 ### New

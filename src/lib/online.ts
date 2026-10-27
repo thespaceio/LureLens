@@ -59,6 +59,40 @@ export function postScore(session: GameSession, ranked = !session.practice): Pro
   });
 }
 
+/**
+ * Sends a classroom game to its class board (never the public scoreboard).
+ * rank/of in the reply are the player's place in the class. Sending again the
+ * same day returns the first result.
+ */
+export function postClassResult(session: GameSession): Promise<PostedScore & { already?: boolean }> {
+  return rpc('submit_score', {
+    p_name: session.name,
+    p_level: session.level,
+    p_answers: session.answers.map(a => ({ id: a.id, choice: a.choice, seconds: a.seconds })),
+    p_played_at: session.date,
+    p_ranked: false,
+    p_class_code: session.classCode,
+  });
+}
+
+export interface ClassBoardRow {
+  name: string;
+  score: number;
+  correct: number;
+  total: number;
+  accuracy: number;
+  avg_seconds: number;
+  /** Each answer's outcome in round order: R right, S verify first where not needed, W wrong. */
+  marks: string;
+  played_at: string;
+  is_me: boolean;
+}
+
+/** A class's results today, best first. Anyone with the code can read them. */
+export function fetchClassBoard(code: string): Promise<ClassBoardRow[]> {
+  return rpc<ClassBoardRow[]>('class_board', { p_code: code });
+}
+
 export interface BoardRow {
   name: string;
   level: Level;

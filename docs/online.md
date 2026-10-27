@@ -14,12 +14,13 @@ Everything is in `supabase/schema.sql`, which is safe to run again after changes
 
 | Who | Can |
 |---|---|
-| Anyone (public key) | read the scoreboard (`leaderboard`), check a certificate (`check_certificate`) |
-| Signed-in player | post a game (`submit_score`), register a certificate (`register_certificate`), edit their profile (`save_profile`), read their own profile, read and add their own game history (`games`), delete their account (`delete_my_account`) |
+| Anyone (public key) | read the scoreboard (`leaderboard`), read a class's board with its code (`class_board`), check a certificate (`check_certificate`) |
+| Signed-in player | post a game or a class result (`submit_score`), register a certificate (`register_certificate`), edit their profile (`save_profile`), read their own profile, read and add their own game history (`games`), delete their account (`delete_my_account`) |
 
 - `submit_score` receives the **answers**, not a score. It checks them against the answer key (`messages`), recomputes the score with the game's rules, files it under the account's username, and limits floods (10 games per account per 10 minutes, 120 a minute overall).
 - Names (usernames and certificate names) accept letters from any language, including Yoruba and Igbo (ọ ẹ ṣ ụ ị and tone marks), plus numbers, spaces and `. ' _ -`. A short list of offensive words and reserved names (admin, lurelens, th3spaceio, ...) is refused.
 - Every new ranked game triggers `realtime.send(...)` on the public channel `scoreboard` with just the level, no names. Open scoreboards reload when they hear it, and refresh every minute anyway.
+- **Class boards.** A classroom game is posted with its class code (`p_class_code`). The server checks the code and that it's for the game's level, scores the game as usual, keeps it off the public scoreboard, and stores each answer's outcome (`marks`: R right, S "verify first" where it wasn't needed, W wrong) for the debrief. Each player's first result per class within a day counts; sending again returns it. Everyone in a class must have played the same round (a fingerprint of the message order is compared), so a player on a different version is asked to refresh. `class_board(code)` lists the day's results, best first, and each result signals `new_class_result` on the public channel `class:<code>`, which only that class's screens listen to (they also refresh every 20 seconds). The class big screen is `?live&class=<code>`.
 - Deleting an account removes the user, profile, history, posted scores and certificates (cascading deletes).
 
 `supabase/schema.test.ts` runs the SQL in an in-memory Postgres in CI, with stand-ins for Supabase's `auth` and `realtime`, and fails if the server and the game ever score differently or access rules break.
@@ -69,11 +70,11 @@ Then run the new `supabase/messages.sql` in the SQL Editor.
 
 In the Supabase Table Editor:
 
-- **Remove a game from the scoreboard:** `scores` → set `hidden` to true (or delete the row).
+- **Remove a game from the scoreboard or a class board:** `scores` → set `hidden` to true (or delete the row). Class results have `class_code` set.
 - **Rename an offensive username:** `profiles` → edit `username` (the scoreboard shows the new name at once).
 - **Withdraw a certificate:** `certificates` → set `hidden` to true.
 - **Remove a player entirely:** Authentication → Users → delete the user (removes everything of theirs).
 
 ## About Supabase's security advisor
 
-Expected notes: *RLS enabled, no policy* on `scores`, `messages` and `certificates` (closed on purpose), and *SECURITY DEFINER function executable* for the public functions listed above (they are the intended way in, and each checks its input).
+Expected notes: *RLS enabled, no policy* on `scores`, `messages` and `certificates` (closed on purpose), and *SECURITY DEFINER function executable* for the public functions listed above (they are the intended way in, and each checks its input). Since quick join, *Anonymous access policies* on `profiles` and `games` is expected too: quick-join players are signed-in players, and those policies only ever show a player their own rows. *Leaked password protection* doesn't apply, as LureLens has no passwords.
