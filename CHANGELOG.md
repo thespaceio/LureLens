@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.0 (not released yet)
+## 2.2.0 (27 October 2026)
 
 ### New
 - **Accounts.** Sign in with your email and a 6-digit code, no password. Choose a public username that nobody else can use, and optionally add your full name (for certificates) and your school or organisation.

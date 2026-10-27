@@ -424,7 +424,7 @@ function App() {
 
       <WhatsNew
         open={whatsNew !== 'none'}
-        renamed={whatsNew === 'renamed'}
+        kind={whatsNew}
         onClose={closeWhatsNew}
         onScoreboard={() => {
           closeWhatsNew();
