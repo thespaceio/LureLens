@@ -30,6 +30,7 @@ const CertificateCheck = lazy(() => import('@/components/Online/CertificateCheck
 const Account = lazy(() => import('@/components/Account/Account'));
 const Privacy = lazy(() => import('@/components/Privacy/Privacy'));
 const LiveBoard = lazy(() => import('@/components/Online/LiveBoard'));
+const ClassLiveBoard = lazy(() => import('@/components/Online/ClassLiveBoard'));
 
 type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about' | 'account' | 'privacy' | 'live';
 
@@ -84,6 +85,7 @@ const RETURN_LABEL: Partial<Record<View, string>> = {
   results: 'Back to your results',
   progress: 'Back to your certificate',
   scoreboard: 'Back to the scoreboard',
+  classroom: 'Back to your class',
 };
 
 function App() {
@@ -95,6 +97,8 @@ function App() {
     LINK_LIVE ? 'live' : LINK_PRIVACY ? 'privacy' : LINK_CERT ? 'check' : LINK_CODE ? 'classroom' : 'menu',
   );
   const [returnTo, setReturnTo] = useState<View | null>(null);
+  // The class shown on the big screen (?live&class=…), or null for the public board.
+  const [liveClass, setLiveClass] = useState<string | null>(LINK_LIVE && LINK_CODE ? LINK_CODE : null);
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
@@ -258,6 +262,15 @@ function App() {
               store.updateSession(result.session.id, patch);
               setResult(r => (r ? { ...r, session: { ...r.session, ...patch } } : r));
             }}
+            onClassPosted={posted => {
+              const patch = {
+                onlineId: posted.id,
+                classBoard: { rank: posted.rank, of: posted.of },
+                ...(result.session.userId ? {} : { userId: auth.userId ?? undefined, name: posted.name, synced: false }),
+              };
+              store.updateSession(result.session.id, patch);
+              setResult(r => (r ? { ...r, session: { ...r.session, ...patch } } : r));
+            }}
             onPlayLevel={level => startGame(level)}
             onScoreboard={() => navigate('scoreboard')}
             onProgress={() => navigate('progress')}
@@ -302,8 +315,14 @@ function App() {
               playerName={store.playerName}
               lockedName={signedIn ? username : undefined}
               onNameChange={store.setPlayerName}
-              initialCode={LINK_CODE}
+              initialCode={LINK_LIVE ? undefined : LINK_CODE}
               onJoin={joinClass}
+              signedIn={signedIn}
+              onSignIn={() => signIn('classroom')}
+              onBigScreen={code => {
+                setLiveClass(code);
+                navigate('live');
+              }}
             />
           </Suspense>
         );
@@ -376,7 +395,17 @@ function App() {
   if (view === 'live') {
     return (
       <Suspense fallback={<p className="p-8 text-center text-muted-foreground">Loading…</p>}>
-        <LiveBoard onExit={() => navigate('scoreboard')} />
+        {liveClass ? (
+          <ClassLiveBoard
+            code={liveClass}
+            onExit={() => {
+              setLiveClass(null);
+              navigate('classroom');
+            }}
+          />
+        ) : (
+          <LiveBoard onExit={() => navigate('scoreboard')} />
+        )}
       </Suspense>
     );
   }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, ClipboardList, Copy, Eye, LogIn, Presentation, RefreshCw, Users, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ClipboardList, Copy, Eye, LogIn, MonitorPlay, Presentation, RefreshCw, UserRound, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EmailViewer from '@/components/EmailViewer/EmailViewer';
@@ -9,6 +9,10 @@ import Explanation from '@/components/Explanation/Explanation';
 import LinkStatus from '@/components/LinkStatus/LinkStatus';
 import type { InspectedLink } from '@/components/LinkStatus/LinkStatus';
 import QrCode from '@/components/Classroom/QrCode';
+import LiveDot from '@/components/Online/LiveDot';
+import { mergeResults, useClassBoard } from '@/hooks/useClassBoard';
+import type { ClassBoard } from '@/hooks/useClassBoard';
+import { ONLINE } from '@/lib/online';
 import {
   classRound,
   createClassCode,
@@ -32,7 +36,29 @@ interface ClassroomProps {
   /** Code from an invite link, filled in for the player. */
   initialCode?: string;
   onJoin: (decoded: JoinedClass) => void;
+  signedIn: boolean;
+  /** Sign in or quick join, then come back here. */
+  onSignIn: () => void;
+  /** Opens the class board on the big screen. */
+  onBigScreen: (code: string) => void;
 }
+
+// A code typed in the join box survives a trip to sign in and back.
+const JOIN_KEY = 'lurelens_join_code';
+const readJoin = () => {
+  try {
+    return sessionStorage.getItem(JOIN_KEY) ?? '';
+  } catch {
+    return '';
+  }
+};
+const writeJoin = (code: string) => {
+  try {
+    sessionStorage.setItem(JOIN_KEY, code);
+  } catch {
+    // Storage blocked: the code just isn't remembered.
+  }
+};
 
 // The facilitator's class survives a refresh, so pasted results aren't lost.
 const HOST_KEY = 'lurelens_class_host_v1';
@@ -94,14 +120,16 @@ function accuracyTone(right: number, answered: number): string {
   return 'border-destructive/60 bg-destructive/10 text-destructive';
 }
 
-export function Classroom({ playerName, lockedName, onNameChange, initialCode, onJoin }: ClassroomProps) {
+export function Classroom(props: ClassroomProps) {
+  const { onBigScreen } = props;
   const [host, setHost] = useState<HostState | null>(readHost);
   const [debrief, setDebrief] = useState(false);
+  const board = useClassBoard(host?.code ?? null);
 
   useEffect(() => writeHost(host), [host]);
 
   if (host && debrief) {
-    return <Debrief host={host} onBack={() => setDebrief(false)} />;
+    return <Debrief host={host} board={board} onBack={() => setDebrief(false)} />;
   }
 
   return (
@@ -111,13 +139,18 @@ export function Classroom({ playerName, lockedName, onNameChange, initialCode, o
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-5xl">Classroom mode</h1>
         <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
           Run LureLens with a group. Everyone who enters the same class code plays the same 10 messages in the same order,
-          so you can talk through each one together afterwards. Nothing is sent to a server.
+          so you can talk through each one together afterwards.
+          {ONLINE
+            ? ' Signed-in players appear on your class board as they finish, ready for the big screen.'
+            : ' Nothing is sent to a server.'}
         </p>
       </motion.section>
 
       {host ? (
         <HostPanel
           host={host}
+          board={board}
+          onBigScreen={() => onBigScreen(host.code)}
           onChange={setHost}
           onDebrief={() => {
             setDebrief(true);
@@ -130,15 +163,15 @@ export function Classroom({ playerName, lockedName, onNameChange, initialCode, o
       ) : null}
 
       <div className={`grid gap-4 ${host ? '' : 'md:grid-cols-2'}`}>
-        <JoinCard playerName={playerName} lockedName={lockedName} onNameChange={onNameChange} initialCode={initialCode} onJoin={onJoin} />
+        <JoinCard {...props} />
         {!host && <HostCard onCreate={code => setHost({ code, pasted: '' })} />}
       </div>
     </div>
   );
 }
 
-function JoinCard({ playerName, lockedName, onNameChange, initialCode, onJoin }: ClassroomProps) {
-  const [code, setCode] = useState(initialCode ? formatCode(initialCode) : '');
+function JoinCard({ playerName, lockedName, onNameChange, initialCode, onJoin, signedIn, onSignIn }: ClassroomProps) {
+  const [code, setCode] = useState(() => (initialCode ? formatCode(initialCode) : readJoin()));
   const [error, setError] = useState<string | null>(null);
 
   const join = () => {
@@ -201,16 +234,32 @@ function JoinCard({ playerName, lockedName, onNameChange, initialCode, onJoin }:
             className="h-12 bg-background font-mono text-lg uppercase tracking-[0.2em] placeholder:normal-case placeholder:tracking-normal"
             onChange={e => {
               setCode(e.target.value);
+              writeJoin(e.target.value);
               setError(null);
             }}
             onKeyDown={e => e.key === 'Enter' && join()}
           />
         </div>
         {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+        {ONLINE && !signedIn && (
+          <div className="space-y-2 rounded-lg border border-lavender/40 bg-lavender/10 p-3 text-sm" data-testid="join-sign-in">
+            <p>
+              <strong>Sign in or quick join first</strong> so your result goes straight to your facilitator's class board. It
+              takes a few seconds; no email needed.
+            </p>
+            <Button variant="secondary" className="w-full gap-2" onClick={onSignIn}>
+              <UserRound className="size-4" /> Sign in or quick join
+            </Button>
+          </div>
+        )}
         <Button size="lg" className="h-12 w-full gap-2 font-semibold" onClick={join} data-testid="join-class">
           <LogIn className="size-4" /> Join and start
         </Button>
-        <p className="text-xs text-muted-foreground">Class rounds count towards your progress but not the scoreboard.</p>
+        <p className="text-xs text-muted-foreground">
+          {ONLINE
+            ? 'Class rounds go to your class board and your progress, not the public scoreboard.'
+            : 'Class rounds count towards your progress but not the scoreboard.'}
+        </p>
       </div>
     </section>
   );
@@ -252,22 +301,34 @@ function HostCard({ onCreate }: { onCreate: (code: string) => void }) {
       >
         <Presentation className="size-4" /> Create class code
       </Button>
-      <ol className="mt-4 list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
-        <li>Players join with the code, link or QR code.</li>
-        <li>Each player sends you their result line, for example in your WhatsApp group.</li>
-        <li>Paste the lines here to see the class results, then run the debrief.</li>
-      </ol>
+      {ONLINE ? (
+        <ol className="mt-4 list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
+          <li>Players sign in or quick join, then join with the code, link or QR code.</li>
+          <li>Their results appear on your class board as they finish. Put it on the big screen for the room.</li>
+          <li>Run the debrief, message by message, with how the class answered each one.</li>
+        </ol>
+      ) : (
+        <ol className="mt-4 list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
+          <li>Players join with the code, link or QR code.</li>
+          <li>Each player sends you their result line, for example in your WhatsApp group.</li>
+          <li>Paste the lines here to see the class results, then run the debrief.</li>
+        </ol>
+      )}
     </section>
   );
 }
 
 function HostPanel({
   host,
+  board,
+  onBigScreen,
   onChange,
   onDebrief,
   onEnd,
 }: {
   host: HostState;
+  board: ClassBoard;
+  onBigScreen: () => void;
   onChange: (state: HostState) => void;
   onDebrief: () => void;
   onEnd: () => void;
@@ -300,6 +361,11 @@ function HostPanel({
                 Send on WhatsApp
               </a>
             </Button>
+            {ONLINE && (
+              <Button variant="secondary" className="gap-2" onClick={onBigScreen} data-testid="class-big-screen">
+                <MonitorPlay className="size-4" /> Big screen
+              </Button>
+            )}
             <Button variant="outline" className="gap-2 bg-transparent" onClick={onEnd}>
               <RefreshCw className="size-4" /> New class
             </Button>
@@ -307,23 +373,27 @@ function HostPanel({
         </div>
       </div>
 
-      <ClassResults host={host} round={round} onChange={onChange} onDebrief={onDebrief} />
+      <ClassResults host={host} board={board} round={round} onChange={onChange} onDebrief={onDebrief} />
     </section>
   );
 }
 
 function ClassResults({
   host,
+  board,
   round,
   onChange,
   onDebrief,
 }: {
   host: HostState;
+  board: ClassBoard;
   round: Email[];
   onChange: (state: HostState) => void;
   onDebrief: () => void;
 }) {
-  const { results, otherClass } = useMemo(() => parseResults(host.pasted, host.code), [host.pasted, host.code]);
+  const pasted = useMemo(() => parseResults(host.pasted, host.code), [host.pasted, host.code]);
+  const otherClass = pasted.otherClass;
+  const results = useMemo(() => mergeResults(board.results, pasted.results), [board.results, pasted.results]);
   const perMessage = useMemo(() => messageAccuracy(results, round.length), [results, round.length]);
   const average = results.length
     ? Math.round(results.reduce((s, r) => s + (r.total ? r.correct / r.total : 0), 0) / results.length * 100)
@@ -340,22 +410,31 @@ function ClassResults({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 font-semibold">
           <ClipboardList className="size-4 text-lavender" /> Class results
+          {ONLINE && <LiveDot status={board.status} className="ml-1" />}
         </h3>
         <Button size="lg" className="gap-2 font-semibold" onClick={onDebrief} data-testid="start-debrief">
           <Presentation className="size-4" /> Start debrief
         </Button>
       </div>
-      <label htmlFor="class-results" className="block text-sm text-muted-foreground">
-        Paste the result lines your players send you. You can paste a whole chat; anything else is ignored.
-      </label>
-      <textarea
-        id="class-results"
-        value={host.pasted}
-        onChange={e => onChange({ ...host, pasted: e.target.value })}
-        rows={4}
-        placeholder={`LureLens class ${formatCode(host.code)} · Tunde · 1180 pts · 8/10 · ✓✓✗✓✓✓✗✓✓✓`}
-        className="w-full rounded-lg border border-input bg-background px-3 py-2 font-mono text-xs placeholder:text-muted-foreground/60 focus-visible:outline-2 focus-visible:outline-ring"
-      />
+      {ONLINE && (
+        <p className="text-sm text-muted-foreground" data-testid="class-board-note">
+          {board.error
+            ? `${board.error} Retrying…`
+            : results.length
+              ? 'Results appear here as players finish.'
+              : board.results === null
+                ? 'Loading the class board…'
+                : 'Waiting for the first player to finish. Results appear here as they do.'}
+        </p>
+      )}
+      {ONLINE ? (
+        <details className="rounded-lg border border-border px-3 py-2 text-sm" open={Boolean(host.pasted)}>
+          <summary className="cursor-pointer text-muted-foreground">Players without internet? Paste the result lines they send you</summary>
+          <PasteBox host={host} onChange={onChange} />
+        </details>
+      ) : (
+        <PasteBox host={host} onChange={onChange} />
+      )}
       {otherClass > 0 && (
         <p className="text-xs text-muted-foreground">
           {otherClass} line{otherClass === 1 ? ' was' : 's were'} for a different class code and left out.
@@ -399,10 +478,29 @@ function ClassResults({
   );
 }
 
-function Debrief({ host, onBack }: { host: HostState; onBack: () => void }) {
+function PasteBox({ host, onChange }: { host: HostState; onChange: (state: HostState) => void }) {
+  return (
+    <div className="space-y-2 pt-2">
+      <label htmlFor="class-results" className="block text-sm text-muted-foreground">
+        Paste the result lines your players send you. You can paste a whole chat; anything else is ignored.
+      </label>
+      <textarea
+        id="class-results"
+        value={host.pasted}
+        onChange={e => onChange({ ...host, pasted: e.target.value })}
+        rows={4}
+        placeholder={`LureLens class ${formatCode(host.code)} · Tunde · 1180 pts · 8/10 · ✓✓✗✓✓✓✗✓✓✓`}
+        className="w-full rounded-lg border border-input bg-background px-3 py-2 font-mono text-xs placeholder:text-muted-foreground/60 focus-visible:outline-2 focus-visible:outline-ring"
+      />
+    </div>
+  );
+}
+
+function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; onBack: () => void }) {
   const decoded = useMemo(() => decodeClassCode(host.code) as JoinedClass, [host.code]);
   const round = useMemo(() => classRound(decoded), [decoded]);
-  const { results } = useMemo(() => parseResults(host.pasted, host.code), [host.pasted, host.code]);
+  const pasted = useMemo(() => parseResults(host.pasted, host.code), [host.pasted, host.code]);
+  const results = useMemo(() => mergeResults(board.results, pasted.results), [board.results, pasted.results]);
   const perMessage = useMemo(() => messageAccuracy(results, round.length), [results, round.length]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);

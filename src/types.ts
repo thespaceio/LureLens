@@ -109,6 +109,8 @@ export interface GameSession {
   userId?: string;
   /** True once this game is saved in the account's history online. */
   synced?: boolean;
+  /** Classroom games sent to the class board: the player's place in the class. */
+  classBoard?: { rank: number | null; of: number | null };
   /** The server's score and rank, when posted to the online scoreboard. */
   online?: { score: number; rank: number | null; of: number | null };
 }

@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { PGlite } from '@electric-sql/pglite';
 import { buildRound, scoreAnswer, scoreVerify } from '@/lib/game';
+import { classRound, createClassCode, decodeClassCode, formatCode, seededRandom } from '@/lib/classroom';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { Choice, Email, Level } from '@/types';
 
@@ -31,6 +32,7 @@ const SUPABASE_STANDINS = `
 const ADA = '00000000-0000-4000-8000-00000000000a';
 const BOLA = '00000000-0000-4000-8000-00000000000b';
 const CHI = '00000000-0000-4000-8000-00000000000c';
+const DAN = '00000000-0000-4000-8000-00000000000d';
 
 /** Runs SQL as a browser would: anonymous, or signed in as `uid`. */
 async function as<T>(uid: string | null, sql: string, params: unknown[] = []): Promise<T[]> {
@@ -89,12 +91,16 @@ const submit = (uid: string | null, level: string, answers: unknown, ranked = tr
   as<{ r: Posted }>(uid, 'select submit_score($1, $2, $3::jsonb, now(), $4) as r', ['ignored', level, JSON.stringify(answers), ranked]).then(r => r[0].r);
 const saveProfile = (uid: string | null, username: string, full: string | null = null, org: string | null = null) =>
   as<{ r: { username: string; full_name: string | null; organisation: string | null } }>(uid, 'select save_profile($1, $2, $3) as r', [username, full, org]).then(r => r[0].r);
+const submitClass = (uid: string, level: string, answers: unknown, code: string) =>
+  as<{ r: Posted & { already?: boolean } }>(uid, 'select submit_score($1, $2, $3::jsonb, now(), true, $4) as r', ['ignored', level, JSON.stringify(answers), code]).then(r => r[0].r);
+type ClassRow = { name: string; score: number; correct: number; marks: string; is_me: boolean };
+const classBoard = (uid: string | null, code: string) => as<ClassRow>(uid, 'select * from class_board($1)', [code]);
 const relax = () => db.exec("update scores set created_at = created_at - interval '1 hour'");
 
 beforeAll(async () => {
   db = new PGlite();
   await db.exec(SUPABASE_STANDINS);
-  await db.exec(`insert into auth.users (id, email) values ('${ADA}', 'ada@example.com'), ('${BOLA}', 'bola@example.com'), ('${CHI}', 'chi@example.com')`);
+  await db.exec(`insert into auth.users (id, email) values ('${ADA}', 'ada@example.com'), ('${BOLA}', 'bola@example.com'), ('${CHI}', 'chi@example.com'), ('${DAN}', 'dan@example.com')`);
   const schema = readFileSync('supabase/schema.sql', 'utf8');
   await db.exec(schema);
   await db.exec(readFileSync('supabase/messages.sql', 'utf8'));
@@ -198,6 +204,68 @@ describe('scoreboard', () => {
         expect(await refusal(as(uid, sql))).not.toBeNull();
       }
     }
+  });
+});
+
+let posted0: Posted;
+describe('class boards', () => {
+  const code = createClassCode('beginner', seededRandom(7));
+  const round = classRound(decodeClassCode(code) as Extract<ReturnType<typeof decodeClassCode>, { ok: true }>);
+  const choices = (wrongAt: number[]): Choice[] =>
+    round.map((e, i) => (wrongAt.includes(i) ? (e.is_phishing ? 'legitimate' : 'phishing') : e.is_phishing ? 'phishing' : 'legitimate'));
+
+  it("posts a class result to the class's board only, scored as the game does", async () => {
+    await relax();
+    await db.exec('delete from realtime.sent');
+    const game = play('beginner', round, choices([1, 4]), Array(10).fill(5));
+    // Typed the way people read codes out: with a dash, lower case, O for 0.
+    const typed = formatCode(code).toLowerCase().replace(/0/g, 'o');
+    const posted = await submitClass(ADA, 'beginner', game.answers, typed);
+    posted0 = posted;
+    expect({ score: posted.score, correct: posted.correct, rank: posted.rank, of: posted.of }).toEqual({ score: game.score, correct: 8, rank: 1, of: 1 });
+    // Not on the public scoreboard, and only this class's screens hear about it.
+    const ranked = (await db.query<{ ranked: boolean; class_code: string }>('select ranked, class_code from scores where id = $1', [posted.id])).rows[0];
+    expect(ranked).toEqual({ ranked: false, class_code: code });
+    const sent = (await db.query<{ payload: unknown; event: string; topic: string }>('select payload, event, topic from realtime.sent')).rows;
+    expect(sent).toEqual([{ payload: {}, event: 'new_class_result', topic: `class:${code}` }]);
+  });
+
+  it("keeps each player's first result, ranks the class and shows every answer's outcome", async () => {
+    const again = await submitClass(ADA, 'beginner', play('beginner', round, choices([]), Array(10).fill(1)).answers, code);
+    expect(again.already).toBe(true);
+    expect(again.correct).toBe(8);
+
+    const verifyIndex = round.findIndex(e => !e.verify_first);
+    const picks = choices([]);
+    picks[verifyIndex] = 'verify';
+    const bola = await submitClass(BOLA, 'beginner', play('beginner', round, picks, Array(10).fill(2)).answers, code);
+    expect({ rank: bola.rank, of: bola.of }).toEqual({ rank: 1, of: 2 });
+    // Equal points: more correct answers, then speed, decide; the reply matches the board's order.
+    const chi = await saveProfile(CHI, 'Chi').then(() =>
+      submitClass(CHI, 'beginner', play('beginner', round, choices([1, 4]), Array(10).fill(5)).answers, code),
+    );
+    expect(chi.score).toBe(posted0.score);
+    expect({ rank: chi.rank, of: chi.of }).toEqual({ rank: 3, of: 3 });
+
+    const board = await classBoard(null, formatCode(code));
+    expect(board.map(r => [r.name, r.correct, r.is_me])).toEqual([
+      [board[0].name, 9, false],
+      ['Adá Okafor', 8, false],
+      ['Chi', 8, false],
+    ]);
+    expect(board[0].marks).toBe(round.map((_, i) => (i === verifyIndex ? 'S' : 'R')).join(''));
+    expect(board[1].marks).toBe(round.map((_, i) => ([1, 4].includes(i) ? 'W' : 'R')).join(''));
+    expect((await classBoard(ADA, code)).find(r => r.is_me)?.name).toBe('Adá Okafor');
+    expect(await classBoard(null, 'nonsense')).toEqual([]);
+  });
+
+  it('refuses wrong codes, other levels and a different round', async () => {
+    const answers = play('beginner', round, choices([]), Array(10).fill(3)).answers;
+    expect(await refusal(submitClass(ADA, 'beginner', answers, 'ABC'))).toMatch(/isn't right/);
+    expect(await refusal(submitClass(ADA, 'beginner', answers, createClassCode('advanced', seededRandom(3))))).toMatch(/different level/);
+    await saveProfile(DAN, 'Dan');
+    expect(await refusal(submitClass(DAN, 'beginner', perfect('beginner'), code))).toMatch(/don't match/);
+    expect(await refusal(as(null, `select submit_score('x', 'beginner', '[]'::jsonb, now(), false, '${code}')`))).toMatch(/permission denied|Sign in/);
   });
 });
 

@@ -5,8 +5,8 @@
 -- It is safe to run again after changes. Then run supabase/messages.sql.
 --
 -- Security model
--- - Anyone (the public "anon" key) can read the scoreboard and check a
---   certificate, through functions. Nothing else.
+-- - Anyone (the public "anon" key) can read the scoreboard, read a class's
+--   board with its code, and check a certificate, through functions. Nothing else.
 -- - Signed-in players can post games, register certificates, edit their own
 --   profile, read and add their own game history, and delete their account.
 -- - Scores are worked out on the server from the answers, so a made-up score
@@ -59,10 +59,18 @@ create table if not exists public.scores (
 -- Games posted from 2.2 on belong to an account. Older guest games have none.
 alter table public.scores add column if not exists user_id uuid references auth.users (id) on delete cascade;
 
+-- Classroom games (2.3): the class code, each answer's outcome in round order
+-- (R right, S "verify first" where it wasn't needed, W wrong), and a
+-- fingerprint of the round so everyone in a class played the same messages.
+alter table public.scores add column if not exists class_code text;
+alter table public.scores add column if not exists marks text;
+alter table public.scores add column if not exists class_round text;
+
 create index if not exists scores_board on public.scores (level, score desc) where ranked and not hidden;
 create index if not exists scores_by_name on public.scores (lower(name), created_at desc);
 create index if not exists scores_by_user on public.scores (user_id, created_at desc);
 create index if not exists scores_recent on public.scores (created_at desc);
+create index if not exists scores_by_class on public.scores (class_code, created_at desc) where class_code is not null;
 
 create table if not exists public.certificates (
   reference text primary key check (reference ~ '^LL-[0-9A-Z]{4}-[0-9A-Z]{4}$'),
@@ -262,16 +270,81 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
--- Post a game. Mirrors the scoring in src/lib/game.ts and LEVELS in src/types.ts.
--- p_name is ignored: the name is the account's username.
+-- Class codes (src/lib/classroom.ts): 6 Crockford base32 characters. The
+-- first 5 hold the level and the round's seed; the last is a check character
+-- the app verifies against its message bank. Returns the code tidied up
+-- (upper case, no dash, O read as 0 and I or L as 1), or null if it isn't one.
 -- ---------------------------------------------------------------------------
 
+create or replace function public.lurelens_class_code(p_code text)
+returns text
+language sql
+immutable
+set search_path = public
+as $$
+  select case when c ~ '^[0-9A-HJKMNP-TV-Z]{6}$' then c end
+  from (select translate(upper(regexp_replace(coalesce(p_code, ''), '[^0-9A-Za-z]', '', 'g')), 'OIL', '011') as c) t;
+$$;
+
+-- Each player's first result for a class within the last day.
+create or replace function public.lurelens_class_firsts(p_code text)
+returns setof public.scores
+language sql
+stable
+set search_path = public
+as $$
+  select distinct on (s.user_id) s.*
+  from scores s
+  where s.class_code = p_code and s.created_at > now() - interval '1 day' and not s.hidden
+  order by s.user_id, s.created_at;
+$$;
+
+-- A result's place in its class, in the same order as class_board.
+create or replace function public.lurelens_class_rank(p_code text, p_id uuid)
+returns integer
+language sql
+stable
+set search_path = public
+as $$
+  select r::integer from (
+    select f.id, row_number() over (order by f.score desc, f.correct desc, f.avg_seconds asc, f.created_at asc) as r
+    from lurelens_class_firsts(p_code) f
+  ) x where x.id = p_id;
+$$;
+
+-- The level a class code is for.
+create or replace function public.lurelens_class_level(p_code text)
+returns text
+language plpgsql
+immutable
+set search_path = public
+as $$
+declare
+  v_value bigint := 0;
+begin
+  for i in 1..5 loop
+    v_value := v_value * 32 + strpos('0123456789ABCDEFGHJKMNPQRSTVWXYZ', substr(p_code, i, 1)) - 1;
+  end loop;
+  return (array['beginner', 'intermediate', 'advanced'])[v_value % 3 + 1];
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Post a game. Mirrors the scoring in src/lib/game.ts and LEVELS in src/types.ts.
+-- p_name is ignored: the name is the account's username.
+-- p_class_code: a classroom game for that class's board. It never goes on the
+-- public scoreboard, each player's first result per class (within a day)
+-- counts, and rank/of in the reply are the player's place in the class.
+-- ---------------------------------------------------------------------------
+
+drop function if exists public.submit_score(text, text, jsonb, timestamptz, boolean);
 create or replace function public.submit_score(
   p_name text,
   p_level text,
   p_answers jsonb,
   p_played_at timestamptz default now(),
-  p_ranked boolean default true
+  p_ranked boolean default true,
+  p_class_code text default null
 )
 returns jsonb
 language plpgsql
@@ -300,6 +373,11 @@ declare
   v_accuracy integer;
   v_rank integer;
   v_of integer;
+  v_code text;
+  v_marks text := '';
+  v_round text;
+  v_ranked boolean := coalesce(p_ranked, true);
+  v_first public.scores%rowtype;
 begin
   if v_uid is null then
     raise exception 'Sign in to post to the online scoreboard.' using errcode = '22023';
@@ -315,6 +393,29 @@ begin
     when 'advanced' then v_limit := 20; v_mult := 2;
     else raise exception 'Unknown level.' using errcode = '22023';
   end case;
+
+  if p_class_code is not null then
+    v_code := lurelens_class_code(p_class_code);
+    if v_code is null then
+      raise exception 'That class code isn''t right. Check it with your facilitator.' using errcode = '22023';
+    end if;
+    if lurelens_class_level(v_code) <> p_level then
+      raise exception 'This class code is for a different level.' using errcode = '22023';
+    end if;
+    v_ranked := false;
+    -- Already on this class's board today: the first result stands.
+    select * into v_first from scores
+    where class_code = v_code and user_id = v_uid and created_at > now() - interval '1 day'
+    order by created_at limit 1;
+    if found then
+      select lurelens_class_rank(v_code, v_first.id) into v_rank;
+      select count(*) into v_of from lurelens_class_firsts(v_code);
+      return jsonb_build_object(
+        'id', v_first.id, 'name', v_name, 'score', v_first.score, 'correct', v_first.correct,
+        'accuracy', v_first.accuracy, 'rank', v_rank, 'of', v_of, 'already', true
+      );
+    end if;
+  end if;
 
   -- Light flood protection.
   if (select count(*) from scores where user_id = v_uid and created_at > now() - interval '10 minutes') >= 10 then
@@ -370,19 +471,37 @@ begin
     if v_correct then
       v_right := v_right + 1;
     end if;
+    v_marks := v_marks || case when v_correct then 'R' when v_choice = 'verify' then 'S' else 'W' end;
     v_best := greatest(v_best, v_streak);
   end loop;
+
+  if v_code is not null then
+    -- Everyone in a class plays the same messages in the same order. A
+    -- different round means a different version of LureLens.
+    v_round := md5(array_to_string(v_seen, ','));
+    if exists (
+      select 1 from scores
+      where class_code = v_code and created_at > now() - interval '1 day' and class_round <> v_round
+    ) then
+      raise exception 'Your messages don''t match the rest of your class. Refresh LureLens so you have the same version as your facilitator, then play the class round again.' using errcode = '22023';
+    end if;
+  end if;
 
   if v_played > now() + interval '5 minutes' or v_played < now() - interval '2 years' then
     v_played := now();
   end if;
   v_accuracy := round(v_right * 100.0 / v_rounds)::integer;
 
-  insert into scores (user_id, name, level, score, correct, total, accuracy, best_streak, avg_seconds, ranked, played_at)
-  values (v_uid, v_name, p_level, v_score, v_right, v_rounds, v_accuracy, v_best, round(v_time / v_rounds, 1), coalesce(p_ranked, true), v_played)
+  insert into scores (user_id, name, level, score, correct, total, accuracy, best_streak, avg_seconds, ranked, played_at,
+                      class_code, marks, class_round)
+  values (v_uid, v_name, p_level, v_score, v_right, v_rounds, v_accuracy, v_best, round(v_time / v_rounds, 1), v_ranked, v_played,
+          v_code, case when v_code is not null then v_marks end, v_round)
   returning id into v_id;
 
-  if coalesce(p_ranked, true) then
+  if v_code is not null then
+    select lurelens_class_rank(v_code, v_id) into v_rank;
+    select count(*) into v_of from lurelens_class_firsts(v_code);
+  elsif v_ranked then
     select count(*) + 1 into v_rank
     from (
       select coalesce(user_id::text, 'guest:' || lower(name)) as player, max(score) as best
@@ -434,8 +553,33 @@ as $$
   limit least(greatest(coalesce(p_limit, 20), 1), 100);
 $$;
 
+-- ---------------------------------------------------------------------------
+-- A class's board: each player's first result for the class code in the last
+-- day, best first, with every answer's outcome for the debrief. Anyone with
+-- the code can read it (the facilitator's screen, the big screen).
+-- ---------------------------------------------------------------------------
+
+create or replace function public.class_board(p_code text)
+returns table (
+  name text, score integer, correct integer, total integer, accuracy integer,
+  avg_seconds numeric, marks text, played_at timestamptz, is_me boolean
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(p.username, f.name), f.score, f.correct, f.total, f.accuracy, f.avg_seconds, f.marks, f.played_at,
+         coalesce(f.user_id = auth.uid(), false)
+  from lurelens_class_firsts(lurelens_class_code(p_code)) f
+  left join profiles p on p.id = f.user_id
+  order by f.score desc, f.correct desc, f.avg_seconds asc, f.created_at asc
+  limit 300;
+$$;
+
 -- Live updates: every new ranked game sends a small public signal on the
--- "scoreboard" channel (just the level, no names). Open scoreboards reload.
+-- "scoreboard" channel (just the level, no names), and every class result a
+-- signal on "class:<code>". Open boards reload.
 create or replace function public.lurelens_announce_score()
 returns trigger
 language plpgsql
@@ -443,13 +587,16 @@ security definer
 set search_path = public
 as $$
 begin
-  if new.ranked and not new.hidden then
-    begin
+  begin
+    if new.class_code is not null then
+      -- Only screens watching this class hear it ("class:<code>").
+      perform realtime.send('{}'::jsonb, 'new_class_result', 'class:' || new.class_code, false);
+    elsif new.ranked and not new.hidden then
       perform realtime.send(jsonb_build_object('level', new.level), 'new_score', 'scoreboard', false);
-    exception when others then
-      null; -- live updates must never stop a game from being posted
-    end;
-  end if;
+    end if;
+  exception when others then
+    null; -- live updates must never stop a game from being posted
+  end;
   return new;
 end;
 $$;
@@ -554,7 +701,12 @@ revoke execute on function public.lurelens_clean_name(text, integer) from public
 revoke execute on function public.lurelens_clean_text(text, integer) from public, anon, authenticated;
 revoke execute on function public.lurelens_announce_score() from public, anon, authenticated;
 revoke execute on function public.lurelens_games_limit() from public, anon, authenticated;
-revoke execute on function public.submit_score(text, text, jsonb, timestamptz, boolean) from public, anon;
+revoke execute on function public.lurelens_class_code(text) from public, anon, authenticated;
+revoke execute on function public.lurelens_class_level(text) from public, anon, authenticated;
+revoke execute on function public.lurelens_class_firsts(text) from public, anon, authenticated;
+revoke execute on function public.lurelens_class_rank(text, uuid) from public, anon, authenticated;
+revoke execute on function public.submit_score(text, text, jsonb, timestamptz, boolean, text) from public, anon;
+revoke execute on function public.class_board(text) from public;
 revoke execute on function public.leaderboard(text, integer, integer) from public;
 revoke execute on function public.register_certificate(text, text, uuid[]) from public, anon;
 revoke execute on function public.check_certificate(text) from public;
@@ -564,8 +716,9 @@ revoke execute on function public.delete_my_account() from public, anon;
 -- Everyone: read the board, check a certificate.
 grant execute on function public.leaderboard(text, integer, integer) to anon, authenticated;
 grant execute on function public.check_certificate(text) to anon, authenticated;
+grant execute on function public.class_board(text) to anon, authenticated;
 -- Signed-in players only.
-grant execute on function public.submit_score(text, text, jsonb, timestamptz, boolean) to authenticated;
+grant execute on function public.submit_score(text, text, jsonb, timestamptz, boolean, text) to authenticated;
 grant execute on function public.register_certificate(text, text, uuid[]) to authenticated;
 grant execute on function public.save_profile(text, text, text) to authenticated;
 grant execute on function public.delete_my_account() to authenticated;
