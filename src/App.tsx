@@ -20,6 +20,7 @@ import { certificateProgress } from '@/lib/certificate';
 import { ONLINE } from '@/lib/online';
 import type { DecodedClass } from '@/lib/classroom';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
+import Roadmap from '@/components/About/Roadmap';
 import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
 import './App.css';
 
@@ -504,7 +505,12 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>Links inside training emails never open.</li>
             <li>Without an account, scores stay in this browser. With one, your games follow you between devices.</li>
-            <li>Classroom mode gives a group the same messages through a shared code, without sending anything to a server.</li>
+            <li>
+              Classroom mode gives a group the same messages through a shared code.
+              {ONLINE
+                ? " Signed-in players' results go to the facilitator's live class board."
+                : ' Nothing is sent to a server.'}
+            </li>
             <li>Score 80% or more on every level to earn a LureLens certificate you can print or add to LinkedIn.</li>
             {ONLINE && (
               <li>
@@ -519,6 +525,7 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
           </ul>
         </section>
       </div>
+      <Roadmap />
       {ONLINE && (
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
           <div>
