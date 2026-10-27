@@ -29,7 +29,7 @@ function cacheProfile(userId: string, profile: Profile | null) {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(
-    ONLINE ? { status: 'loading', userId: null, email: null, profile: null, profileLoaded: false } : { ...SIGNED_OUT, status: 'off' },
+    ONLINE ? { status: 'loading', userId: null, email: null, anonymous: false, profile: null, profileLoaded: false } : { ...SIGNED_OUT, status: 'off' },
   );
 
   useEffect(() => {
@@ -48,7 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState(s => ({
         status: 'signedIn',
         userId,
-        email: session.user.email ?? null,
+        email: session.user.email || null,
+        anonymous: Boolean(session.user.is_anonymous),
         profile: s.userId === userId && s.profile ? s.profile : cached,
         profileLoaded: (s.userId === userId && s.profileLoaded) || Boolean(cached),
       }));
@@ -100,6 +101,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const quickJoin = useCallback(async () => {
+    const sb = await getSupabase().catch(() => {
+      throw new OnlineError("Couldn't load sign-in. Check your connection and try again.");
+    });
+    const { error } = await sb.auth.signInAnonymously();
+    if (error) {
+      if (error.status === 429) {
+        throw new OnlineError(
+          'Too many quick joins from this internet connection right now. Wait a few minutes, switch to mobile data, or sign in with email.',
+        );
+      }
+      if (/disabled|not enabled/i.test(error.message)) throw new OnlineError("Quick join isn't switched on yet. Sign in with email instead.");
+      throw friendlyError(error, "Couldn't create a quick-join account. Try again in a moment.");
+    }
+  }, []);
+
+  const addEmail = useCallback(async (email: string) => {
+    const sb = await getSupabase();
+    const { error } = await sb.auth.updateUser({ email: email.trim() }, { emailRedirectTo: `${location.origin}${location.pathname}` });
+    if (error) {
+      if (error.status === 429) throw new OnlineError('Too many codes requested. Wait a minute, then try again.');
+      if (/already|registered|exists/i.test(error.message)) throw new OnlineError('That email already has a LureLens account. Sign in with it instead.');
+      if (/not authori[sz]ed/i.test(error.message)) throw new OnlineError("LureLens can't send email to that address yet. Please try again later.");
+      throw friendlyError(error, "Couldn't send the code. Try again in a moment.");
+    }
+  }, []);
+
+  const confirmEmail = useCallback(async (email: string, code: string) => {
+    const sb = await getSupabase();
+    const { error } = await sb.auth.verifyOtp({ email: email.trim(), token: code.replace(/\D/g, ''), type: 'email_change' });
+    if (error) throw new OnlineError('That code is wrong or has expired. Check it, or ask for a new one.');
+    // Pick up the confirmed email.
+    const { data } = await sb.auth.getUser();
+    setState(s => ({ ...s, email: data.user?.email ?? s.email, anonymous: Boolean(data.user?.is_anonymous) }));
+  }, []);
+
   const verifyCode = useCallback(async (email: string, code: string) => {
     const sb = await getSupabase();
     const { error } = await sb.auth.verifyOtp({ email: email.trim(), token: code.replace(/\D/g, ''), type: 'email' });
@@ -139,8 +176,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [signOut]);
 
   const value = useMemo<Auth>(
-    () => ({ ...state, sendCode, verifyCode, saveProfile, signOut, deleteAccount }),
-    [state, sendCode, verifyCode, saveProfile, signOut, deleteAccount],
+    () => ({ ...state, sendCode, quickJoin, addEmail, confirmEmail, verifyCode, saveProfile, signOut, deleteAccount }),
+    [state, sendCode, quickJoin, addEmail, confirmEmail, verifyCode, saveProfile, signOut, deleteAccount],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

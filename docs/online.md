@@ -33,9 +33,10 @@ Everything is in `supabase/schema.sql`, which is safe to run again after changes
 1. **Authentication → URL Configuration**
    - Site URL: `https://lurelens.netlify.app`
    - Redirect URLs: `https://lurelens.netlify.app/**`, `https://thespaceio.github.io/LureLens/**`, `http://localhost:5173/**`
-2. **Authentication → Emails → Templates**: in both **Magic link** and **Confirm signup**, use the code template below so the email contains the 6-digit code (the app asks for the code, which works even when the email opens in another browser).
+2. **Authentication → Emails → Templates**: in **Magic link**, **Confirm signup** and **Change email address**, use the code template below so the email contains the 6-digit code (the app asks for the code, which works even when the email opens in another browser).
 3. **Authentication → Emails → SMTP settings**: connect an email service (Resend, Brevo, ...). Without it Supabase only emails members of the Supabase team, a few times an hour. Then raise the email rate limit under **Authentication → Rate Limits** to suit (for example 100 an hour).
-4. **Realtime → Settings**: keep public channels allowed (the scoreboard signal uses the public channel `scoreboard`). If live updates don't arrive, the board still refreshes every minute.
+4. **Authentication → Sign In / Providers**: turn on **Allow anonymous sign-ins**. This powers *Quick join*: players pick a username and post straight away with no email (useful in a class while email sending is limited). Quick-join accounts live on one device until the player adds an email. Supabase allows about 30 new quick joins per hour from one IP address, and a class on shared Wi-Fi counts as one address; if **Authentication → Rate Limits** shows an anonymous users setting, raise it before a big session.
+5. **Realtime → Settings**: keep public channels allowed (the scoreboard signal uses the public channel `scoreboard`). If live updates don't arrive, the board still refreshes every minute.
 
 Email template (subject: `Your LureLens sign-in code`):
 
@@ -44,6 +45,7 @@ Email template (subject: `Your LureLens sign-in code`):
 <p>Enter this code in LureLens:</p>
 <p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
 <p>Or <a href="{{ .ConfirmationURL }}">sign in with this link</a> on the device where you are playing.</p>
+<!-- In "Change email address", say "confirm your email" instead of "sign in". -->
 <p>If you didn't ask for this, you can ignore this email.</p>
 ```
 

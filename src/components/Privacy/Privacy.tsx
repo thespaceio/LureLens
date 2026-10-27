@@ -39,7 +39,8 @@ export function Privacy() {
         <ul className="list-disc space-y-1 pl-5">
           <li>
             <strong className="text-foreground">Email address:</strong> to send your sign-in code. It is never shown to
-            other players and we don't send newsletters or marketing.
+            other players and we don't send newsletters or marketing. Quick-join accounts have no email until you choose to
+            add one.
           </li>
           <li>
             <strong className="text-foreground">Username:</strong> public, shown on the online scoreboard and on certificate

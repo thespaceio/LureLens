@@ -13,6 +13,8 @@ export interface AuthState {
   status: 'off' | 'loading' | 'signedOut' | 'signedIn';
   userId: string | null;
   email: string | null;
+  /** A quick-join account (no email): lives only on this device until an email is added. */
+  anonymous: boolean;
   /** Null when signed in but no username chosen yet. */
   profile: Profile | null;
   profileLoaded: boolean;
@@ -20,6 +22,11 @@ export interface AuthState {
 
 export interface Auth extends AuthState {
   sendCode: (email: string) => Promise<void>;
+  /** Creates a quick-join account without an email. */
+  quickJoin: () => Promise<void>;
+  /** Quick-join accounts: send a code to an email to keep the account. */
+  addEmail: (email: string) => Promise<void>;
+  confirmEmail: (email: string, code: string) => Promise<void>;
   verifyCode: (email: string, code: string) => Promise<void>;
   saveProfile: (profile: Profile) => Promise<Profile>;
   signOut: () => Promise<void>;
@@ -30,15 +37,19 @@ const noop = async () => {
   throw new Error('Online features are not set up.');
 };
 
-export const SIGNED_OUT: AuthState = { status: 'signedOut', userId: null, email: null, profile: null, profileLoaded: true };
+export const SIGNED_OUT: AuthState = { status: 'signedOut', userId: null, email: null, anonymous: false, profile: null, profileLoaded: true };
 
 export const AuthContext = createContext<Auth>({
   status: 'off',
   userId: null,
   email: null,
+  anonymous: false,
   profile: null,
   profileLoaded: true,
   sendCode: noop,
+  quickJoin: noop,
+  addEmail: noop,
+  confirmEmail: noop,
   verifyCode: noop,
   saveProfile: noop,
   signOut: noop,

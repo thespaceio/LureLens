@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, BadgeCheck, Cloud, Globe, Loader2, LogOut, Mail, Trash2, Trophy, UserRound } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, Cloud, Globe, Loader2, LogOut, Mail, Trash2, Trophy, UserRound, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/authContext';
@@ -201,10 +201,143 @@ function SignIn({ onPrivacy }: { onPrivacy: () => void }) {
           </p>
         )}
       </section>
+      <QuickJoin onPrivacy={onPrivacy} />
+
       <p className="text-sm text-muted-foreground">
         You can always play without an account. Your scores then stay on this device.
       </p>
     </>
+  );
+}
+
+/** Join with just a username: an account without an email, for classes and events. */
+function QuickJoin({ onPrivacy }: { onPrivacy: () => void }) {
+  const auth = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const join = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      await auth.quickJoin();
+    } catch (e) {
+      setError(message(e));
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="space-y-3 rounded-xl border border-lavender/40 bg-card p-5" aria-labelledby="quick-join-heading" data-testid="quick-join">
+      <h2 id="quick-join-heading" className="flex items-center gap-2 text-lg font-semibold">
+        <Zap className="size-5 text-lavender" /> Quick join, no email
+      </h2>
+      <p className="text-sm text-muted-foreground">
+        In a class or at an event? Pick a username and post to the live scoreboard straight away. The account lives only on
+        this device; you can add your email later to keep it.
+      </p>
+      <Button size="lg" variant="secondary" className="h-12 w-full gap-2 font-semibold" onClick={() => void join()} disabled={busy} data-testid="quick-join-button">
+        {busy ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />} Quick join with a username
+      </Button>
+      {error && (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+      <p className="text-xs text-muted-foreground">
+        By continuing you agree to the{' '}
+        <button type="button" onClick={onPrivacy} className="text-lavender underline underline-offset-2 hover:text-foreground">
+          privacy notice
+        </button>
+        .
+      </p>
+    </section>
+  );
+}
+
+/** Quick-join accounts: add an email (with a code) to keep the account and use it on other devices. */
+function AddEmail() {
+  const auth = useAuth();
+  const [email, setEmail] = useState('');
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [done, setDone] = useState(false);
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError('');
+    try {
+      await fn();
+    } catch (e) {
+      setError(message(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (done || !auth.anonymous) {
+    return (
+      <p className="flex items-center gap-2 rounded-xl border border-primary/50 bg-card p-4 text-sm">
+        <BadgeCheck className="size-4 text-primary" /> Email added. You can now sign in with it on any device.
+      </p>
+    );
+  }
+
+  return (
+    <section className="space-y-3 rounded-xl border border-lavender/50 bg-card p-5 text-sm" data-testid="add-email">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <Zap className="size-4 text-lavender" /> Quick-join account
+      </h2>
+      <p className="text-muted-foreground">
+        This account lives only on this device. Add your email to keep it if you change phones or clear your browser, and to
+        sign in on other devices.
+      </p>
+      {!sentTo ? (
+        <form
+          className="flex flex-wrap gap-2"
+          onSubmit={e => {
+            e.preventDefault();
+            void run(async () => {
+              await auth.addEmail(email);
+              setSentTo(email.trim());
+            });
+          }}
+        >
+          <label htmlFor="add-email" className="sr-only">Email address</label>
+          <Input id="add-email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className="h-11 min-w-0 flex-1 bg-background" />
+          <Button type="submit" disabled={busy || !/^\S+@\S+\.\S+$/.test(email.trim())}>
+            {busy && <Loader2 className="size-4 animate-spin" />} Send code
+          </Button>
+        </form>
+      ) : (
+        <form
+          className="flex flex-wrap gap-2"
+          onSubmit={e => {
+            e.preventDefault();
+            void run(async () => {
+              await auth.confirmEmail(sentTo, code);
+              setDone(true);
+            });
+          }}
+        >
+          <label htmlFor="add-email-code" className="sr-only">Code from the email</label>
+          <Input id="add-email-code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={e => setCode(e.target.value.replace(/[^\d]/g, ''))} placeholder="123456" className="h-11 w-40 bg-background font-mono tracking-[0.3em]" />
+          <Button type="submit" disabled={busy || code.length < 6}>
+            {busy && <Loader2 className="size-4 animate-spin" />} Confirm
+          </Button>
+          <button type="button" className="text-lavender underline underline-offset-2" onClick={() => setSentTo(null)}>
+            Different email
+          </button>
+        </form>
+      )}
+      {error && (
+        <p className="text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -260,7 +393,11 @@ function ProfileForm({ firstTime = false, onDone, onPrivacy }: { firstTime?: boo
       }}
     >
       <h2 className="text-lg font-semibold">{firstTime ? 'Choose your username' : 'Edit your profile'}</h2>
-      {firstTime && <p className="text-sm text-muted-foreground">Signed in as {auth.email}. One more step.</p>}
+      {firstTime && (
+        <p className="text-sm text-muted-foreground">
+          {auth.anonymous ? 'Quick join: choose the name the scoreboard will show.' : `Signed in as ${auth.email}. One more step.`}
+        </p>
+      )}
       {field('username', 'Username', 'Public: shown on the scoreboard. Letters from any language are fine.', 24, true)}
       {field('full_name', 'Full name', 'Private: only printed on your certificate and its check page.', 48)}
       {field('organisation', 'School or organisation', 'Private for now. Helps us plan school and team boards.', 80)}
@@ -298,6 +435,8 @@ function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<
   const [confirm, setConfirm] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  // Remember a quick-join start, so the "Email added" note stays after the account gets its email.
+  const [quickJoined] = useState(auth.anonymous);
 
   const mine = sessions.filter(s => s.userId === auth.userId);
   const pending = mine.filter(s => !s.synced).length;
@@ -340,7 +479,7 @@ function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
             {[
               ['Username (public)', profile.username],
-              ['Email (private)', auth.email ?? ''],
+              ['Email (private)', auth.email ?? (auth.anonymous ? 'None (quick join)' : '')],
               ['Full name for certificates (private)', profile.full_name || 'Not set'],
               ['School or organisation (private)', profile.organisation || 'Not set'],
             ].map(([label, value]) => (
@@ -356,14 +495,16 @@ function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<
         </section>
       )}
 
+      {(auth.anonymous || quickJoined) && <AddEmail />}
+
       <section className="space-y-2 rounded-xl border border-border bg-card p-5 text-sm" data-testid="sync-card">
         <h2 className="flex items-center gap-2 font-semibold">
           <Cloud className="size-4 text-lavender" /> Your games
         </h2>
         <p className="text-muted-foreground">
           {mine.length} game{mine.length === 1 ? '' : 's'} in your account
-          {pending ? `, ${pending} waiting to sync (they upload when you're online)` : ', all synced'}. Sign in on another
-          device to carry on there.
+          {pending ? `, ${pending} waiting to sync (they upload when you're online)` : ', all synced'}.
+          {auth.anonymous ? ' Add your email above to carry on on another device.' : ' Sign in on another device to carry on there.'}
         </p>
         <p className="flex items-center gap-2 text-muted-foreground">
           <Globe className="size-4" /> Games only appear on the online scoreboard when you tap "Post" after a game.
@@ -412,9 +553,19 @@ function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<
 
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-5 text-sm">
         <p className="text-muted-foreground">
-          Signing out removes your games from this device. They stay in your account.
+          {auth.anonymous
+            ? "Quick-join accounts can't be signed back into. If you sign out without adding an email, this account is gone (your posted scores stay on the board)."
+            : 'Signing out removes your games from this device. They stay in your account.'}
         </p>
-        <Button variant="outline" className="gap-2 bg-transparent" onClick={() => void auth.signOut()} data-testid="sign-out">
+        <Button
+          variant="outline"
+          className="gap-2 bg-transparent"
+          onClick={() => {
+            if (auth.anonymous && !window.confirm("Sign out of this quick-join account? You won't be able to sign back in to it.")) return;
+            void auth.signOut();
+          }}
+          data-testid="sign-out"
+        >
           <LogOut className="size-4" /> Sign out
         </Button>
       </section>
