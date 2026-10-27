@@ -49,6 +49,12 @@ Email template (subject: `Your LureLens sign-in code`):
 <p>If you didn't ask for this, you can ignore this email.</p>
 ```
 
+### Keeping the project awake
+
+Free Supabase projects pause after 7 days without activity, which would take the scoreboard, accounts and certificate checks offline. The **Keep Supabase awake** workflow (`.github/workflows/keep-alive.yml`) asks the scoreboard for its top score once a day, using only the public key, so the project never sits idle. Run it any time from **Actions → Keep Supabase awake → Run workflow**. If it fails, the project may already be paused: restore it from the Supabase dashboard.
+
+GitHub turns off scheduled workflows after 60 days without commits to the repository and emails the owner; re-enable it from the same Actions page.
+
 ## When the messages change
 
 `npm run check:data` fails until the answer key is regenerated:

@@ -1,0 +1,52 @@
+# Keeps the Supabase project awake.
+# Free Supabase projects pause after 7 days without activity, and a paused
+# project takes the online scoreboard, accounts and certificate checks offline
+# until someone restores it in the dashboard. This asks the scoreboard for its
+# top score once a day, the same read any visitor makes, which counts as
+# activity. It uses only the public key from src/onlineConfig.ts.
+#
+# Note: GitHub turns off scheduled workflows in a repository with no commits for
+# 60 days. If that happens, GitHub emails the owner; re-enable it under
+# Actions → Keep Supabase awake → Enable workflow.
+name: Keep Supabase awake
+
+on:
+  schedule:
+    - cron: '17 6 * * *' # every day at 06:17 UTC (07:17 in Lagos)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: src/onlineConfig.ts
+          sparse-checkout-cone-mode: false
+      - name: Ask the scoreboard for its top score
+        run: |
+          URL=$(grep -o "https://[a-z0-9]*\.supabase\.co" src/onlineConfig.ts | head -1)
+          KEY=$(grep -o "sb_publishable_[A-Za-z0-9_-]*" src/onlineConfig.ts | head -1)
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "Online features are off (no Supabase URL or key in src/onlineConfig.ts). Nothing to keep awake."
+            exit 0
+          fi
+          for attempt in 1 2 3; do
+            status=$(curl -sS -o response.json -w '%{http_code}' --max-time 30 \
+              -X POST "$URL/rest/v1/rpc/leaderboard" \
+              -H "apikey: $KEY" -H "Content-Type: application/json" \
+              -d '{"p_limit": 1}') || status=000
+            echo "Attempt $attempt: HTTP $status"
+            if [ "$status" = "200" ]; then
+              echo "Scoreboard is awake."
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::error::The scoreboard didn't answer. If the project is paused, restore it at https://supabase.com/dashboard (project LureLens)."
+          cat response.json 2>/dev/null || true
+          exit 1

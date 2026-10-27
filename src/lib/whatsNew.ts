@@ -6,11 +6,12 @@ const SEEN_KEY = 'lurelens_seen_version';
 /**
  * What to show this browser:
  * - 'none': new player, or already seen this version's note
- * - 'update': played 2.0 or later and saw its note; show what's new since
+ * - 'update': saw the previous version's note; show what's new in this one
+ * - 'since-2.0': last saw the 2.0 note, so also show what 2.1 added
  * - 'renamed': played back when the game was PhishGuard (before 2.0), so the
  *   note also explains the rename and everything 2.0 added
  */
-export type WhatsNewKind = 'none' | 'update' | 'renamed';
+export type WhatsNewKind = 'none' | 'update' | 'since-2.0' | 'renamed';
 
 export function whatsNewFor(hasHistory: boolean): WhatsNewKind {
   try {
@@ -21,7 +22,8 @@ export function whatsNewFor(hasHistory: boolean): WhatsNewKind {
       localStorage.setItem(SEEN_KEY, APP_VERSION);
       return 'none';
     }
-    return seen === null ? 'renamed' : 'update';
+    if (seen === null) return 'renamed';
+    return seen.startsWith('2.0') ? 'since-2.0' : 'update';
   } catch {
     return 'none';
   }

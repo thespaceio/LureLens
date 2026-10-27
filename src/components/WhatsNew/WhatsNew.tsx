@@ -1,10 +1,20 @@
-import { Award, BadgeCheck, Flag, Globe, MessageSquareText, Phone, Sparkles, Users } from 'lucide-react';
+import { Award, BadgeCheck, Flag, Globe, Lock, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { APP_VERSION, REPO_URL } from '@/lib/report';
 
-// New in 2.1: shown to everyone returning.
+// New in 2.2: shown to everyone returning.
 const LATEST = [
+  { icon: UserRound, title: 'Accounts', text: 'Sign in with your email and a 6-digit code, no password. Your username is yours alone, and your progress and certificate follow you to every device.' },
+  { icon: Zap, title: 'Quick join', text: 'In a class or at an event, join with just a username and post your score straight away, no email needed.' },
+  { icon: Radio, title: 'Live scoreboard', text: 'New scores appear within seconds, and the top players of the week are on the home screen.' },
+  { icon: MonitorPlay, title: 'Big-screen view', text: 'Put the live scoreboard on a projector, with a QR code so everyone in the room can join.' },
+  { icon: Lock, title: 'Your data, your choice', text: 'Playing without an account works as before. A privacy notice explains what is stored, and you can delete your account at any time.' },
+];
+
+// New in 2.1: also shown to players who last saw the 2.0 note.
+const SINCE_20 = [
   { icon: Globe, title: 'Online scoreboard', text: 'After a ranked game, post your score and see how you rank against players everywhere, this week or all time.' },
   { icon: BadgeCheck, title: 'Checkable certificates', text: 'Make your certificate checkable online, so employers and trainers can confirm it from its reference.' },
 ];
@@ -20,13 +30,14 @@ const SINCE_PHISHGUARD = [
 
 interface WhatsNewProps {
   open: boolean;
-  renamed: boolean;
+  kind: WhatsNewKind;
   onClose: () => void;
   onScoreboard: () => void;
 }
 
-export function WhatsNew({ open, renamed, onClose, onScoreboard }: WhatsNewProps) {
-  const items = renamed ? [...LATEST, ...SINCE_PHISHGUARD] : LATEST;
+export function WhatsNew({ open, kind, onClose, onScoreboard }: WhatsNewProps) {
+  const renamed = kind === 'renamed';
+  const items = renamed ? [...LATEST, ...SINCE_20, ...SINCE_PHISHGUARD] : kind === 'since-2.0' ? [...LATEST, ...SINCE_20] : LATEST;
   return (
     <Dialog open={open} onOpenChange={o => !o && onClose()}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] gap-0 overflow-y-auto border-border bg-card p-0 sm:max-w-lg" data-testid="whats-new">
@@ -35,12 +46,12 @@ export function WhatsNew({ open, renamed, onClose, onScoreboard }: WhatsNewProps
             <Sparkles className="size-4" /> LureLens {APP_VERSION}
           </p>
           <DialogTitle className="text-xl font-semibold">
-            {renamed ? 'PhishGuard is now LureLens' : 'The online scoreboard is here'}
+            {renamed ? 'PhishGuard is now LureLens' : 'Accounts and a live scoreboard'}
           </DialogTitle>
           <DialogDescription className="mt-1 text-sm text-muted-foreground">
             {renamed
               ? 'New name, same mission, and a lot more to practise on. Your scores and progress came with you.'
-              : 'Your scores stay on your device as before. Posting online is your choice, one game at a time.'}
+              : 'Sign in, or quick join with just a username, to post scores and keep your progress on every device.'}
           </DialogDescription>
         </div>
         <ul className="space-y-3 px-6 py-5">
