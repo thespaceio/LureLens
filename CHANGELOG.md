@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### New
+- **Moderation.** Moderators get a Moderation page from their Account. It lists recent online games, flags likely scripted ones (perfect and very fast), and hides a single score or a whole player from the scoreboard, class boards and certificate checks in a tap. Nothing is deleted, anything can be restored, and every change is logged with who, when and why. Moderators are added by hand in the database ([docs/online.md](docs/online.md#moderation)).
+
+### Changed
+- The privacy notice explains the moderation record.
+
 ## 2.3.1 (28 October 2026)
 
 ### Security

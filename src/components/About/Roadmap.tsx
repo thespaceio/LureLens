@@ -42,11 +42,9 @@ const PHASES: Phase[] = [
       'A security review, with every finding fixed or documented',
       'An accessibility review of every screen and every training email',
       'Uptime alerts, so an outage is noticed and fixed quickly',
+      'Moderation, so offensive names or fake scores can be hidden in a tap',
     ],
-    rolling: [
-      'Sign in by email for everyone, on our own domain',
-      'Moderation, so offensive names or fake scores can be hidden quickly',
-    ],
+    rolling: ['Sign in by email for everyone, on our own domain'],
   },
   {
     n: 2,
