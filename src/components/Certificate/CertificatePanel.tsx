@@ -56,7 +56,7 @@ export function CertificatePanel({ sessions, name, onPlay, onPosted, signedIn = 
                     </div>
                   </div>
                   {passedWith ? (
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary" aria-label="Passed">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary" role="img" aria-label="Passed">
                       <Check className="size-4" />
                     </span>
                   ) : (

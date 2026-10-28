@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Security
+- **Security review** of the app, database, hosting and build: findings, fixes and accepted risks are in [docs/security-review.md](docs/security-review.md).
+- Online history can't be used as free storage or flooded: games are capped at 8 KB, with limits per account, per quick-join account and overall.
+- Quick-join accounts that never chose a username are removed after 7 days.
+- Built pages carry a Content Security Policy and a referrer policy; the two inline scripts moved to `boot.js`.
+- Test tooling upgraded (Vitest 5); `npm audit` reports no vulnerabilities.
+
+### Accessibility
+- Every screen checked with axe on laptop and phone sizes, and all 80 training emails checked for contrast.
+- Keyboard hints on buttons and the counts in level settings are easier to read.
+- Wide tables (scoreboards, recent games) can be scrolled with the keyboard and are announced by name.
+- The "Passed" badge on certificates is announced properly by screen readers.
+- Nine training emails had brand text or buttons too faint to read; their colours are adjusted. Which messages are phishing, and why, is unchanged.
+
+### Reliability
+- **Uptime alerts.** Every 30 minutes a check opens the game and the scoreboard. If either is down it opens one GitHub issue (which emails watchers) and closes it when they're back. It also keeps the free Supabase project awake, replacing the daily keep-alive.
+
 ## 2.3.0 (28 October 2026)
 
 ### New

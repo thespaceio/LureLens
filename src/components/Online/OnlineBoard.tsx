@@ -98,7 +98,7 @@ export function OnlineBoard({ level, onBigScreen }: { level: Level | 'all'; onBi
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-card">
+        <div className="overflow-x-auto rounded-xl border border-border bg-card focus-visible:outline-2 focus-visible:outline-primary" tabIndex={0} role="region" aria-label="Online scores">
           <table className="w-full text-sm" data-testid="online-table">
             <thead>
               <tr className="border-b border-border font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground">

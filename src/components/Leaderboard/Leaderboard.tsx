@@ -126,7 +126,7 @@ export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: Leade
             })}
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+          <div className="overflow-x-auto rounded-xl border border-border bg-card focus-visible:outline-2 focus-visible:outline-primary" tabIndex={0} role="region" aria-label="Scores on this device">
             <table className="w-full text-sm" data-testid="leaderboard-table">
               <thead>
                 <tr className="border-b border-border font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground">

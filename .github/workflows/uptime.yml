@@ -1,0 +1,120 @@
+# Uptime check: is LureLens up, and is the online side answering?
+#
+# Every 30 minutes this opens the game's main address (from src/lib/site.ts) and
+# asks the scoreboard for its top score (Supabase URL and public key from
+# src/onlineConfig.ts), retrying a few times so a single slow answer isn't an
+# alarm.
+#
+# When something is down it opens one GitHub issue labelled "uptime", which
+# GitHub emails to everyone watching the repository. While it stays down the
+# same issue is reused, so there is one email when it breaks, not one every half
+# hour. When everything answers again the issue is closed with a note, which
+# emails again. Nothing else is posted.
+#
+# It also keeps the free Supabase project awake: free projects pause after 7
+# days with no activity, and the scoreboard read counts as activity. (This
+# replaces the old daily "Keep Supabase awake" workflow.)
+#
+# GitHub turns off scheduled workflows in a repository with no commits for 60
+# days, and emails the owner when it does. Re-enable it under
+# Actions → Uptime check → Enable workflow.
+name: Uptime check
+
+on:
+  schedule:
+    - cron: '7,37 * * * *' # every 30 minutes (GitHub may start it a few minutes late)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/lib/site.ts
+            src/onlineConfig.ts
+          sparse-checkout-cone-mode: false
+
+      - name: Check the game and the scoreboard
+        id: check
+        run: |
+          SITE=$(grep -o "https://[^']*" src/lib/site.ts | head -1)
+          URL=$(grep -o "https://[a-z0-9]*\.supabase\.co" src/onlineConfig.ts | head -1)
+          KEY=$(grep -o "sb_publishable_[A-Za-z0-9_-]*" src/onlineConfig.ts | head -1)
+          problems=""
+
+          site_ok=no
+          for attempt in 1 2 3; do
+            status=$(curl -sSL -o page.html -w '%{http_code}' --max-time 30 "$SITE") || status=000
+            echo "Game, attempt $attempt: HTTP $status"
+            if [ "$status" = "200" ] && grep -q "LureLens" page.html; then site_ok=yes; break; fi
+            sleep 20
+          done
+          [ "$site_ok" = yes ] || problems="${problems}- The game at $SITE didn't load (last answer: HTTP $status).\n"
+
+          if [ -n "$URL" ] && [ -n "$KEY" ]; then
+            board_ok=no
+            for attempt in 1 2 3; do
+              status=$(curl -sS -o board.json -w '%{http_code}' --max-time 30 \
+                -X POST "$URL/rest/v1/rpc/leaderboard" \
+                -H "apikey: $KEY" -H "Content-Type: application/json" \
+                -d '{"p_limit": 1}') || status=000
+              echo "Scoreboard, attempt $attempt: HTTP $status"
+              if [ "$status" = "200" ]; then board_ok=yes; break; fi
+              sleep 20
+            done
+            [ "$board_ok" = yes ] || problems="${problems}- The online scoreboard (Supabase) didn't answer (last answer: HTTP $status). If the project is paused, restore it at https://supabase.com/dashboard (project LureLens). Accounts, class boards and certificate checks are down with it; offline play still works.\n"
+          else
+            echo "Online features are off (no Supabase URL or key in src/onlineConfig.ts); skipping the scoreboard."
+          fi
+
+          printf '%b' "$problems" > problems.md
+          if [ -s problems.md ]; then
+            echo "down=yes" >> "$GITHUB_OUTPUT"
+            echo "::warning::LureLens has a problem:"; cat problems.md
+          else
+            echo "down=no" >> "$GITHUB_OUTPUT"
+            echo "Everything is up."
+          fi
+
+      - name: Open an issue (once) when something is down
+        if: steps.check.outputs.down == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          open=$(gh issue list --label uptime --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            echo "Issue #$open is already open; not posting again."
+            exit 0
+          fi
+          gh label create uptime --color D93F0B --description "Raised by the uptime check" --force
+          {
+            echo "The uptime check found a problem at $(date -u '+%d %b %Y %H:%M UTC'):"
+            echo
+            cat problems.md
+            echo
+            echo "It checks every 30 minutes and will close this issue by itself when everything answers again."
+            echo "Run log: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          } > body.md
+          gh issue create --title "LureLens is down" --label uptime --body-file body.md
+
+      - name: Close the issue when everything is back
+        if: steps.check.outputs.down == 'no'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for n in $(gh issue list --label uptime --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Back up: the game and the scoreboard both answered at $(date -u '+%d %b %Y %H:%M UTC')."
+          done

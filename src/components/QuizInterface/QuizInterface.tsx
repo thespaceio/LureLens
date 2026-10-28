@@ -264,7 +264,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         >
           <ShieldCheck className="size-5" />
           Legitimate
-          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">L</kbd>
+          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-70 sm:inline">L</kbd>
         </Button>
         <Button
           variant="outline"
@@ -275,7 +275,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         >
           <ShieldAlert className="size-5" />
           Phishing
-          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">P</kbd>
+          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-70 sm:inline">P</kbd>
         </Button>
         <Button
           variant="outline"
@@ -288,7 +288,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           <Phone className="size-4" />
           <span>Verify first</span>
           <span className="hidden font-normal opacity-80 sm:inline">: check through the official app or a number I trust</span>
-          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">V</kbd>
+          <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-70 sm:inline">V</kbd>
         </Button>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">

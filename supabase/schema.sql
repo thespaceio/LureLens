@@ -95,6 +95,12 @@ alter table public.certificates
   add constraint certificates_intermediate_id_fkey foreign key (intermediate_id) references public.scores (id) on delete cascade,
   add constraint certificates_advanced_id_fkey foreign key (advanced_id) references public.scores (id) on delete cascade;
 
+-- Deleting a game or an account looks certificates up by these.
+create index if not exists certificates_by_user on public.certificates (user_id);
+create index if not exists certificates_beginner on public.certificates (beginner_id);
+create index if not exists certificates_intermediate on public.certificates (intermediate_id);
+create index if not exists certificates_advanced on public.certificates (advanced_id);
+
 -- A signed-in player's own game history, synced between their devices.
 -- `data` is the game as the app saves it (src/types.ts GameSession).
 create table if not exists public.games (
@@ -106,6 +112,18 @@ create table if not exists public.games (
   primary key (user_id, id)
 );
 create index if not exists games_by_user on public.games (user_id, played_at desc);
+create index if not exists games_recent on public.games (created_at desc);
+-- A saved game is about 1.3 KB; 8 KB leaves plenty of room and stops anyone
+-- using history as free storage (security review, October 2026).
+do $$
+begin
+  if exists (select 1 from pg_constraint where conname = 'games_data_check' and conrelid = 'public.games'::regclass) then
+    alter table public.games drop constraint games_data_check;
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'games_data_size' and conrelid = 'public.games'::regclass) then
+    alter table public.games add constraint games_data_size check (pg_column_size(data) < 8192) not valid;
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- Access: tables closed except a player's own profile and history.
@@ -134,16 +152,27 @@ drop policy if exists "Players delete their own games" on public.games;
 create policy "Players delete their own games" on public.games
   for delete to authenticated using ((select auth.uid()) = user_id);
 
--- Keep history to a sensible size per player.
+-- Keep history to a sensible size per player, and stop floods: quick-join
+-- accounts are free to create, so limits also apply across everyone.
 create or replace function public.lurelens_games_limit()
 returns trigger
 language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_anonymous boolean := coalesce((select is_anonymous from auth.users where id = new.user_id), false);
+  v_max integer;
 begin
-  if (select count(*) from games where user_id = new.user_id) >= 2000 then
-    raise exception 'Your history is full (2,000 games).' using errcode = '22023';
+  v_max := case when v_anonymous then 300 else 2000 end;
+  if (select count(*) from games where user_id = new.user_id) >= v_max then
+    raise exception 'Your history is full. Add an email to your account to keep more games.' using errcode = '22023';
+  end if;
+  if (select count(*) from games where user_id = new.user_id and created_at > now() - interval '10 minutes') >= 200 then
+    raise exception 'Too many games saved in a short time. Try again in a few minutes.' using errcode = '22023';
+  end if;
+  if (select count(*) from games where created_at > now() - interval '10 minutes') >= 1000 then
+    raise exception 'LureLens is busy. Your games will sync in a few minutes.' using errcode = '22023';
   end if;
   return new;
 end;

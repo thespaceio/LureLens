@@ -2,13 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script>
-      // The game used to live at phishguard-by-faith.netlify.app. Send visitors
-      // from that old address to the new one, keeping the path.
-      if (location.hostname === 'phishguard-by-faith.netlify.app') {
-        location.replace('https://thespaceio.github.io/LureLens' + location.pathname + location.search + location.hash);
-      }
-    </script>
+    <!-- Content-Security-Policy is added here at build time (see vite.config.ts). -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <script src="./boot.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="LureLens by Th3 SpaceIO: a timed phishing-detection training game with Nigerian scenarios, three levels and a scoreboard." />
     <meta name="theme-color" content="#1B1035" />
@@ -44,13 +40,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      // Register the offline service worker in production builds only.
-      if ('serviceWorker' in navigator && !/localhost:5173/.test(location.host)) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js').catch(() => {});
-        });
-      }
-    </script>
   </body>
 </html>

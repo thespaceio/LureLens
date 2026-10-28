@@ -168,7 +168,7 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
 
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-3 font-semibold">Recent games</h2>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary" tabIndex={0} role="region" aria-label="Recent games">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground">

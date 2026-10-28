@@ -49,6 +49,42 @@ function precacheServiceWorker(): Plugin {
   }
 }
 
+/**
+ * Adds a Content Security Policy to the built page (not in dev, where Vite
+ * needs inline scripts). Scripts only from LureLens itself; network calls only
+ * to the Supabase project; fonts from Google Fonts. Inline styles stay allowed:
+ * React style attributes and the email viewer's shadow-root styles need them.
+ * Keep the default URL in step with src/onlineConfig.ts.
+ */
+function contentSecurityPolicy(): Plugin {
+  const supabase = process.env.VITE_SUPABASE_URL ?? 'https://rxyhvpdbfuboukqgbych.supabase.co'
+  const connect = ["'self'"]
+  if (supabase) connect.push(supabase, supabase.replace(/^http/, 'ws'))
+  const policy = [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: blob:",
+    `connect-src ${connect.join(' ')}`,
+    "worker-src 'self'",
+    "manifest-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ')
+  return {
+    name: 'lurelens-content-security-policy',
+    apply: 'build',
+    transformIndexHtml(html) {
+      return html.replace(
+        '<!-- Content-Security-Policy is added here at build time (see vite.config.ts). -->',
+        `<meta http-equiv="Content-Security-Policy" content="${policy}" />`,
+      )
+    },
+  }
+}
+
 const pkg = JSON.parse(readFileSync(path.resolve(__dirname, "package.json"), "utf8")) as { version: string }
 
 // https://vite.dev/config/
@@ -62,7 +98,7 @@ export default defineConfig({
     // The email bank is bundled into the main chunk on purpose (works offline).
     chunkSizeWarningLimit: 700,
   },
-  plugins: [react(), precacheServiceWorker()],
+  plugins: [react(), precacheServiceWorker(), contentSecurityPolicy()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

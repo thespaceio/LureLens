@@ -50,9 +50,15 @@ Email template (subject: `Your LureLens sign-in code`):
 <p>If you didn't ask for this, you can ignore this email.</p>
 ```
 
-### Keeping the project awake
+### Uptime alerts, and keeping the project awake
 
-Free Supabase projects pause after 7 days without activity, which would take the scoreboard, accounts and certificate checks offline. The **Keep Supabase awake** workflow (`.github/workflows/keep-alive.yml`) asks the scoreboard for its top score once a day, using only the public key, so the project never sits idle. Run it any time from **Actions → Keep Supabase awake → Run workflow**. If it fails, the project may already be paused: restore it from the Supabase dashboard.
+The **Uptime check** workflow (`.github/workflows/uptime.yml`) runs every 30 minutes. It opens the game's main address and asks the scoreboard for its top score (using only the public key), retrying a few times before it calls anything down.
+
+- **When something is down** it opens one issue titled "LureLens is down", labelled `uptime`, saying what failed. GitHub emails it to everyone watching the repository, so make sure you're watching (**Watch → All activity**, or at least issues). While it stays down, that issue is reused: one email when it breaks, not one every half hour.
+- **When everything answers again** it closes the issue with a note, which emails again.
+- Run it any time from **Actions → Uptime check → Run workflow**.
+
+Because it reads the scoreboard every half hour, it also stops the free Supabase project pausing after 7 idle days (this replaces the old daily "Keep Supabase awake" workflow). If the issue says the scoreboard didn't answer, the project may be paused: restore it from the Supabase dashboard. Offline play keeps working either way.
 
 GitHub turns off scheduled workflows after 60 days without commits to the repository and emails the owner; re-enable it from the same Actions page.
 
