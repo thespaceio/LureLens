@@ -39,10 +39,13 @@ const PHASES: Phase[] = [
       'Certificates anyone can check online',
       'A privacy notice, and deleting your account removes everything stored with it',
       "A live class board: results appear on the facilitator's screen as students finish",
+      'A security review, with every finding fixed or documented',
+      'An accessibility review of every screen and every training email',
+      'Uptime alerts, so an outage is noticed and fixed quickly',
     ],
     rolling: [
       'Sign in by email for everyone, on our own domain',
-      'An accessibility review',
+      'Moderation, so offensive names or fake scores can be hidden quickly',
     ],
   },
   {
