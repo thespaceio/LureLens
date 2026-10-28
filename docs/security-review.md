@@ -34,11 +34,12 @@ LureLens is a free awareness game, so the main things to protect are players' ac
 - **Training emails can't do anything.** They are bundled with the app, cleaned with DOMPurify, shown inside a shadow root, every link is disabled, and remote images are removed so opening one never tells anyone.
 - **No secrets in the code or its history.** Only the publishable key is in the app, which is public by design.
 - **Deleting an account deletes everything** (cascading deletes, tested).
+- **Moderation is server-checked.** Moderators are listed by hand in a closed table. Every moderation function checks it, hides rather than deletes, and logs who did what. Players can't see or change the list or the log (tested).
 - **Live updates leak nothing.** The scoreboard signal carries only the level; a class signal carries nothing and goes only to that class's channel.
 
 ## Accepted risks
 
-- **Scripted perfect scores.** The game runs in the browser, so the answer key ships with it, and a determined person could script a perfect, fast game. The server stops made-up scores and floods, but not a script that answers correctly. For an awareness game this is acceptable; bad entries can be hidden (and the planned admin view will make that one tap).
+- **Scripted perfect scores.** The game runs in the browser, so the answer key ships with it, and a determined person could script a perfect, fast game. The server stops made-up scores and floods, but not a script that answers correctly. For an awareness game this is acceptable. Moderators can hide such entries in a tap, and likely scripted games (perfect and very fast) are flagged for them to review.
 - **Class boards are readable by anyone with the code**, for a day. They show only usernames, which are already public, and scores.
 - **Certificate checks are public by reference**, which is their purpose. References are random.
 - **No clickjacking protection.** GitHub Pages can't send the header that forbids framing, and the page has no actions worth tricking someone into.

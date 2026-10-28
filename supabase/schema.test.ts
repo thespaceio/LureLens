@@ -332,6 +332,106 @@ describe('certificates', () => {
   });
 });
 
+describe('moderation', () => {
+  type ModRow = { id: string; player_id: string | null; name: string; hidden: boolean; player_hidden: boolean; flags: string[] };
+  const review = (uid: string | null, view = 'recent', search: string | null = null) =>
+    as<ModRow>(uid, 'select * from moderation_scores($1, $2, 200)', [view, search]);
+  const hideScore = (uid: string, id: string, hidden: boolean, reason: string | null = null) =>
+    as(uid, 'select moderate_score($1, $2, $3)', [id, hidden, reason]);
+  const hidePlayer = (uid: string, id: string, hidden: boolean, reason: string | null = null) =>
+    as(uid, 'select moderate_player($1, $2, $3)', [id, hidden, reason]);
+  const board = (level: string) => as<{ name: string }>(null, 'select * from leaderboard($1, null, 100)', [level]).then(b => b.map(r => r.name));
+
+  it('is closed to everyone but moderators', async () => {
+    expect(await refusal(as(null, 'select is_moderator()'))).not.toBeNull();
+    expect((await as<{ m: boolean }>(BOLA, 'select is_moderator() as m'))[0].m).toBe(false);
+    for (const uid of [null, BOLA]) {
+      expect(await refusal(review(uid))).not.toBeNull();
+      expect(await refusal(as(uid, 'select * from moderation_history(10)'))).not.toBeNull();
+      expect(await refusal(as(uid, 'select * from moderators'))).not.toBeNull();
+      expect(await refusal(as(uid, 'select * from moderation_log'))).not.toBeNull();
+    }
+    const any = (await db.query<{ id: string }>('select id from scores limit 1')).rows[0].id;
+    expect(await refusal(hideScore(BOLA, any, true))).toMatch(/permission denied|Only moderators/);
+    expect(await refusal(hidePlayer(BOLA, ADA, true))).toMatch(/permission denied|Only moderators/);
+
+    // Moderators are added by hand in the SQL editor.
+    await db.exec(`insert into moderators (user_id) values ('${DAN}')`);
+    expect((await as<{ m: boolean }>(DAN, 'select is_moderator() as m'))[0].m).toBe(true);
+  });
+
+  it('lists recent games, flags likely scripted ones, and searches by name', async () => {
+    const recent = await review(DAN);
+    expect(recent.length).toBeGreaterThan(5);
+    // The 2.1 guest game averaged 1.3 seconds a message: faster than anyone reads.
+    const johnny = recent.find(r => r.name === 'Johnny')!;
+    expect(johnny.player_id).toBeNull();
+    expect(johnny.flags).toEqual(['very_fast']);
+    expect((await review(DAN, 'flagged')).map(r => r.name)).toContain('Johnny');
+    expect((await review(DAN, 'flagged')).every(r => r.flags.length > 0)).toBe(true);
+    const bolas = await review(DAN, 'recent', 'BOL');
+    expect(bolas.length).toBeGreaterThan(0);
+    expect(bolas.every(r => r.name === 'Bola')).toBe(true);
+  });
+
+  it('hides and restores a single score, with a live refresh and a log entry', async () => {
+    const johnny = (await review(DAN, 'recent', 'johnny'))[0];
+    await db.exec('delete from realtime.sent');
+    await hideScore(DAN, johnny.id, true, 'Test entry');
+    expect(await board('beginner')).not.toContain('Johnny');
+    expect((await review(DAN, 'hidden')).map(r => r.id)).toEqual([johnny.id]);
+    const sent = (await db.query<{ event: string; topic: string }>('select event, topic from realtime.sent')).rows;
+    expect(sent).toEqual([{ event: 'new_score', topic: 'scoreboard' }]);
+
+    await hideScore(DAN, johnny.id, false);
+    expect(await board('beginner')).toContain('Johnny');
+    expect(await refusal(hideScore(DAN, '00000000-0000-4000-8000-000000000999', true))).toMatch(/no longer exists/);
+    expect(await refusal(hideScore(DAN, johnny.id, true, '<script>'))).toMatch(/not allowed/);
+  });
+
+  it('hides a whole player from every board and check, and brings them back', async () => {
+    const classCode = (await db.query<{ c: string }>(`select class_code c from scores where user_id = '${ADA}' and class_code is not null limit 1`)).rows[0].c;
+    const classNames = () => as<{ name: string }>(null, 'select * from class_board($1)', [classCode]).then(b => b.map(r => r.name));
+    const cert = () => as<{ c: unknown }>(null, 'select check_certificate($1) as c', ['LL-ABCD-EFGH']).then(r => r[0].c);
+    expect(await board('advanced')).toContain('Adá Okafor');
+    expect(await classNames()).toContain('Adá Okafor');
+    expect(await cert()).not.toBeNull();
+
+    await db.exec('delete from realtime.sent');
+    await hidePlayer(DAN, ADA, true, 'Offensive name');
+    for (const level of LEVEL_ORDER) expect(await board(level)).not.toContain('Adá Okafor');
+    expect(await classNames()).not.toContain('Adá Okafor');
+    expect(await cert()).toBeNull();
+    // Open class boards refresh too.
+    const topics = (await db.query<{ topic: string }>('select topic from realtime.sent')).rows.map(r => r.topic);
+    expect(topics).toEqual(expect.arrayContaining(['scoreboard', `class:${classCode}`]));
+    // New games stay off the boards, and don't push other players down.
+    await relax();
+    const posted = await submit(ADA, 'beginner', perfect('beginner'));
+    expect(await board('beginner')).not.toContain('Adá Okafor');
+    const bola = await submit(BOLA, 'beginner', play('beginner', buildRound('beginner'), Array(10).fill('skip'), Array(10).fill(9)).answers);
+    expect(bola.rank).toBeLessThanOrEqual(bola.of!);
+    expect((await review(DAN, 'hidden')).find(r => r.id === posted.id)?.player_hidden).toBe(true);
+
+    await hidePlayer(DAN, ADA, false);
+    expect(await board('beginner')).toContain('Adá Okafor');
+    expect(await cert()).not.toBeNull();
+
+    expect(await refusal(hidePlayer(DAN, DAN, true))).toMatch(/yourself/);
+    expect(await refusal(hidePlayer(DAN, EVE, true))).toMatch(/no account/);
+  });
+
+  it('keeps a history of who did what, and why', async () => {
+    const log = await as<{ action: string; moderator: string; player: string; reason: string | null }>(DAN, 'select * from moderation_history(10)');
+    expect(log.map(l => [l.action, l.moderator, l.player, l.reason])).toEqual([
+      ['show_player', 'Dan', 'Adá Okafor', null],
+      ['hide_player', 'Dan', 'Adá Okafor', 'Offensive name'],
+      ['show_score', 'Dan', 'Johnny', null],
+      ['hide_score', 'Dan', 'Johnny', 'Test entry'],
+    ]);
+  });
+});
+
 describe('deleting an account', () => {
   it('removes the profile, history, scores and certificates', async () => {
     expect(await refusal(as(null, 'select delete_my_account()'))).not.toBeNull();
@@ -345,6 +445,10 @@ describe('deleting an account', () => {
                (select count(*)::int from certificates where reference = 'LL-ABCD-EFGH') certificates`)
     ).rows[0];
     expect(counts).toEqual({ users: 0, profiles: 0, games: 0, scores: 0, certificates: 0 });
+    // The moderation log keeps what was done, but no longer points at them.
+    const log = (await db.query<{ n: number }>(`select count(*)::int n from moderation_log where player_id = '${ADA}'`)).rows[0];
+    expect(log.n).toBe(0);
+    expect((await db.query<{ n: number }>('select count(*)::int n from moderation_log')).rows[0].n).toBe(4);
     // Other players are untouched.
     expect((await as<{ name: string }>(null, 'select * from leaderboard($1, null, 50)', ['beginner'])).some(b => b.name === 'Bola')).toBe(true);
   });

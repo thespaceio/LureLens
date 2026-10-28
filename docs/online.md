@@ -74,13 +74,43 @@ Then run the new `supabase/messages.sql` in the SQL Editor.
 
 ## Moderation
 
-In the Supabase Table Editor:
+### In the app
 
-- **Remove a game from the scoreboard or a class board:** `scores` → set `hidden` to true (or delete the row). Class results have `class_code` set.
-- **Rename an offensive username:** `profiles` → edit `username` (the scoreboard shows the new name at once).
+Moderators see **"You're a moderator"** on their Account page. **Open moderation** shows:
+
+- **Recent:** the latest games posted online, newest first, searchable by name.
+- **Flagged:** games too fast or too perfect for a person reading the messages. A perfect game averaging under 4 seconds a message, or any game under 2 seconds, is flagged. Flagged games are likely scripted, but check before hiding them.
+- **Hidden:** everything currently off the public boards.
+
+Every game has two buttons:
+
+- **Hide score** takes that one game off the scoreboard and class boards.
+- **Hide player** takes every game by that account, now and in future, off every board, and its certificate stops checking. It's there for offensive names and repeat cheats. Guest games from before accounts can only be hidden one at a time.
+
+Nothing is deleted, so **Restore** puts anything back. Open boards refresh straight away. You can add a reason, and every change is listed under **Recent actions**, showing who did it, when and why.
+
+### Adding or removing a moderator
+
+This is done by hand in the SQL Editor, never from the app:
+
+```sql
+-- add
+insert into public.moderators (user_id)
+select id from auth.users where email = 'their-email@example.com';
+
+-- remove
+delete from public.moderators
+where user_id = (select id from auth.users where email = 'their-email@example.com');
+```
+
+Only accounts with an email can moderate, not quick-join accounts.
+
+### In the Table Editor (anything else)
+
+- **Rename an offensive username:** `profiles` → edit `username`. The scoreboard shows the new name at once.
 - **Withdraw a certificate:** `certificates` → set `hidden` to true.
-- **Remove a player entirely:** Authentication → Users → delete the user (removes everything of theirs).
+- **Remove a player entirely:** Authentication → Users → delete the user. This removes everything of theirs.
 
 ## About Supabase's security advisor
 
-Expected notes: *RLS enabled, no policy* on `scores`, `messages` and `certificates` (closed on purpose), and *SECURITY DEFINER function executable* for the public functions listed above (they are the intended way in, and each checks its input). Since quick join, *Anonymous access policies* on `profiles` and `games` is expected too: quick-join players are signed-in players, and those policies only ever show a player their own rows. *Leaked password protection* doesn't apply, as LureLens has no passwords.
+Expected notes: *RLS enabled, no policy* on `scores`, `messages`, `certificates`, `moderators` and `moderation_log` (closed on purpose), and *SECURITY DEFINER function executable* for the public functions listed above and the moderation functions (they are the intended way in; each checks its input, and the moderation ones check the `moderators` table). Since quick join, *Anonymous access policies* on `profiles` and `games` is expected too: quick-join players are signed-in players, and those policies only ever show a player their own rows. *Leaked password protection* doesn't apply, as LureLens has no passwords. The *Anonymous access policies* notes on `cron.job` and `cron.job_run_details` come from pg_cron itself (used for the nightly quick-join cleanup): the `cron` schema isn't exposed to the API, and its policies only show a role its own jobs.

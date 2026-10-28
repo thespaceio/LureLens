@@ -134,3 +134,57 @@ export function checkCertificate(reference: string): Promise<CheckedCertificate 
 export function certificateLink(reference: string, base = SITE_URL): string {
   return `${base}?cert=${encodeURIComponent(reference)}`;
 }
+
+// Moderation (moderators only; the server checks, see supabase/schema.sql).
+
+export type ModerationView = 'recent' | 'flagged' | 'hidden';
+export type ModerationFlag = 'perfect_fast' | 'very_fast';
+
+export interface ModerationRow {
+  id: string;
+  /** null for guest games from before accounts. */
+  player_id: string | null;
+  name: string;
+  level: Level;
+  score: number;
+  correct: number;
+  total: number;
+  accuracy: number;
+  avg_seconds: number;
+  ranked: boolean;
+  class_code: string | null;
+  created_at: string;
+  hidden: boolean;
+  player_hidden: boolean;
+  flags: ModerationFlag[];
+}
+
+export interface ModerationEntry {
+  created_at: string;
+  action: 'hide_score' | 'show_score' | 'hide_player' | 'show_player';
+  moderator: string | null;
+  player: string | null;
+  level: Level | null;
+  score: number | null;
+  reason: string | null;
+}
+
+export function isModerator(): Promise<boolean> {
+  return rpc<boolean>('is_moderator', {});
+}
+
+export function fetchModeration(view: ModerationView, search: string): Promise<ModerationRow[]> {
+  return rpc<ModerationRow[]>('moderation_scores', { p_view: view, p_search: search.trim() || null, p_limit: 100 });
+}
+
+export function moderateScore(id: string, hidden: boolean, reason: string | null): Promise<unknown> {
+  return rpc('moderate_score', { p_id: id, p_hidden: hidden, p_reason: reason });
+}
+
+export function moderatePlayer(id: string, hidden: boolean, reason: string | null): Promise<unknown> {
+  return rpc('moderate_player', { p_player: id, p_hidden: hidden, p_reason: reason });
+}
+
+export function fetchModerationHistory(): Promise<ModerationEntry[]> {
+  return rpc<ModerationEntry[]>('moderation_history', { p_limit: 30 });
+}

@@ -32,8 +32,9 @@ const Account = lazy(() => import('@/components/Account/Account'));
 const Privacy = lazy(() => import('@/components/Privacy/Privacy'));
 const LiveBoard = lazy(() => import('@/components/Online/LiveBoard'));
 const ClassLiveBoard = lazy(() => import('@/components/Online/ClassLiveBoard'));
+const Moderation = lazy(() => import('@/components/Moderation/Moderation'));
 
-type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about' | 'account' | 'privacy' | 'live';
+type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about' | 'account' | 'privacy' | 'live' | 'moderation';
 
 /** Reads ?class=… or ?cert=… from a link, and removes it from the address bar. */
 function paramFromLink(name: string): string | undefined {
@@ -340,6 +341,7 @@ function App() {
               sessions={store.sessions}
               onClaim={ids => updateSessions(ids, { userId: auth.userId ?? undefined, name: username, synced: false })}
               onPrivacy={() => navigate('privacy')}
+              onModerate={() => navigate('moderation')}
               returnLabel={returnTo ? RETURN_LABEL[returnTo] : undefined}
               onReturn={
                 returnTo && (returnTo !== 'results' || result)
@@ -351,6 +353,12 @@ function App() {
                   : undefined
               }
             />
+          </Suspense>
+        );
+      case 'moderation':
+        return (
+          <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
+            <Moderation onBack={() => navigate('account')} />
           </Suspense>
         );
       case 'privacy':
@@ -379,7 +387,7 @@ function App() {
     }
   };
 
-  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view === 'check' || view === 'privacy' ? 'about' : view;
+  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view === 'check' || view === 'privacy' ? 'about' : view === 'moderation' ? 'account' : view;
   const nav = ONLINE
     ? [
         ...NAV,

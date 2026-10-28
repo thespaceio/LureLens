@@ -9,6 +9,8 @@
 --   board with its code, and check a certificate, through functions. Nothing else.
 -- - Signed-in players can post games, register certificates, edit their own
 --   profile, read and add their own game history, and delete their account.
+-- - Moderators (listed by hand in the moderators table) can hide and unhide
+--   scores and players, and every change is logged.
 -- - Scores are worked out on the server from the answers, so a made-up score
 --   can't be posted.
 --
@@ -38,6 +40,8 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 create unique index if not exists profiles_username on public.profiles (lower(username));
+-- Moderation (2.4): a hidden player is left off every public board and check.
+alter table public.profiles add column if not exists hidden boolean not null default false;
 
 create table if not exists public.scores (
   id uuid primary key default gen_random_uuid(),
@@ -325,6 +329,7 @@ as $$
   select distinct on (s.user_id) s.*
   from scores s
   where s.class_code = p_code and s.created_at > now() - interval '1 day' and not s.hidden
+    and not exists (select 1 from profiles p where p.id = s.user_id and p.hidden)
   order by s.user_id, s.created_at;
 $$;
 
@@ -536,11 +541,13 @@ begin
       select coalesce(user_id::text, 'guest:' || lower(name)) as player, max(score) as best
       from scores
       where level = p_level and ranked and not hidden
+        and not exists (select 1 from profiles p where p.id = scores.user_id and p.hidden)
       group by 1
     ) b
     where b.best > v_score and b.player <> v_uid::text;
     select count(distinct coalesce(user_id::text, 'guest:' || lower(name))) into v_of
-    from scores where level = p_level and ranked and not hidden;
+    from scores where level = p_level and ranked and not hidden
+      and not exists (select 1 from profiles p where p.id = scores.user_id and p.hidden);
   end if;
 
   return jsonb_build_object(
@@ -578,6 +585,7 @@ as $$
              s.score desc, s.accuracy desc, s.avg_seconds asc, s.created_at asc
   ) b
   left join profiles p on p.id = b.user_id
+  where not coalesce(p.hidden, false)
   order by b.score desc, b.accuracy desc, b.avg_seconds asc, b.played_at asc
   limit least(greatest(coalesce(p_limit, 20), 1), 100);
 $$;
@@ -719,7 +727,192 @@ as $$
   join scores i on i.id = c.intermediate_id
   join scores a on a.id = c.advanced_id
   left join profiles p on p.id = c.user_id
-  where c.reference = upper(btrim(coalesce(p_reference, ''))) and not c.hidden;
+  where c.reference = upper(btrim(coalesce(p_reference, ''))) and not c.hidden and not coalesce(p.hidden, false);
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Moderation: moderators can take a score, or a whole player, off every public
+-- board (the scoreboard, class boards and certificate checks), put it back,
+-- and see who did what and why. Nothing is deleted, so it can always be undone.
+--
+-- Moderators are added by hand in the SQL editor, never from the app:
+--   insert into public.moderators (user_id)
+--   select id from auth.users where email = 'someone@example.com';
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.moderators (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  added_at timestamptz not null default now()
+);
+
+create table if not exists public.moderation_log (
+  id bigint generated always as identity primary key,
+  moderator uuid references auth.users (id) on delete set null,
+  action text not null check (action in ('hide_score', 'show_score', 'hide_player', 'show_player')),
+  score_id uuid references public.scores (id) on delete set null,
+  player_id uuid references auth.users (id) on delete set null,
+  reason text,
+  created_at timestamptz not null default now()
+);
+create index if not exists moderation_log_recent on public.moderation_log (created_at desc);
+create index if not exists moderation_log_by_moderator on public.moderation_log (moderator);
+create index if not exists moderation_log_by_score on public.moderation_log (score_id);
+create index if not exists moderation_log_by_player on public.moderation_log (player_id);
+
+alter table public.moderators enable row level security;
+alter table public.moderation_log enable row level security;
+revoke all on public.moderators, public.moderation_log from anon, authenticated;
+
+create or replace function public.is_moderator()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from moderators where user_id = auth.uid());
+$$;
+
+-- Tells open boards to reload after a change.
+create or replace function public.lurelens_moderation_signal(p_class_codes text[])
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_code text;
+begin
+  begin
+    perform realtime.send('{}'::jsonb, 'new_score', 'scoreboard', false);
+    foreach v_code in array coalesce(p_class_codes, '{}') loop
+      perform realtime.send('{}'::jsonb, 'new_class_result', 'class:' || v_code, false);
+    end loop;
+  exception when others then
+    null; -- a missed signal only delays the refresh
+  end;
+end;
+$$;
+
+-- Recent posted games for review. p_view: 'recent', 'flagged' (perfect and
+-- very fast, or impossibly fast: likely scripted) or 'hidden'.
+create or replace function public.moderation_scores(p_view text default 'recent', p_search text default null, p_limit integer default 100)
+returns table (
+  id uuid, player_id uuid, name text, level text, score integer, correct integer, total integer,
+  accuracy integer, avg_seconds numeric, ranked boolean, class_code text, created_at timestamptz,
+  hidden boolean, player_hidden boolean, flags text[]
+)
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+#variable_conflict use_column
+declare
+  v_search text := lower(btrim(coalesce(p_search, '')));
+begin
+  if not is_moderator() then
+    raise exception 'Only moderators can do that.' using errcode = '42501';
+  end if;
+  return query
+  select s.id, s.user_id, coalesce(p.username, s.name), s.level, s.score, s.correct, s.total,
+         s.accuracy, s.avg_seconds, s.ranked, s.class_code, s.created_at,
+         s.hidden, coalesce(p.hidden, false),
+         array_remove(array[
+           case when s.accuracy = 100 and s.avg_seconds < 4 then 'perfect_fast' end,
+           case when s.avg_seconds < 2 then 'very_fast' end
+         ], null)
+  from scores s
+  left join profiles p on p.id = s.user_id
+  where (v_search = '' or strpos(lower(coalesce(p.username, s.name)), v_search) > 0)
+    and case coalesce(p_view, 'recent')
+          when 'hidden' then s.hidden or coalesce(p.hidden, false)
+          when 'flagged' then (s.accuracy = 100 and s.avg_seconds < 4) or s.avg_seconds < 2
+          else true
+        end
+  order by s.created_at desc
+  limit least(greatest(coalesce(p_limit, 100), 1), 200);
+end;
+$$;
+
+create or replace function public.moderate_score(p_id uuid, p_hidden boolean, p_reason text default null)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v scores%rowtype;
+  v_reason text := lurelens_clean_text(p_reason, 200);
+begin
+  if not is_moderator() then
+    raise exception 'Only moderators can do that.' using errcode = '42501';
+  end if;
+  update scores set hidden = coalesce(p_hidden, true) where id = p_id returning * into v;
+  if v.id is null then
+    raise exception 'That score no longer exists.' using errcode = '22023';
+  end if;
+  insert into moderation_log (moderator, action, score_id, player_id, reason)
+  values (auth.uid(), case when v.hidden then 'hide_score' else 'show_score' end, v.id, v.user_id, v_reason);
+  perform lurelens_moderation_signal(case when v.class_code is not null then array[v.class_code] end);
+  return jsonb_build_object('id', v.id, 'hidden', v.hidden);
+end;
+$$;
+
+create or replace function public.moderate_player(p_player uuid, p_hidden boolean, p_reason text default null)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v profiles%rowtype;
+  v_reason text := lurelens_clean_text(p_reason, 200);
+begin
+  if not is_moderator() then
+    raise exception 'Only moderators can do that.' using errcode = '42501';
+  end if;
+  if p_player = auth.uid() then
+    raise exception 'You can''t hide yourself.' using errcode = '22023';
+  end if;
+  update profiles set hidden = coalesce(p_hidden, true) where id = p_player returning * into v;
+  if v.id is null then
+    raise exception 'That player has no account, so hide their scores one at a time.' using errcode = '22023';
+  end if;
+  insert into moderation_log (moderator, action, player_id, reason)
+  values (auth.uid(), case when v.hidden then 'hide_player' else 'show_player' end, v.id, v_reason);
+  perform lurelens_moderation_signal(array(
+    select distinct class_code from scores
+    where user_id = v.id and class_code is not null and created_at > now() - interval '1 day'
+  ));
+  return jsonb_build_object('id', v.id, 'username', v.username, 'hidden', v.hidden);
+end;
+$$;
+
+-- What moderators did, newest first.
+create or replace function public.moderation_history(p_limit integer default 50)
+returns table (
+  created_at timestamptz, action text, moderator text, player text, level text, score integer, reason text
+)
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+#variable_conflict use_column
+begin
+  if not is_moderator() then
+    raise exception 'Only moderators can do that.' using errcode = '42501';
+  end if;
+  return query
+  select l.created_at, l.action, m.username, coalesce(p.username, s.name), s.level, s.score, l.reason
+  from moderation_log l
+  left join profiles m on m.id = l.moderator
+  left join scores s on s.id = l.score_id
+  left join profiles p on p.id = coalesce(l.player_id, s.user_id)
+  order by l.created_at desc, l.id desc
+  limit least(greatest(coalesce(p_limit, 50), 1), 200);
+end;
 $$;
 
 -- ---------------------------------------------------------------------------
@@ -741,6 +934,12 @@ revoke execute on function public.register_certificate(text, text, uuid[]) from 
 revoke execute on function public.check_certificate(text) from public;
 revoke execute on function public.save_profile(text, text, text) from public, anon;
 revoke execute on function public.delete_my_account() from public, anon;
+revoke execute on function public.lurelens_moderation_signal(text[]) from public, anon, authenticated;
+revoke execute on function public.is_moderator() from public, anon;
+revoke execute on function public.moderation_scores(text, text, integer) from public, anon;
+revoke execute on function public.moderate_score(uuid, boolean, text) from public, anon;
+revoke execute on function public.moderate_player(uuid, boolean, text) from public, anon;
+revoke execute on function public.moderation_history(integer) from public, anon;
 
 -- Everyone: read the board, check a certificate.
 grant execute on function public.leaderboard(text, integer, integer) to anon, authenticated;
@@ -751,3 +950,9 @@ grant execute on function public.submit_score(text, text, jsonb, timestamptz, bo
 grant execute on function public.register_certificate(text, text, uuid[]) to authenticated;
 grant execute on function public.save_profile(text, text, text) to authenticated;
 grant execute on function public.delete_my_account() to authenticated;
+-- Moderators only (each function checks the moderators table itself).
+grant execute on function public.is_moderator() to authenticated;
+grant execute on function public.moderation_scores(text, text, integer) to authenticated;
+grant execute on function public.moderate_score(uuid, boolean, text) to authenticated;
+grant execute on function public.moderate_player(uuid, boolean, text) to authenticated;
+grant execute on function public.moderation_history(integer) to authenticated;

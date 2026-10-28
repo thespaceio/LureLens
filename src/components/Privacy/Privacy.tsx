@@ -85,7 +85,8 @@ export function Privacy() {
       <Section title="How long we keep it">
         <p>
           Until you delete your account. Online scores and certificates you posted stay public until then, unless a
-          moderator removes them for breaking the rules (for example an offensive name).
+          moderator hides them for breaking the rules (for example an offensive name). We keep a private record of what
+          was hidden and why; once you delete your account, that record no longer points to you.
         </p>
       </Section>
 

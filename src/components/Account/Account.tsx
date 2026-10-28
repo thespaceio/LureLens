@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
-import { ArrowLeft, BadgeCheck, Cloud, Globe, Loader2, LogOut, Mail, Trash2, Trophy, UserRound, Zap } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, BadgeCheck, Cloud, Globe, Loader2, LogOut, Mail, ShieldCheck, Trash2, Trophy, UserRound, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/authContext';
 import type { Profile } from '@/hooks/authContext';
-import { OnlineError } from '@/lib/online';
+import { OnlineError, isModerator } from '@/lib/online';
 import type { GameSession } from '@/types';
 
 interface AccountProps {
@@ -15,11 +15,13 @@ interface AccountProps {
   /** Where to go after signing in, if the player came from somewhere specific. */
   returnLabel?: string;
   onReturn?: () => void;
+  /** Opens the moderation tools (shown to moderators only). */
+  onModerate?: () => void;
 }
 
 const message = (e: unknown) => (e instanceof OnlineError ? e.message : e instanceof Error ? e.message : 'Something went wrong. Try again.');
 
-export function Account({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: AccountProps) {
+export function Account({ sessions, onClaim, onPrivacy, returnLabel, onReturn, onModerate }: AccountProps) {
   const auth = useAuth();
 
   return (
@@ -38,7 +40,7 @@ export function Account({ sessions, onClaim, onPrivacy, returnLabel, onReturn }:
       ) : auth.status === 'signedIn' && !auth.profile ? (
         <ProfileForm firstTime onPrivacy={onPrivacy} />
       ) : auth.status === 'signedIn' ? (
-        <SignedIn sessions={sessions} onClaim={onClaim} onPrivacy={onPrivacy} returnLabel={returnLabel} onReturn={onReturn} />
+        <SignedIn sessions={sessions} onClaim={onClaim} onPrivacy={onPrivacy} returnLabel={returnLabel} onReturn={onReturn} onModerate={onModerate} />
       ) : (
         <SignIn onPrivacy={onPrivacy} />
       )}
@@ -427,7 +429,7 @@ function ProfileForm({ firstTime = false, onDone, onPrivacy }: { firstTime?: boo
   );
 }
 
-function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<AccountProps, never>) {
+function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn, onModerate }: Omit<AccountProps, never>) {
   const auth = useAuth();
   const profile = auth.profile!;
   const [editing, setEditing] = useState(false);
@@ -496,6 +498,8 @@ function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<
       )}
 
       {(auth.anonymous || quickJoined) && <AddEmail />}
+
+      {onModerate && !auth.anonymous && <ModeratorCard onOpen={onModerate} />}
 
       <section className="space-y-2 rounded-xl border border-border bg-card p-5 text-sm" data-testid="sync-card">
         <h2 className="flex items-center gap-2 font-semibold">
@@ -618,3 +622,33 @@ function SignedIn({ sessions, onClaim, onPrivacy, returnLabel, onReturn }: Omit<
 }
 
 export default Account;
+
+/** Shown only when the server says this account is a moderator. */
+function ModeratorCard({ onOpen }: { onOpen: () => void }) {
+  const [moderator, setModerator] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    isModerator()
+      .then(m => !cancelled && setModerator(m))
+      .catch(() => {
+        // Offline or not allowed: no card.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (!moderator) return null;
+  return (
+    <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-lavender/50 bg-card p-5 text-sm" data-testid="moderator-card">
+      <div className="space-y-1">
+        <h2 className="flex items-center gap-2 font-semibold">
+          <ShieldCheck className="size-4 text-lavender" /> You're a moderator
+        </h2>
+        <p className="text-muted-foreground">Review posted games and hide offensive names or fake scores.</p>
+      </div>
+      <Button variant="secondary" onClick={onOpen} data-testid="moderation-open">
+        Open moderation
+      </Button>
+    </section>
+  );
+}
