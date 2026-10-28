@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.3.1 (28 October 2026)
 
 ### Security
 - **Security review** of the app, database, hosting and build: findings, fixes and accepted risks are in [docs/security-review.md](docs/security-review.md).

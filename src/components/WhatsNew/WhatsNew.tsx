@@ -1,4 +1,4 @@
-import { Award, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import { Accessibility, Award, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
 import { isNewer } from '@/lib/whatsNew';
 import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ const RELEASES = [
       { icon: MonitorPlay, title: 'Class big screen', text: 'Put just your room on the projector, ranked as they finish, with a QR code to join.' },
       { icon: Map, title: 'Roadmap', text: 'See where LureLens is going, phase by phase, on the About page.' },
       { icon: Globe, title: 'New address', text: 'LureLens now lives at thespaceio.github.io/LureLens. Update your bookmark.' },
+      { icon: Accessibility, title: 'Easier for everyone', text: 'Every screen and message has been checked for accessibility: clearer text, and tables you can scroll with the keyboard.' },
     ],
   },
   {

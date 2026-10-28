@@ -22,6 +22,11 @@ export function whatsNewFor(hasHistory: boolean): WhatsNewKind {
       return 'none';
     }
     if (seen === null) return 'renamed';
+    // Patch releases (2.3.0 to 2.3.1) bring fixes, not features: no note.
+    if (!isNewer(APP_VERSION, seen)) {
+      localStorage.setItem(SEEN_KEY, APP_VERSION);
+      return 'none';
+    }
     return `since:${seen}`;
   } catch {
     return 'none';
