@@ -38,9 +38,9 @@ const PHASES: Phase[] = [
       'Classroom mode, where everyone plays the same messages, with a debrief',
       'Certificates anyone can check online',
       'A privacy notice, and deleting your account removes everything stored with it',
+      "A live class board: results appear on the facilitator's screen as students finish",
     ],
     rolling: [
-      "A live class board: results appear on the facilitator's screen as students finish",
       'Sign in by email for everyone, on our own domain',
       'An accessibility review',
     ],
@@ -105,10 +105,11 @@ const PHASES: Phase[] = [
   },
 ];
 
+// [lead in bold, what joins it to the rest, the rest]
 const ALWAYS = [
-  ['Privacy first', 'we collect the minimum and explain why.'],
-  ['Security built in', 'and regularly tested.'],
-  ['Every scenario reviewed', 'for accuracy before it goes live.'],
+  ['Privacy first', ': ', 'we collect the minimum and explain why.'],
+  ['Security built in', ', ', 'and regularly tested.'],
+  ['Every scenario reviewed', ' ', 'for accuracy before it goes live.'],
 ];
 
 function Items({ items, done }: { items: string[]; done?: boolean }) {
@@ -178,12 +179,12 @@ export function Roadmap() {
       <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
         <h3 className="mb-2 font-semibold text-foreground">Always</h3>
         <ul className="space-y-1.5">
-          {ALWAYS.map(([lead, rest]) => (
+          {ALWAYS.map(([lead, join, rest]) => (
             <li key={lead} className="flex gap-2">
               <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
               <span>
                 <strong className="text-foreground">{lead}</strong>
-                {lead === 'Security built in' ? ', ' : ': '}
+                {join}
                 {rest}
               </span>
             </li>

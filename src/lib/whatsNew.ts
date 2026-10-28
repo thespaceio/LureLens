@@ -6,12 +6,11 @@ const SEEN_KEY = 'lurelens_seen_version';
 /**
  * What to show this browser:
  * - 'none': new player, or already seen this version's note
- * - 'update': saw the previous version's note; show what's new in this one
- * - 'since-2.0': last saw the 2.0 note, so also show what 2.1 added
+ * - 'since:<version>': last saw that version's note; show every release since
  * - 'renamed': played back when the game was PhishGuard (before 2.0), so the
  *   note also explains the rename and everything 2.0 added
  */
-export type WhatsNewKind = 'none' | 'update' | 'since-2.0' | 'renamed';
+export type WhatsNewKind = 'none' | 'renamed' | `since:${string}`;
 
 export function whatsNewFor(hasHistory: boolean): WhatsNewKind {
   try {
@@ -23,10 +22,17 @@ export function whatsNewFor(hasHistory: boolean): WhatsNewKind {
       return 'none';
     }
     if (seen === null) return 'renamed';
-    return seen.startsWith('2.0') ? 'since-2.0' : 'update';
+    return `since:${seen}`;
   } catch {
     return 'none';
   }
+}
+
+/** True when version a (e.g. "2.3") is newer than b (e.g. "2.2.0"), by major and minor. */
+export function isNewer(a: string, b: string): boolean {
+  const [am = 0, an = 0] = a.split('.').map(Number);
+  const [bm = 0, bn = 0] = b.split('.').map(Number);
+  return am > bm || (am === bm && an > bn);
 }
 
 export function markWhatsNewSeen() {
