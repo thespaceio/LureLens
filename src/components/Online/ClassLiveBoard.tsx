@@ -5,6 +5,7 @@ import LiveDot from '@/components/Online/LiveDot';
 import { LogoMark } from '@/components/Logo/Logo';
 import { useClassBoard } from '@/hooks/useClassBoard';
 import { decodeClassCode, formatCode, inviteLink } from '@/lib/classroom';
+import { SITE_HOST } from '@/lib/shareCard';
 import { LEVELS } from '@/types';
 
 const MEDAL = ['bg-primary', 'bg-lavender', 'bg-muted-foreground'];
@@ -125,7 +126,7 @@ export function ClassLiveBoard({ code, onExit }: { code: string; onExit: () => v
           </div>
           <p className="font-mono text-4xl font-semibold tracking-[0.08em]">{formatCode(code)}</p>
           <p className="text-sm text-muted-foreground">
-            Or open <span className="font-mono text-primary">lurelens.netlify.app</span>, choose Classroom and enter the code. Sign in or quick join first so your
+            Or open <span className="font-mono text-primary [overflow-wrap:anywhere]">{SITE_HOST}</span>, choose Classroom and enter the code. Sign in or quick join first so your
             result appears here.
           </p>
         </aside>

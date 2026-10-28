@@ -2,6 +2,7 @@
 // Calls the database functions through the Supabase client, which adds the
 // player's sign-in when there is one.
 import { ONLINE, getSupabase } from '@/lib/supabase';
+import { SITE_URL } from '@/lib/site';
 import type { GameSession, Level } from '@/types';
 
 export { ONLINE };
@@ -130,6 +131,6 @@ export function checkCertificate(reference: string): Promise<CheckedCertificate 
 }
 
 /** Link that opens the certificate check with a reference filled in. */
-export function certificateLink(reference: string, base = 'https://lurelens.netlify.app/'): string {
+export function certificateLink(reference: string, base = SITE_URL): string {
   return `${base}?cert=${encodeURIComponent(reference)}`;
 }

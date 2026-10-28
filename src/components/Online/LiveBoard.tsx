@@ -6,7 +6,7 @@ import { LogoMark } from '@/components/Logo/Logo';
 import { fetchBoard } from '@/lib/online';
 import type { BoardRow } from '@/lib/online';
 import { useScoreboardUpdates } from '@/lib/live';
-import { SITE_URL } from '@/lib/shareCard';
+import { SITE_HOST, SITE_URL } from '@/lib/shareCard';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { Level } from '@/types';
 
@@ -150,7 +150,7 @@ export function LiveBoard({ onExit }: { onExit: () => void }) {
           <div className="w-full max-w-[12rem] overflow-hidden rounded-xl">
             <QrCode text={SITE_URL} label={`QR code for ${SITE_URL}`} className="block h-auto w-full" />
           </div>
-          <p className="font-mono text-sm text-primary">lurelens.netlify.app</p>
+          <p className="font-mono text-sm text-primary [overflow-wrap:anywhere]">{SITE_HOST}</p>
           <p className="text-xs text-muted-foreground">Sign in, play a ranked round, then tap "Post to the online scoreboard".</p>
         </aside>
       </div>

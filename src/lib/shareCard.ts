@@ -5,7 +5,9 @@ import { rankTitle } from '@/lib/game';
 import { LEVELS } from '@/types';
 import type { GameSession } from '@/types';
 
-export const SITE_URL = 'https://lurelens.netlify.app/';
+import { SITE_HOST, SITE_URL } from '@/lib/site';
+
+export { SITE_HOST, SITE_URL } from '@/lib/site';
 
 const C = {
   ground: '#1B1035',
@@ -142,7 +144,7 @@ export async function drawResultCard(session: GameSession): Promise<Blob> {
   // Footer.
   ctx.fillStyle = C.lime;
   ctx.font = '500 26px "JetBrains Mono", monospace';
-  ctx.fillText('Can you beat me?  lurelens.netlify.app', 72, 560);
+  ctx.fillText(`Can you beat me?  ${SITE_HOST}`, 72, 560);
   ctx.textAlign = 'right';
   ctx.fillStyle = C.lavender;
   ctx.font = '500 16px "JetBrains Mono", monospace';
