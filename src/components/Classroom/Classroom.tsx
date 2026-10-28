@@ -610,7 +610,7 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
           </p>
           <Button size="lg" className="gap-2 font-semibold" onClick={() => setRevealed(true)} data-testid="reveal-answer">
             <Eye className="size-4" /> Reveal answer
-            <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-60 sm:inline">R</kbd>
+            <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] opacity-70 sm:inline">R</kbd>
           </Button>
         </section>
       )}

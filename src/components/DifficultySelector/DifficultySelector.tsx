@@ -195,7 +195,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
                   on ? 'border-lavender bg-lavender text-primary-foreground' : 'border-border hover:border-lavender/60'
                 }`}
               >
-                {CHANNELS[id].label} <span className="opacity-60">({chCounts[id]})</span>
+                {CHANNELS[id].label} <span className="opacity-70">({chCounts[id]})</span>
               </button>
             );
           })}
@@ -226,7 +226,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
                   on ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
                 }`}
               >
-                {CATEGORIES[id].label} <span className="opacity-60">({count})</span>
+                {CATEGORIES[id].label} <span className="opacity-70">({count})</span>
               </button>
             );
           })}

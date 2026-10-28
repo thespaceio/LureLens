@@ -116,7 +116,7 @@ export function FeedbackModal({ open, email, choice, correct, points, streak, is
           <Button autoFocus onClick={onNext} size="lg" className="w-full gap-2 font-semibold">
             {isLast ? 'See results' : 'Next message'}
             <ArrowRight className="size-4" />
-            <kbd className="ml-1 hidden rounded border border-current px-1.5 opacity-60 font-mono text-[10px] sm:inline">Enter</kbd>
+            <kbd className="ml-1 hidden rounded border border-current px-1.5 opacity-70 font-mono text-[10px] sm:inline">Enter</kbd>
           </Button>
         </div>
       </DialogContent>

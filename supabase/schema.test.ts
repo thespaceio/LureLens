@@ -17,7 +17,7 @@ let db: PGlite;
 const SUPABASE_STANDINS = `
   create role anon; create role authenticated;
   create schema auth;
-  create table auth.users (id uuid primary key, email text);
+  create table auth.users (id uuid primary key, email text, is_anonymous boolean not null default false);
   create function auth.uid() returns uuid language sql stable as $$
     select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
   $$;
@@ -33,6 +33,7 @@ const ADA = '00000000-0000-4000-8000-00000000000a';
 const BOLA = '00000000-0000-4000-8000-00000000000b';
 const CHI = '00000000-0000-4000-8000-00000000000c';
 const DAN = '00000000-0000-4000-8000-00000000000d';
+const EVE = '00000000-0000-4000-8000-00000000000e'; // a quick-join account
 
 /** Runs SQL as a browser would: anonymous, or signed in as `uid`. */
 async function as<T>(uid: string | null, sql: string, params: unknown[] = []): Promise<T[]> {
@@ -101,6 +102,7 @@ beforeAll(async () => {
   db = new PGlite();
   await db.exec(SUPABASE_STANDINS);
   await db.exec(`insert into auth.users (id, email) values ('${ADA}', 'ada@example.com'), ('${BOLA}', 'bola@example.com'), ('${CHI}', 'chi@example.com'), ('${DAN}', 'dan@example.com')`);
+  await db.exec(`insert into auth.users (id, email, is_anonymous) values ('${EVE}', null, true)`);
   const schema = readFileSync('supabase/schema.sql', 'utf8');
   await db.exec(schema);
   await db.exec(readFileSync('supabase/messages.sql', 'utf8'));
@@ -278,6 +280,27 @@ describe('game history', () => {
     const own = await as<{ id: string }>(ADA, 'select id from games');
     expect(own.map(g => g.id)).toEqual(['local-1']);
     expect(await as(BOLA, 'select id from games')).toEqual([]);
+  });
+
+  it('stops history being used as storage or flooded', async () => {
+    const save = (uid: string, id: string, data: unknown = { id }) =>
+      as(uid, 'insert into games (user_id, id, played_at, data) values ($1, $2, now(), $3::jsonb)', [uid, id, JSON.stringify(data)]);
+    // A real game is about 1.3 KB; 8 KB is the cap.
+    expect(await refusal(save(BOLA, 'big', { pad: 'x'.repeat(9000) }))).toMatch(/games_data_size/);
+    expect(await refusal(save(BOLA, 'ok', { pad: 'x'.repeat(5000) }))).toBeNull();
+    // At most 200 games per account in 10 minutes (enough to add a long history at once).
+    await db.exec(`insert into games (user_id, id, played_at, data) select '${BOLA}', 'b' || g, now(), '{}' from generate_series(1, 199) g`);
+    expect(await refusal(save(BOLA, 'one-too-many'))).toMatch(/short time/);
+    await db.exec(`update games set created_at = now() - interval '1 hour' where user_id = '${BOLA}'`);
+    expect(await refusal(save(BOLA, 'later'))).toBeNull();
+    // Quick-join accounts keep up to 300 games.
+    await db.exec(`insert into games (user_id, id, played_at, data, created_at) select '${EVE}', 'e' || g, now(), '{}', now() - interval '1 day' from generate_series(1, 300) g`);
+    expect(await refusal(save(EVE, 'e-more'))).toMatch(/history is full/);
+    // At most 1,000 games saved across everyone in 10 minutes.
+    // (setup only: skip the trigger to load 1,000 recent games quickly)
+    await db.exec(`set session_replication_role = replica; insert into games (user_id, id, played_at, data) select '${DAN}', 'd' || g, now(), '{}' from generate_series(1, 1000) g; set session_replication_role = origin;`);
+    expect(await refusal(save(CHI, 'c1'))).toMatch(/busy/);
+    await db.exec(`delete from games where user_id in ('${BOLA}', '${DAN}', '${EVE}')`);
   });
 });
 
