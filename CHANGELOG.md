@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 (not released yet)
+## 2.3.0 (28 October 2026)
 
 ### New
 - **Live class board.** In Classroom mode, signed-in players' results go straight to the facilitator's class board as they finish, with no result lines to paste. The facilitator's panel and the debrief update live, showing how the class answered each message.
