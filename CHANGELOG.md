@@ -9,6 +9,7 @@
 - **Roadmap** on the About page: where LureLens is going, phase by phase, from today's free game to organisations, real-world practice and scale across Africa.
 
 ### Changed
+- **New main address: [thespaceio.github.io/LureLens](https://thespaceio.github.io/LureLens/).** Share cards, certificates and their check links, the big-screen QR codes and link previews now use it. lurelens.netlify.app still works but may lag behind, because Netlify's free plan limits how often it updates.
 - Result lines still work for players without internet: they send their line and the facilitator pastes it in. Pasted players appear alongside online ones.
 
 ## 2.2.0 (27 October 2026)

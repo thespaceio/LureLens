@@ -9,7 +9,7 @@
 
 **A timed phishing-detection training game by [Th3 SpaceIO](https://th3spaceio.community).**
 
-**Play it:** [lurelens.netlify.app](https://lurelens.netlify.app/) · [GitHub Pages mirror](https://thespaceio.github.io/LureLens/)
+**Play it:** [thespaceio.github.io/LureLens](https://thespaceio.github.io/LureLens/) · also at [lurelens.netlify.app](https://lurelens.netlify.app/), which may lag behind (Netlify's free plan limits how often it updates)
 
 **Version 2.1** · see the [changelog](CHANGELOG.md) for what's new.
 

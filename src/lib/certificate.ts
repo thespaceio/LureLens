@@ -1,7 +1,7 @@
 // The LureLens certificate: earned by scoring at least 80% on all three levels
 // in full rounds (ranked or classroom, not single-topic practice). It is drawn
 // in the browser, so it works offline and nothing is sent anywhere.
-import { DAYLIGHT_MARK, SITE_URL, drawMark, fit, fontsReady } from '@/lib/shareCard';
+import { DAYLIGHT_MARK, SITE_HOST, drawMark, fit, fontsReady } from '@/lib/shareCard';
 import { playerSessions } from '@/lib/stats';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { GameSession, Level } from '@/types';
@@ -186,7 +186,7 @@ export async function drawCertificate(progress: CertificateProgress, displayName
   ctx.fillText('Th3 SpaceIO', cx, footY);
   ctx.fillStyle = MUTED;
   ctx.font = '400 24px Inter, sans-serif';
-  ctx.fillText(`Issued through ${SITE_URL.replace(/^https:\/\/|\/$/g, '')}`, cx, footY + 40);
+  ctx.fillText(`Issued through ${SITE_HOST}`, cx, footY + 40);
 
   ctx.textAlign = 'right';
   ctx.fillStyle = INK;

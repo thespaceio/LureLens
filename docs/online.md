@@ -4,7 +4,7 @@ LureLens works fully offline without any of this. With the Supabase project conn
 
 - **Accounts** (email sign-in with a 6-digit code): a reserved public username, an optional full name for certificates, an optional school or organisation, and game history synced between devices. Guests can still play; their scores stay on their device.
 - **The online scoreboard**, live: each player's best posted game, this week or all time. Signed-in players tap "Post to the online scoreboard" after a ranked game. New scores appear on open scoreboards within seconds.
-- **"Top players this week"** on the home screen, and a **big-screen view** for projectors at `https://lurelens.netlify.app/?live`.
+- **"Top players this week"** on the home screen, and a **big-screen view** for projectors at `https://thespaceio.github.io/LureLens/?live`.
 - **Checkable certificates** tied to an account, and a public **Check a certificate** page (`?cert=LL-XXXX-XXXX`), which the LinkedIn "Add to profile" link points to.
 - A **privacy notice** at `?privacy`, and **account deletion** on the Account page.
 
@@ -32,7 +32,7 @@ Everything is in `supabase/schema.sql`, which is safe to run again after changes
 ### Dashboard settings (one-time)
 
 1. **Authentication → URL Configuration**
-   - Site URL: `https://lurelens.netlify.app`
+   - Site URL: `https://thespaceio.github.io/LureLens/` (the main address since October 2026)
    - Redirect URLs: `https://lurelens.netlify.app/**`, `https://thespaceio.github.io/LureLens/**`, `http://localhost:5173/**`
 2. **Authentication → Emails → Templates**: in **Magic link**, **Confirm signup** and **Change email address**, use the code template below so the email contains the 6-digit code (the app asks for the code, which works even when the email opens in another browser).
 3. **Authentication → Emails → SMTP settings**: connect an email service (Resend, Brevo, ...). Without it Supabase only emails members of the Supabase team, a few times an hour. Then raise the email rate limit under **Authentication → Rate Limits** to suit (for example 100 an hour).
