@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { Globe, MonitorSmartphone, Play } from 'lucide-react';
 import OnlineBoard from '@/components/Online/OnlineBoard';
@@ -64,7 +65,7 @@ export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: Leade
               aria-pressed={source === id}
               onClick={() => setSource(id)}
               className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:flex-none ${
-                source === id ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:text-foreground'
+                source === id ? 'bg-primary/15 text-primary hover:bg-primary/25' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
               <Icon className="size-4" /> {label}
@@ -83,7 +84,7 @@ export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: Leade
               data-board-level={l}
               onClick={() => setLevel(l)}
               className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
-                level === l ? 'border-primary bg-primary font-semibold text-primary-foreground' : 'border-border text-muted-foreground hover:text-foreground'
+                level === l ? 'border-primary bg-primary font-semibold text-primary-foreground hover:bg-primary/85' : 'border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-foreground'
               }`}
             >
               {l === 'all' ? 'All levels' : LEVELS[l].label}
@@ -116,7 +117,7 @@ export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: Leade
             {podium.filter(i => rows[i]).map(i => {
               const r = rows[i];
               return (
-                <div key={r.id} className={`rounded-xl border bg-card p-4 text-center ${i === 0 ? 'border-primary/60' : 'border-border'}`}>
+                <div key={r.id} className={`rise-in rounded-xl border bg-card p-4 text-center ${i === 0 ? 'border-primary/60' : 'border-border'}`} style={{ '--i': i } as CSSProperties}>
                   <span className={`mx-auto grid size-7 place-items-center rounded-full text-sm font-bold text-primary-foreground ${MEDAL[i]}`}>{i + 1}</span>
                   <div className="mt-2 truncate font-semibold">{r.name}</div>
                   <div className="text-xl font-bold text-primary">{r.score.toLocaleString()}</div>
@@ -142,7 +143,7 @@ export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: Leade
               </thead>
               <tbody>
                 {rows.map((r, i) => (
-                  <tr key={r.id} className={`border-t border-border first:border-t-0 ${r.name.trim().toLowerCase() === me ? 'bg-primary/10' : ''}`}>
+                  <tr key={r.id} className={`fade-in-row border-t border-border first:border-t-0 hover:bg-secondary/40 ${r.name.trim().toLowerCase() === me ? 'bg-primary/10' : ''}`} style={{ '--i': i } as CSSProperties}>
                     <td className="px-4 py-3 font-mono font-bold">
                       {i < 3 ? <span className={`grid size-6 place-items-center rounded-full text-xs text-primary-foreground ${MEDAL[i]}`}>{i + 1}</span> : i + 1}
                     </td>

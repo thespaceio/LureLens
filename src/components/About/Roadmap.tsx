@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Check, CircleDot, ShieldCheck } from 'lucide-react';
 
 // The public roadmap shown on the About page. Keep it in step with the
@@ -140,8 +141,8 @@ export function Roadmap() {
       </div>
 
       <ol className="space-y-3">
-        {PHASES.map(p => (
-          <li key={p.n} className={`rounded-xl border bg-card p-5 text-sm text-muted-foreground ${p.status === 'now' ? 'border-primary/50' : 'border-border'}`}>
+        {PHASES.map((p, i) => (
+          <li key={p.n} style={{ '--i': i } as CSSProperties} className={`rise-in lift rounded-xl border bg-card p-5 text-sm text-muted-foreground ${p.status === 'now' ? 'border-primary/50 hover:border-primary' : 'border-border hover:border-lavender/50'}`}>
             <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="font-mono text-xs tracking-[0.14em] text-lavender">PHASE {p.n}</span>
               <h3 className="text-base font-semibold text-foreground">{p.title}</h3>

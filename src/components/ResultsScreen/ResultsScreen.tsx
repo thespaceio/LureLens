@@ -1,5 +1,6 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { animate, motion, useReducedMotion } from 'framer-motion';
 import { Award, Check, Copy, Loader2, Phone, RotateCcw, Send, Share2, Trophy, UserRound, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
@@ -47,7 +48,7 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-primary">{cfg.label} complete</p>
         <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{rankTitle(session.accuracy)}</h1>
         <p className="mt-1 text-5xl font-bold text-primary sm:text-6xl" data-testid="results-score">
-          {session.score.toLocaleString()} <span className="text-base font-medium text-muted-foreground">points</span>
+          <CountUp value={session.score} /> <span className="text-base font-medium text-muted-foreground">points</span>
         </p>
         <p className="mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank">
           <Trophy className="size-4" />
@@ -68,8 +69,8 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
           ['Correct', `${session.correct}/${session.total}`],
           ['Best streak', String(session.bestStreak)],
           ['Avg. answer time', `${session.avgSeconds}s`],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-border bg-card p-4 text-center">
+        ].map(([label, value], i) => (
+          <div key={label} className="rise-in rounded-xl border border-border bg-card p-4 text-center" style={{ '--i': i + 2 } as CSSProperties}>
             <div className="text-2xl font-bold">{value}</div>
             <div className="text-xs text-muted-foreground">{label}</div>
           </div>
@@ -147,8 +148,8 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
       <section>
         <h2 className="mb-3 font-semibold">Review your answers</h2>
         <ol className="space-y-2">
-          {session.answers.map(a => (
-            <li key={a.id} className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+          {session.answers.map((a, i) => (
+            <li key={a.id} className="rise-in flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3" style={{ '--i': i } as CSSProperties}>
               <span
                 className={`grid size-7 shrink-0 place-items-center rounded-full ${
                   a.correct
@@ -319,3 +320,21 @@ function SendToFacilitator({ session }: { session: GameSession }) {
 }
 
 export default ResultsScreen;
+
+/** The score counts up when the results appear (shown at once with reduced motion). */
+function CountUp({ value }: { value: number }) {
+  const reduce = useReducedMotion();
+  const [counted, setShown] = useState(0);
+  const shown = reduce ? value : counted;
+  useEffect(() => {
+    if (reduce) return;
+    const controls = animate(0, value, { duration: 1.1, ease: [0.22, 1, 0.36, 1], onUpdate: v => setShown(Math.round(v)) });
+    return () => controls.stop();
+  }, [value, reduce]);
+  return (
+    <>
+      <span aria-hidden>{shown.toLocaleString()}</span>
+      <span className="sr-only">{value.toLocaleString()}</span>
+    </>
+  );
+}

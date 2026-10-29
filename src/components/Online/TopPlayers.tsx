@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Trophy } from 'lucide-react';
 import LiveDot from '@/components/Online/LiveDot';
@@ -36,7 +37,7 @@ export function TopPlayers({ onOpen }: { onOpen: () => void }) {
       </div>
       <ol className="space-y-1.5">
         {rows.map((r, i) => (
-          <li key={`${r.name}-${r.level}`} className={`flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${r.is_me ? 'bg-primary/10' : ''}`}>
+          <li key={`${r.name}-${r.level}`} className={`rise-in flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${r.is_me ? 'bg-primary/10' : ''}`} style={{ '--i': i } as CSSProperties}>
             <span className={`grid size-6 shrink-0 place-items-center rounded-full font-mono text-xs font-bold ${i < 3 ? `${MEDAL[i]} text-primary-foreground` : 'text-muted-foreground'}`}>
               {i + 1}
             </span>

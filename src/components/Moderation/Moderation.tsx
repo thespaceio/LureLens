@@ -123,7 +123,7 @@ export function Moderation({ onBack }: { onBack: () => void }) {
                 setPending(null);
               }}
               className={`rounded-full px-3.5 py-2 text-sm transition-colors ${
-                view === v.id ? 'bg-lavender font-semibold text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                view === v.id ? 'bg-lavender font-semibold text-primary-foreground hover:bg-lavender/85' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
               {v.label}
@@ -223,7 +223,7 @@ export function Moderation({ onBack }: { onBack: () => void }) {
                             aria-pressed={reason === r}
                             onClick={() => setReason(reason === r ? '' : r)}
                             className={`rounded-full border px-2.5 py-1 text-xs ${
-                              reason === r ? 'border-lavender bg-lavender font-semibold text-primary-foreground' : 'border-border text-muted-foreground'
+                              reason === r ? 'border-lavender bg-lavender font-semibold text-primary-foreground hover:bg-lavender/85' : 'border-border text-muted-foreground hover:border-lavender/60 hover:text-foreground'
                             }`}
                           >
                             {r}

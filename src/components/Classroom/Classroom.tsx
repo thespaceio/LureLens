@@ -284,7 +284,7 @@ function HostCard({ onCreate }: { onCreate: (code: string) => void }) {
             aria-checked={level === id}
             onClick={() => setLevel(id)}
             className={`rounded-lg border px-2 py-3 text-sm font-medium transition-colors ${
-              level === id ? 'border-lavender bg-lavender text-primary-foreground' : 'border-border hover:border-lavender/60'
+              level === id ? 'border-lavender bg-lavender text-primary-foreground hover:bg-lavender/85' : 'border-border hover:border-lavender/60 hover:bg-lavender/10'
             }`}
           >
             {LEVELS[id].label}
@@ -549,7 +549,7 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
               aria-current={i === index ? 'step' : undefined}
               title={s.answered ? `${pct(s.right, s.answered)}% got this right` : undefined}
               className={`min-w-11 rounded-lg border px-2 py-1.5 text-center font-mono text-xs transition-colors ${accuracyTone(s.right, s.answered)} ${
-                i === index ? 'ring-2 ring-foreground' : ''
+                i === index ? 'ring-2 ring-foreground hover:ring-lavender' : 'hover:ring-2 hover:ring-lavender/60'
               }`}
             >
               <span className="block text-sm font-semibold">{i + 1}</span>

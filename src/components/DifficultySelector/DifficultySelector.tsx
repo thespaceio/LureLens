@@ -152,7 +152,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
               whileTap={{ scale: 0.98 }}
               onClick={() => selectLevel(id)}
               className={`flex flex-col gap-3 rounded-xl border bg-card p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-primary ${
-                selected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-primary/50'
+                selected ? 'border-primary ring-1 ring-primary hover:bg-primary/[0.06]' : 'border-border hover:border-primary/50 hover:bg-secondary/40'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
             aria-pressed={channels.length === 0}
             onClick={() => setChannels([])}
             className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-              channels.length === 0 ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
+              channels.length === 0 ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/85' : 'border-border hover:border-primary/50 hover:bg-primary/10'
             }`}
           >
             All channels
@@ -211,7 +211,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
                 disabled={chCounts[id] === 0}
                 onClick={() => toggleChannel(id)}
                 className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
-                  on ? 'border-lavender bg-lavender text-primary-foreground' : 'border-border hover:border-lavender/60'
+                  on ? 'border-lavender bg-lavender text-primary-foreground hover:bg-lavender/85' : 'border-border hover:border-lavender/60 hover:bg-lavender/10'
                 }`}
               >
                 {CHANNELS[id].label} <span className="opacity-70">({chCounts[id]})</span>
@@ -225,7 +225,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
             aria-pressed={categories.length === 0}
             onClick={() => setCategories([])}
             className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-              categories.length === 0 ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
+              categories.length === 0 ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/85' : 'border-border hover:border-primary/50 hover:bg-primary/10'
             }`}
           >
             All topics
@@ -242,7 +242,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
                 title={CATEGORIES[id].description}
                 onClick={() => toggleCategory(id)}
                 className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
-                  on ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary/50'
+                  on ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/85' : 'border-border hover:border-primary/50 hover:bg-primary/10'
                 }`}
               >
                 {CATEGORIES[id].label} <span className="opacity-70">({count})</span>

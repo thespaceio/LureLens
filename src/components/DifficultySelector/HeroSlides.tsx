@@ -303,7 +303,7 @@ export function HeroSlides({ onPlay, onClassroom }: HeroSlidesProps) {
           <button
             type="button"
             onClick={onPlay}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-5 sm:flex-none font-semibold text-primary-foreground hover:bg-primary/90"
+            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-5 sm:flex-none font-semibold text-primary-foreground hover:bg-primary/85 hover:shadow-[0_8px_24px_-10px_hsl(var(--primary)/0.75)]"
             data-testid="hero-play"
           >
             <Play className="size-4" aria-hidden /> Play now
@@ -312,7 +312,7 @@ export function HeroSlides({ onPlay, onClassroom }: HeroSlidesProps) {
             <button
               type="button"
               onClick={onClassroom}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-border px-5 font-semibold hover:border-lavender hover:text-lavender sm:flex-none"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-border px-5 font-semibold hover:border-lavender hover:bg-lavender/10 hover:text-lavender sm:flex-none"
             >
               <Users className="size-4" aria-hidden /> Run a class
             </button>
@@ -336,11 +336,11 @@ export function HeroSlides({ onPlay, onClassroom }: HeroSlidesProps) {
                 onClick={() => go(i)}
                 aria-label={`Slide ${i + 1}: ${slide.tag.toLowerCase()}`}
                 aria-current={i === index ? 'true' : undefined}
-                className="grid h-11 w-7 place-items-center"
+                className="group grid h-11 w-7 place-items-center rounded-full hover:bg-secondary/60"
               >
                 <span
                   className={`relative block h-1.5 overflow-hidden rounded-full transition-[width,background-color] duration-300 ${
-                    i === index ? 'w-6 bg-primary/30' : 'w-1.5 bg-muted-foreground/50'
+                    i === index ? 'w-6 bg-primary/30 group-hover:bg-primary/45' : 'w-1.5 bg-muted-foreground/50 group-hover:bg-foreground'
                   }`}
                 >
                   {i === index && (

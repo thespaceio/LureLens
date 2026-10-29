@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { Loader2, RefreshCw, Tv } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -59,14 +60,14 @@ export function OnlineBoard({ level, onBigScreen }: { level: Level | 'all'; onBi
               aria-pressed={days === value}
               onClick={() => setDays(value)}
               className={`rounded-full px-3.5 py-2 text-sm transition-colors ${
-                days === value ? 'bg-lavender font-semibold text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                days === value ? 'bg-lavender font-semibold text-primary-foreground hover:bg-lavender/85' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
               {label}
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
           <LiveDot status={live} />
           {onBigScreen && (
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={onBigScreen} data-testid="big-screen-button">
@@ -115,7 +116,8 @@ export function OnlineBoard({ level, onBigScreen }: { level: Level | 'all'; onBi
               {rows.map((r, i) => (
                 <tr
                   key={`${r.name}-${r.level}`}
-                  className={`border-t border-border first:border-t-0 ${r.is_me ? 'bg-primary/10' : ''}`}
+                  className={`fade-in-row border-t border-border first:border-t-0 hover:bg-secondary/40 ${r.is_me ? 'bg-primary/10' : ''}`}
+                  style={{ '--i': i } as CSSProperties}
                 >
                   <td className="px-4 py-3 font-mono font-bold">
                     {i < 3 ? <span className={`grid size-6 place-items-center rounded-full text-xs text-primary-foreground ${MEDAL[i]}`}>{i + 1}</span> : i + 1}
