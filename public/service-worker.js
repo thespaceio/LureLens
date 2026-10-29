@@ -48,9 +48,12 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
 
   // Pages: network first so updates show up, cached copy when offline.
+  // 'no-cache' asks the server whether the page changed instead of reusing the
+  // browser's stored copy (GitHub Pages lets browsers keep it for 10 minutes),
+  // so a new release shows on the next visit.
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-cache' })
         .then(response => {
           // Only cache real pages, so an error page never replaces the offline copy.
           if (response.ok) {
