@@ -1,12 +1,13 @@
+import type { CSSProperties } from 'react';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 import { BarChart3, Info, Play, Trophy, UserRound, Users } from 'lucide-react';
 import DifficultySelector from '@/components/DifficultySelector/DifficultySelector';
 import QuizInterface from '@/components/QuizInterface/QuizInterface';
 import type { QuizResult } from '@/components/QuizInterface/QuizInterface';
 import ResultsScreen from '@/components/ResultsScreen/ResultsScreen';
 import Leaderboard from '@/components/Leaderboard/Leaderboard';
-import { Logo } from '@/components/Logo/Logo';
+import { Logo, LogoMark } from '@/components/Logo/Logo';
 import WhatsNew from '@/components/WhatsNew/WhatsNew';
 import TopPlayers from '@/components/Online/TopPlayers';
 import { isReady, useAuth } from '@/hooks/authContext';
@@ -421,10 +422,11 @@ function App() {
   }
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-40 border-b border-border bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
-          <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg" aria-label="LureLens home">
+          <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg hover:opacity-80" aria-label="LureLens home">
             <Logo size={34} wordmarkClassName="hidden sm:inline" />
           </button>
           <nav className="flex items-center sm:gap-0.5 lg:gap-1">
@@ -435,7 +437,7 @@ function App() {
                 aria-current={activeNav === item.id ? 'page' : undefined}
                 aria-label={item.id === 'account' && signedIn ? `Your account, ${username}` : item.label}
                 className={`flex min-w-10 flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[11px] font-medium transition-colors sm:min-w-11 sm:px-1.5 md:min-w-14 lg:flex-row lg:gap-1.5 lg:px-3 lg:py-2 lg:text-sm ${
-                  activeNav === item.id ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-card hover:text-foreground'
+                  activeNav === item.id ? 'bg-primary/15 text-primary hover:bg-primary/25' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                 }`}
               >
                 <item.icon className="size-4" />
@@ -451,10 +453,10 @@ function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
             {content()}
           </motion.div>
@@ -475,6 +477,7 @@ function App() {
         TH3 SPACEIO · LEARN. BUILD. SECURE.
       </footer>
     </div>
+    </MotionConfig>
   );
 }
 
@@ -485,14 +488,22 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
         <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // ABOUT</p>
         <h1 className="mt-1 text-3xl font-bold sm:text-4xl">About LureLens</h1>
       </div>
-      <p className="text-muted-foreground">
-        LureLens is a phishing-awareness training game by Th3 SpaceIO. You get a few seconds per email, text message or
-        WhatsApp chat to decide if it's safe, then see exactly which signs gave it away. The scenarios are built around
-        what people in Nigeria actually receive: bank and fintech alerts, BVN and NIN requests, grants, NYSC and JAMB
-        scams, delivery fees, fake jobs, hijacked WhatsApp accounts and targeted attacks on businesses.
-      </p>
+      <section className="rise-in flex flex-col items-center gap-6 rounded-2xl border border-border bg-card p-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left" data-testid="about-intro">
+        <div className="shrink-0">
+          <div className="float-y rounded-3xl bg-background/70 p-5 ring-1 ring-border">
+            <LogoMark size={104} title="LureLens logo" />
+          </div>
+          <p className="mt-3 text-center font-display text-2xl font-extrabold tracking-[-0.03em]">lurelens</p>
+        </div>
+        <p className="text-left text-muted-foreground">
+          LureLens is a phishing-awareness training game by Th3 SpaceIO. You get a few seconds per email, text message or
+          WhatsApp chat to decide if it's safe, then see exactly which signs gave it away. The scenarios are built around
+          what people in Nigeria actually receive: bank and fintech alerts, BVN and NIN requests, grants, NYSC and JAMB
+          scams, delivery fees, fake jobs, hijacked WhatsApp accounts and targeted attacks on businesses.
+        </p>
+      </section>
       <div className="grid gap-4 sm:grid-cols-2">
-        <section className="rounded-xl border border-border bg-card p-5">
+        <section className="rise-in rounded-xl border border-border bg-card p-5" style={{ '--i': 2 } as CSSProperties}>
           <h2 className="mb-3 font-semibold">What you'll learn</h2>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
@@ -509,7 +520,7 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
             ))}
           </ul>
         </section>
-        <section className="rounded-xl border border-border bg-card p-5">
+        <section className="rise-in rounded-xl border border-border bg-card p-5" style={{ '--i': 3 } as CSSProperties}>
           <h2 className="mb-3 font-semibold">Good to know</h2>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>Links inside training emails never open.</li>

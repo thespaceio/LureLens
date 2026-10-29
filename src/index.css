@@ -109,3 +109,46 @@ a[data-button] {
     scale: 0.96;
   }
 }
+
+/* Entrances: cards and rows rise in one after another (--i is the order).
+   Only for people who haven't asked for reduced motion. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rise-in {
+    animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+  }
+  .fade-in-row {
+    animation: fade-in 0.4s ease-out both;
+    animation-delay: calc(min(var(--i, 0), 10) * 30ms);
+  }
+  .grow-x {
+    transform-origin: left;
+    animation: grow-x 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+  .float-y {
+    animation: float-y 4s ease-in-out infinite;
+  }
+  /* Cards you can click lift a little under the pointer. */
+  .lift {
+    transition: translate 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  }
+  .lift:hover {
+    translate: 0 -2px;
+  }
+}

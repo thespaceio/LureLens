@@ -94,7 +94,7 @@ export function LiveBoard({ onExit }: { onExit: () => void }) {
                 type="button"
                 aria-pressed={days === value}
                 onClick={() => changePeriod(value)}
-                className={`rounded-full px-3.5 py-2 text-sm ${days === value ? 'bg-lavender font-semibold text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`rounded-full px-3.5 py-2 text-sm ${days === value ? 'bg-lavender font-semibold text-primary-foreground hover:bg-lavender/85' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
               >
                 {label}
               </button>

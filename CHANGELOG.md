@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- **Every button shows it's under your pointer.** Main buttons brighten with a soft glow, secondary and quiet buttons take a lavender or deeper shade, and selected tabs, filters and level cards still change shade when you point at them. Menu items, the logo, slide dots and debrief question numbers respond too.
+- **More motion across the game.** Screens slide in when you switch, cards and rows rise in one after another (results, progress, scoreboards, top players, About and the roadmap), accuracy bars grow into place, your results score counts up, and the score and streak pop as they change during a round. A streak of 3 or more turns the streak lime. All of it stays still if your device asks for reduced motion.
+- **The About page shows the LureLens logo** beside the description of the game.
+- The scoreboard's controls wrap neatly on the narrowest phones, and layouts were checked on phones turned sideways too.
+
 ## 2.4.0 (29 October 2026)
 
 ### New

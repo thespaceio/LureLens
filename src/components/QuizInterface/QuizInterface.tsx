@@ -190,8 +190,8 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         {[
           { label: 'Level', value: cfg.label, className: 'hidden sm:flex' },
           { label: 'Message', value: `${index + 1} / ${emails.length}` },
-          { label: 'Score', value: score.toLocaleString(), testId: 'hud-score' },
-          { label: 'Streak', value: String(streak) },
+          { label: 'Score', value: score.toLocaleString(), testId: 'hud-score', pop: true },
+          { label: 'Streak', value: String(streak), pop: true, valueClass: streak >= 3 ? 'text-primary' : '' },
           {
             label: 'Time',
             value: `${Math.ceil(secondsLeft)}s`,
@@ -204,9 +204,22 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
             className={`flex min-w-0 flex-col rounded-lg border border-border bg-card px-3 py-2 ${item.className ?? ''}`}
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{item.label}</span>
-            <span data-testid={item.testId} className={`truncate text-base font-bold sm:text-lg ${item.valueClass ?? ''}`}>
-              {item.value}
-            </span>
+            {'pop' in item ? (
+              <motion.span
+                key={item.value}
+                data-testid={item.testId}
+                initial={{ scale: 1.35, opacity: 0.6 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                className={`origin-left truncate text-base font-bold sm:text-lg ${item.valueClass ?? ''}`}
+              >
+                {item.value}
+              </motion.span>
+            ) : (
+              <span data-testid={item.testId} className={`truncate text-base font-bold sm:text-lg ${item.valueClass ?? ''}`}>
+                {item.value}
+              </span>
+            )}
           </div>
         ))}
       </div>

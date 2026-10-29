@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Play, RotateCcw } from 'lucide-react';
@@ -89,8 +90,8 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
               ['Total points', games.reduce((n, s) => n + s.score, 0).toLocaleString()],
               ['Overall accuracy', `${accuracyOf(correct, answered)}%`],
               ['Best streak', String(games.reduce((m, s) => Math.max(m, s.bestStreak), 0))],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-border bg-card p-4 text-center">
+            ].map(([label, value], i) => (
+              <div key={label} className="rise-in rounded-xl border border-border bg-card p-4 text-center" style={{ '--i': i } as CSSProperties}>
                 <div className="text-2xl font-bold" data-testid={`stat-${label}`}>{value}</div>
                 <div className="text-xs text-muted-foreground">{label}</div>
               </div>
@@ -102,18 +103,18 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-4 font-semibold">Levels</h2>
             <div className="grid gap-3 md:grid-cols-3">
-              {LEVEL_ORDER.map(id => {
+              {LEVEL_ORDER.map((id, i) => {
                 const lv = games.filter(s => s.level === id);
                 const acc = accuracyOf(lv.reduce((n, s) => n + s.correct, 0), lv.reduce((n, s) => n + s.total, 0));
                 const best = lv.reduce((m, s) => Math.max(m, s.score), 0);
                 return (
-                  <div key={id} className="rounded-lg border border-border bg-background/50 p-4 text-sm">
+                  <div key={id} className="rise-in rounded-lg border border-border bg-background/50 p-4 text-sm" style={{ '--i': i } as CSSProperties}>
                     <span className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase ${PILL[id]}`}>{LEVELS[id].label}</span>
                     <div className="mt-3 flex justify-between text-muted-foreground">Games <strong className="text-foreground">{lv.length}</strong></div>
                     <div className="mt-1 flex justify-between text-muted-foreground">Best score <strong className="text-foreground">{best ? best.toLocaleString() : '–'}</strong></div>
                     <div className="mt-1 flex justify-between text-muted-foreground">Accuracy <strong className="text-foreground">{lv.length ? `${acc}%` : '–'}</strong></div>
                     <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${lv.length ? acc : 0}%` }} />
+                      <div className="grow-x h-full rounded-full bg-primary" style={{ width: `${lv.length ? acc : 0}%` }} />
                     </div>
                     {lv.length === 0 && (
                       <button type="button" className="mt-2 inline-flex min-h-10 items-center text-sm text-primary underline underline-offset-2" onClick={() => onPlay(id)}>
@@ -180,8 +181,8 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
                   </tr>
                 </thead>
                 <tbody>
-                  {games.slice(0, 10).map(s => (
-                    <tr key={s.id} className="border-t border-border">
+                  {games.slice(0, 10).map((s, i) => (
+                    <tr key={s.id} className="fade-in-row border-t border-border" style={{ '--i': i } as CSSProperties}>
                       <td className="whitespace-nowrap py-2.5 pr-4">{formatDateTime(s.date)}</td>
                       <td className="py-2.5 pr-4">
                         <span className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase ${PILL[s.level]}`}>{LEVELS[s.level].label}</span>
