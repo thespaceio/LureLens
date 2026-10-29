@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Play, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import HeroSlides from '@/components/DifficultySelector/HeroSlides';
 import { Input } from '@/components/ui/input';
 import { categoryCounts, channelCounts, emailsFor } from '@/lib/game';
 import { bestScore } from '@/lib/stats';
@@ -20,6 +21,8 @@ interface DifficultySelectorProps {
   onAccount?: () => void;
   /** Shown under the start button, e.g. the live top players. */
   extra?: ReactNode;
+  /** Opens Classroom mode (from the hero's "Run a class"). */
+  onClassroom?: () => void;
 }
 
 const LEVEL_ACCENT: Record<Level, string> = {
@@ -28,7 +31,7 @@ const LEVEL_ACCENT: Record<Level, string> = {
   advanced: 'text-muted-foreground border-muted-foreground',
 };
 
-export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart, lockedName, onAccount, extra }: DifficultySelectorProps) {
+export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart, lockedName, onAccount, extra, onClassroom }: DifficultySelectorProps) {
   const [level, setLevel] = useState<Level>(initialLevel ?? 'beginner');
   const [categories, setCategories] = useState<CategoryId[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -61,14 +64,27 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
     onStart(level, categories, channels);
   };
 
+  /** "Play now" in the hero: bring the round's setup into view, ready to type or pick. */
+  const toSetup = () => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('round-setup')?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    const target = document.getElementById(lockedName ? 'start-round' : 'player-name');
+    window.setTimeout(() => target?.focus({ preventScroll: true }), reduce ? 0 : 450);
+  };
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
-      <motion.section initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // CYBERSECURITY</p>
-        <h1 className="max-w-3xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-          Can you spot the phish before the clock runs out?
-        </h1>
-        <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+      <HeroSlides onPlay={toSetup} onClassroom={onClassroom} />
+
+      <motion.section
+        id="round-setup"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="scroll-mt-24 space-y-2"
+      >
+        <h2 className="text-2xl font-bold sm:text-3xl">Set up your round</h2>
+        <p className="max-w-3xl text-base text-muted-foreground">
           You're <strong className="text-foreground">{PLAYER.name}</strong>, an analyst at {PLAYER.company} (
           <span className="font-mono text-sm">{PLAYER.domain}</span>). Emails, texts and WhatsApp messages land on your phone and in your inbox one at a time. Decide
           which are <span className="rounded bg-primary/15 px-1.5 font-semibold text-primary">legitimate</span> and which
@@ -128,9 +144,12 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
               role="radio"
               aria-checked={selected}
               data-level={id}
+              data-no-press
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
+              whileHover={{ y: -3 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => selectLevel(id)}
               className={`flex flex-col gap-3 rounded-xl border bg-card p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-primary ${
                 selected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-primary/50'
@@ -234,7 +253,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
       </section>
 
       <div className="flex flex-col items-center gap-2">
-        <Button size="lg" onClick={start} disabled={rounds === 0} className="h-12 gap-2 px-10 text-base font-semibold">
+        <Button id="start-round" size="lg" onClick={start} disabled={rounds === 0} className="h-12 w-full gap-2 px-10 text-base font-semibold sm:w-auto">
           <Play className="size-5" />
           Start {LEVELS[level].label}
         </Button>

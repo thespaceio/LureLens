@@ -58,7 +58,7 @@ export function OnlineBoard({ level, onBigScreen }: { level: Level | 'all'; onBi
               type="button"
               aria-pressed={days === value}
               onClick={() => setDays(value)}
-              className={`rounded-full px-3 py-1 text-sm transition-colors ${
+              className={`rounded-full px-3.5 py-2 text-sm transition-colors ${
                 days === value ? 'bg-lavender font-semibold text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >

@@ -122,7 +122,7 @@ export function Moderation({ onBack }: { onBack: () => void }) {
                 setView(v.id);
                 setPending(null);
               }}
-              className={`rounded-full px-3 py-1 text-sm transition-colors ${
+              className={`rounded-full px-3.5 py-2 text-sm transition-colors ${
                 view === v.id ? 'bg-lavender font-semibold text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >

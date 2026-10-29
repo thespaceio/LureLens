@@ -83,3 +83,29 @@
     @apply font-display font-extrabold tracking-[-0.025em];
   }
 }
+/* Home hero: the active slide's dot fills while it's showing. */
+@keyframes hero-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Every button answers a press: a quick, small squeeze (not for people who ask
+   for reduced motion). Unlayered so it applies alongside each button's own
+   transition utilities. */
+button,
+[role='button'],
+a[data-button] {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (prefers-reduced-motion: no-preference) {
+  button:not(:disabled):not([data-no-press]),
+  [role='button']:not([aria-disabled='true']) {
+    transition-property: color, background-color, border-color, box-shadow, opacity, scale, translate, width, outline-color;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  button:not(:disabled):not([data-no-press]):active,
+  [role='button']:not([aria-disabled='true']):active {
+    scale: 0.96;
+  }
+}

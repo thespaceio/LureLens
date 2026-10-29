@@ -46,7 +46,7 @@ export function TopPlayers({ onOpen }: { onOpen: () => void }) {
           </li>
         ))}
       </ol>
-      <button type="button" onClick={onOpen} className="mt-3 flex items-center gap-1 text-sm text-lavender underline-offset-2 hover:underline">
+      <button type="button" onClick={onOpen} className="mt-2 flex min-h-10 items-center gap-1 text-sm text-lavender underline-offset-2 hover:underline">
         See the full scoreboard <ArrowRight className="size-3.5" />
       </button>
     </section>
