@@ -1,4 +1,4 @@
-import { Accessibility, Award, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import { Accessibility, Award, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
 import { isNewer } from '@/lib/whatsNew';
 import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,19 @@ import { APP_VERSION, REPO_URL } from '@/lib/report';
 // release since the note they last saw.
 const RELEASES = [
   {
+    version: '2.4',
+    title: 'A fresh new look',
+    description: 'A new home screen, buttons that respond to your touch, and cleaner scoreboards.',
+    items: [
+      { icon: LayoutTemplate, title: 'New home screen', text: 'Animated slides show what LureLens trains you for, from fake bank alerts to hijacked WhatsApp friends. Swipe through them or let them play.' },
+      { icon: Hand, title: 'Made for every screen', text: 'Buttons respond when you tap them, and everything fits from the smallest phone to a big monitor.' },
+      { icon: ShieldCheck, title: 'Cleaner scoreboards', text: 'Moderators can now hide offensive names and fake scores in a tap, so the boards stay fair.' },
+    ],
+  },
+  {
     version: '2.3',
+    title: 'Live class boards',
+    description: 'Run a class and watch results arrive as students finish, ready for the debrief.',
     items: [
       { icon: Users, title: 'Live class board', text: "In Classroom mode, results reach the facilitator's screen as players finish, with how the class answered every message for the debrief." },
       { icon: MonitorPlay, title: 'Class big screen', text: 'Put just your room on the projector, ranked as they finish, with a QR code to join.' },
@@ -20,6 +32,8 @@ const RELEASES = [
   },
   {
     version: '2.2',
+    title: 'Accounts and a live scoreboard',
+    description: 'Sign in, keep your progress on every device, and see new scores as they land.',
     items: [
       { icon: UserRound, title: 'Accounts', text: 'Sign in with your email and a 6-digit code, no password. Your username is yours alone, and your progress and certificate follow you to every device.' },
       { icon: Zap, title: 'Quick join', text: 'In a class or at an event, join with just a username and post your score straight away, no email needed.' },
@@ -29,6 +43,8 @@ const RELEASES = [
   },
   {
     version: '2.1',
+    title: 'Online scoreboard and checkable certificates',
+    description: 'See how you rank against players everywhere, and prove your certificate online.',
     items: [
       { icon: Globe, title: 'Online scoreboard', text: 'After a ranked game, post your score and see how you rank against players everywhere, this week or all time.' },
       { icon: BadgeCheck, title: 'Checkable certificates', text: 'Make your certificate checkable online, so employers and trainers can confirm it from its reference.' },
@@ -65,12 +81,12 @@ export function WhatsNew({ open, kind, onClose, onScoreboard }: WhatsNewProps) {
             <Sparkles className="size-4" /> LureLens {APP_VERSION}
           </p>
           <DialogTitle className="text-xl font-semibold">
-            {renamed ? 'PhishGuard is now LureLens' : 'Live class boards'}
+            {renamed ? 'PhishGuard is now LureLens' : (releases[0]?.title ?? "What's new")}
           </DialogTitle>
           <DialogDescription className="mt-1 text-sm text-muted-foreground">
             {renamed
               ? 'New name, same mission, and a lot more to practise on. Your scores and progress came with you.'
-              : 'Run a class and watch results arrive as students finish, ready for the debrief.'}
+              : releases[0]?.description}
           </DialogDescription>
         </div>
         <ul className="space-y-3 px-6 py-5">
