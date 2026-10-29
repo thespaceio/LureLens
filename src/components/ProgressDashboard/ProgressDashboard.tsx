@@ -116,7 +116,7 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
                       <div className="h-full rounded-full bg-primary" style={{ width: `${lv.length ? acc : 0}%` }} />
                     </div>
                     {lv.length === 0 && (
-                      <button className="mt-3 text-xs text-primary underline" onClick={() => onPlay(id)}>
+                      <button type="button" className="mt-2 inline-flex min-h-10 items-center text-sm text-primary underline underline-offset-2" onClick={() => onPlay(id)}>
                         Play {LEVELS[id].label}
                       </button>
                     )}

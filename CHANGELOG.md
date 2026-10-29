@@ -5,8 +5,12 @@
 ### New
 - **Moderation.** Moderators get a Moderation page from their Account. It lists recent online games, flags likely scripted ones (perfect and very fast), and hides a single score or a whole player from the scoreboard, class boards and certificate checks in a tap. Nothing is deleted, anything can be restored, and every change is logged with who, when and why. Moderators are added by hand in the database ([docs/online.md](docs/online.md#moderation)).
 
+- **New home screen.** The headline is now a set of animated slides: the game, fake bank alerts, hijacked WhatsApp friends, one-time codes, live classes and certificates, each with a small illustration. They move on by themselves every 6 seconds and pause when you hover, tap or tab into them, when the page is in the background, or with the pause button. They don't move by themselves if your device asks for reduced motion. Swipe, the arrows or the dots change slides. **Play now** jumps to setting up your round, and **Run a class** opens Classroom.
+
 ### Changed
 - The privacy notice explains the moderation record.
+- Buttons respond to a press with a quick squeeze, and level cards lift on hover.
+- Works from 320 px phones to wide screens: the menu fits on the smallest phones and on tablets, and thin buttons (the week/all-time switch, "See the full scoreboard", "Play Intermediate", Privacy and What's new) are taller and easier to tap.
 
 ## 2.3.1 (28 October 2026)
 

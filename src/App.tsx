@@ -381,6 +381,7 @@ function App() {
             onStart={startGame}
             lockedName={signedIn ? username : undefined}
             onAccount={() => navigate('account')}
+            onClassroom={() => navigate('classroom')}
             extra={ONLINE ? <TopPlayers onOpen={() => navigate('scoreboard')} /> : null}
           />
         );
@@ -422,24 +423,24 @@ function App() {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-40 border-b border-border bg-card/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
           <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg" aria-label="LureLens home">
             <Logo size={34} wordmarkClassName="hidden sm:inline" />
           </button>
-          <nav className="flex items-center gap-0.5 md:gap-1">
+          <nav className="flex items-center sm:gap-0.5 lg:gap-1">
             {nav.map(item => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.id)}
                 aria-current={activeNav === item.id ? 'page' : undefined}
                 aria-label={item.id === 'account' && signedIn ? `Your account, ${username}` : item.label}
-                className={`flex min-w-11 flex-col items-center gap-0.5 rounded-lg px-1.5 py-1.5 text-[11px] font-medium transition-colors md:flex-row md:gap-1.5 md:px-3 md:py-2 md:text-sm ${
+                className={`flex min-w-10 flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[11px] font-medium transition-colors sm:min-w-11 sm:px-1.5 md:min-w-14 lg:flex-row lg:gap-1.5 lg:px-3 lg:py-2 lg:text-sm ${
                   activeNav === item.id ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-card hover:text-foreground'
                 }`}
               >
                 <item.icon className="size-4" />
-                <span className="hidden max-w-[9rem] truncate md:inline">{item.label}</span>
-                <span className="md:hidden">{item.short}</span>
+                <span className="hidden max-w-[8rem] truncate lg:inline">{item.label}</span>
+                <span className="lg:hidden">{item.short}</span>
               </button>
             ))}
           </nav>
@@ -565,7 +566,7 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
         </p>
         <p className="mt-3 font-mono text-xs">
           LureLens {APP_VERSION} ·{' '}
-          <button type="button" onClick={onPrivacy} className="text-lavender underline underline-offset-2 hover:text-foreground">
+          <button type="button" onClick={onPrivacy} className="inline-flex min-h-10 items-center text-lavender underline underline-offset-2 hover:text-foreground">
             Privacy
           </button>{' '}
           ·{' '}
@@ -573,7 +574,7 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
             href="https://github.com/thespaceio/LureLens/blob/main/CHANGELOG.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-lavender underline underline-offset-2 hover:text-foreground"
+            className="inline-flex min-h-10 items-center text-lavender underline underline-offset-2 hover:text-foreground"
           >
             What's new
           </a>
