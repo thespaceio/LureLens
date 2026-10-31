@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { ArrowLeft, BadgeCheck, Cloud, Globe, Loader2, LogOut, Mail, ShieldCheck, Trash2, Trophy, UserRound, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,11 +26,11 @@ export function Account({ sessions, onClaim, onPrivacy, returnLabel, onReturn, o
   const auth = useAuth();
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-6" data-testid="account">
+    <div className="stagger-children mx-auto w-full max-w-2xl space-y-6" data-testid="account">
       <div>
-        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // ACCOUNT</p>
+        <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // ACCOUNT</p>
         <h1 className="mt-1 text-3xl font-bold sm:text-4xl">
-          {auth.status === 'signedIn' && auth.profile ? auth.profile.username : 'Your LureLens account'}
+          <RevealText text={auth.status === 'signedIn' && auth.profile ? auth.profile.username : 'Your LureLens account'} />
         </h1>
       </div>
 

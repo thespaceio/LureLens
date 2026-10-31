@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { useEffect, useRef, useState } from 'react';
 import { animate, motion, useReducedMotion } from 'framer-motion';
 import { Award, Check, Copy, Loader2, Phone, RotateCcw, Send, Share2, Trophy, UserRound, Users, X } from 'lucide-react';
@@ -45,12 +46,12 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
   return (
     <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="mx-auto w-full max-w-3xl space-y-6">
       <div className="text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-primary">{cfg.label} complete</p>
-        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{rankTitle(session.accuracy)}</h1>
+        <p className="text-in font-mono text-xs uppercase tracking-[0.16em] text-primary">{cfg.label} complete</p>
+        <h1 className="mt-2 text-3xl font-bold sm:text-4xl"><RevealText text={rankTitle(session.accuracy)} /></h1>
         <p className="mt-1 text-5xl font-bold text-primary sm:text-6xl" data-testid="results-score">
           <CountUp value={session.score} /> <span className="text-base font-medium text-muted-foreground">points</span>
         </p>
-        <p className="mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank">
+        <p className="text-in mt-2 flex items-center justify-center gap-2 text-muted-foreground" data-testid="results-rank" style={{ '--d': '700ms' } as CSSProperties}>
           <Trophy className="size-4" />
           {session.classCode ? (
             <>Class {formatCode(session.classCode)} · {ONLINE ? 'for your class board' : 'saved to your progress, not the scoreboard'}</>

@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { ArrowLeft, Eye, EyeOff, History, Loader2, RefreshCw, Search, ShieldAlert, UserRoundX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -102,9 +104,9 @@ export function Moderation({ onBack }: { onBack: () => void }) {
           <ArrowLeft className="size-4" /> Account
         </Button>
         <div>
-          <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // MODERATION</p>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">Moderation</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // MODERATION</p>
+          <h1 className="mt-1 text-3xl font-bold sm:text-4xl"><RevealText text="Moderation" /></h1>
+          <p className="text-in mt-2 text-sm text-muted-foreground" style={{ '--d': '220ms' } as CSSProperties}>
             Hiding takes a score, or a whole player, off the scoreboard, class boards and certificate checks straight away.
             Nothing is deleted, so you can always restore it. Every change is logged below.
           </p>

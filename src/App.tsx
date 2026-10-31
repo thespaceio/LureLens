@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 import { BarChart3, Info, Play, Trophy, UserRound, Users } from 'lucide-react';
@@ -485,8 +486,8 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // ABOUT</p>
-        <h1 className="mt-1 text-3xl font-bold sm:text-4xl">About LureLens</h1>
+        <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // ABOUT</p>
+        <h1 className="mt-1 text-3xl font-bold sm:text-4xl"><RevealText text="About LureLens" /></h1>
       </div>
       <section className="rise-in flex flex-col items-center gap-6 rounded-2xl border border-border bg-card p-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left" data-testid="about-intro">
         <div className="shrink-0">
@@ -515,8 +516,11 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
               'Recognise CEO fraud and changed bank details',
               'Know when to stop and check through a number you trust',
               'Never share PINs, OTPs or MFA codes',
-            ].map(t => (
-              <li key={t} className="flex gap-2"><span className="text-primary">✓</span>{t}</li>
+            ].map((t, i) => (
+              <li key={t} className="rise-in flex gap-2" style={{ '--i': i + 3 } as CSSProperties}>
+                <span className="text-primary">✓</span>
+                {t}
+              </li>
             ))}
           </ul>
         </section>
