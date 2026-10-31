@@ -135,10 +135,20 @@ With a free Supabase project, LureLens adds email sign-in with profiles and sync
 - Scores are stored in the browser's `localStorage`, so the **This device** scoreboard works with no account or server. The online scoreboard is separate and opt-in (see above).
 - All emails are simulated. Brand names appear for education only, and the phishing domains are fictional.
 
----
-
-TH3 SPACEIO · LEARN. BUILD. SECURE.
-
 ## Brand
 
 The logo, icons and social images live in [`brand/`](brand/README.md): two interlocking Ls for Lure and Lens, each with an "s" for SpaceIO, framing a lime lens. Colours: Midnight `#1B1035`, Lavender `#B9A6FF`, Lime `#C6F432`, Coral `#FF6B6B` for red flags only.
+
+## Licence
+
+Copyright © 2026 Faith Alabi (Th3 SpaceIO). All rights reserved. The code is public so you can read it and see how the game works, but it is not open source: you may not copy, host, sell or build on it without written permission. See [LICENSE](LICENSE). For permission, email th3officialspaceio@gmail.com.
+
+## Keeping secrets out
+
+This repository is public, so nothing secret ever goes into it. The only key in the code is Supabase's **publishable** key, which is public by design; the database is protected by its access rules ([docs/security-review.md](docs/security-review.md)). The Supabase secret (service role) key is never used by the app and never belongs here.
+
+Three guards back this up: GitHub's secret scanning and push protection (on for this repository) refuse a push that contains a known kind of key; the **Secret scan** workflow scans every push and pull request with gitleaks; and `.gitignore` keeps `.env` files and key files out of commits.
+
+---
+
+TH3 SPACEIO · LEARN. BUILD. SECURE.
