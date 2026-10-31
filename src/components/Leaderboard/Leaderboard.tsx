@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { useState } from 'react';
 import { Globe, MonitorSmartphone, Play } from 'lucide-react';
 import OnlineBoard from '@/components/Online/OnlineBoard';
@@ -40,9 +41,9 @@ export function Leaderboard({ sessions, playerName, onPlay, onBigScreen }: Leade
     <div className="mx-auto w-full max-w-5xl space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // SCOREBOARD</p>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">Top phish hunters</h1>
-          <p className="mt-1 text-muted-foreground">
+          <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // SCOREBOARD</p>
+          <h1 className="mt-1 text-3xl font-bold sm:text-4xl"><RevealText text="Top phish hunters" /></h1>
+          <p className="text-in mt-1 text-muted-foreground" style={{ '--d': '280ms' } as CSSProperties}>
             {source === 'online'
               ? 'Best scores posted by players everywhere.'
               : 'Highest scores on this device. Ties go to accuracy, then speed.'}

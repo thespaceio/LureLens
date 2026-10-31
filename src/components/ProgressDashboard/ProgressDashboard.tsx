@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Play, RotateCcw } from 'lucide-react';
@@ -55,9 +56,9 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
     <div className="mx-auto w-full max-w-5xl space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // PROGRESS</p>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">{selected ? `${selected}'s progress` : 'My progress'}</h1>
-          <p className="mt-1 text-muted-foreground">Training history on this device.</p>
+          <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // PROGRESS</p>
+          <h1 className="mt-1 text-3xl font-bold sm:text-4xl"><RevealText text={selected ? `${selected}'s progress` : 'My progress'} /></h1>
+          <p className="text-in mt-1 text-muted-foreground" style={{ '--d': '260ms' } as CSSProperties}>Training history on this device.</p>
         </div>
         {names.length > 1 && (
           <label className="flex items-center gap-2 text-sm text-muted-foreground">

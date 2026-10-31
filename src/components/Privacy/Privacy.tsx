@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import type { ReactNode } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { CONTACT_EMAIL } from '@/lib/report';
 
 const UPDATED = '26 October 2026';
@@ -15,11 +17,11 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 /** Plain-language privacy notice for LureLens, written for the Nigeria Data Protection Act 2023. */
 export function Privacy() {
   return (
-    <article className="mx-auto w-full max-w-3xl space-y-6 text-sm leading-relaxed text-muted-foreground sm:text-base" data-testid="privacy">
+    <article className="stagger-children mx-auto w-full max-w-3xl space-y-6 text-sm leading-relaxed text-muted-foreground sm:text-base" data-testid="privacy">
       <div>
-        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // PRIVACY</p>
-        <h1 className="mt-1 text-3xl font-bold text-foreground sm:text-4xl">Privacy notice</h1>
-        <p className="mt-1">Last updated {UPDATED}.</p>
+        <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // PRIVACY</p>
+        <h1 className="mt-1 text-3xl font-bold text-foreground sm:text-4xl"><RevealText text="Privacy notice" /></h1>
+        <p className="text-in mt-1" style={{ '--d': '300ms' } as CSSProperties}>Last updated {UPDATED}.</p>
       </div>
 
       <p>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { Expand, X } from 'lucide-react';
 import QrCode from '@/components/Classroom/QrCode';
 import LiveDot from '@/components/Online/LiveDot';
@@ -76,7 +77,7 @@ export function LiveBoard({ onExit }: { onExit: () => void }) {
         <div className="flex items-center gap-4">
           <LogoMark size={56} />
           <div>
-            <h1 className="font-display text-3xl font-extrabold tracking-[-0.02em] sm:text-5xl">Live scoreboard</h1>
+            <h1 className="font-display text-3xl font-extrabold tracking-[-0.02em] sm:text-5xl"><RevealText text="Live scoreboard" /></h1>
             <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground sm:text-sm">
               LureLens · {days ? 'this week' : 'all time'}
             </p>

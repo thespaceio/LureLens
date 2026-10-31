@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { BadgeCheck, Loader2, Search, ShieldQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,11 +36,11 @@ export function CertificateCheck({ initialReference }: { initialReference?: stri
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-6">
+    <div className="stagger-children mx-auto w-full max-w-2xl space-y-6">
       <div>
-        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // CERTIFICATES</p>
-        <h1 className="mt-1 text-3xl font-bold sm:text-4xl">Check a certificate</h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // CERTIFICATES</p>
+        <h1 className="mt-1 text-3xl font-bold sm:text-4xl"><RevealText text="Check a certificate" /></h1>
+        <p className="text-in mt-1 text-muted-foreground" style={{ '--d': '300ms' } as CSSProperties}>
           Enter the reference printed on a LureLens certificate, such as <span className="font-mono">LL-7K2Q-X9AB</span>.
         </p>
       </div>

@@ -130,11 +130,11 @@ a[data-button] {
 }
 @media (prefers-reduced-motion: no-preference) {
   .rise-in {
-    animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: calc(min(var(--i, 0), 8) * 40ms);
   }
   .fade-in-row {
-    animation: fade-in 0.4s ease-out both;
+    animation: fade-in 0.4s ease-out backwards;
     animation-delay: calc(min(var(--i, 0), 10) * 30ms);
   }
   .grow-x {
@@ -150,5 +150,57 @@ a[data-button] {
   }
   .lift:hover {
     translate: 0 -2px;
+  }
+}
+
+/* Text that comes in one after another: words of a heading (RevealText),
+   a heading's label and intro line (.text-in, --d sets the delay), and the
+   blocks of a long page (.stagger-children). "backwards" so nothing is held
+   after the animation ends. */
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.45em); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.word-in {
+  display: inline-block;
+  white-space: pre;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .word-in {
+    animation: word-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--d, 0ms) + var(--w, 0) * 55ms);
+  }
+  .text-in {
+    animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+  .stagger-children > :not(:first-child) {
+    animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(250ms + var(--k, 8) * 60ms);
+  }
+  .stagger-children > :nth-child(2) { --k: 0; }
+  .stagger-children > :nth-child(3) { --k: 1; }
+  .stagger-children > :nth-child(4) { --k: 2; }
+  .stagger-children > :nth-child(5) { --k: 3; }
+  .stagger-children > :nth-child(6) { --k: 4; }
+  .stagger-children > :nth-child(7) { --k: 5; }
+  .stagger-children > :nth-child(8) { --k: 6; }
+  .stagger-children > :nth-child(9) { --k: 7; }
+}
+
+/* Containers answer the pointer too: every card and panel (bg-card with a
+   border) takes a soft lavender edge glow, whatever its own border colour.
+   Only the innermost hovered card glows. Mouse and trackpad only. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  :is(div, section, li, article, aside, form, ol, ul).bg-card.border:not([role='dialog']):not([data-no-glow]) {
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, translate 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s;
+  }
+  :is(div, section, li, article, aside, form, ol, ul).bg-card.border:not([role='dialog']):not([data-no-glow]):hover:not(:has(.bg-card.border:hover)) {
+    box-shadow: 0 0 0 1px hsl(var(--lavender) / 0.32), 0 18px 40px -26px hsl(var(--lavender) / 0.55);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  :is(div, section, li, article, aside, form, ol, ul).bg-card.border:not([role='dialog']):not([data-no-glow]):hover:not(:has(.bg-card.border:hover)) {
+    box-shadow: 0 0 0 1px hsl(var(--lavender) / 0.32);
   }
 }

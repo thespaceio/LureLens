@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.4.2 (31 October 2026)
+
+### Changed
+- **Cards and panels respond to your pointer.** Every card and panel takes a soft lavender edge glow when you point at it, whatever its own colour, and only the card you're on lights up. Like the buttons, this needs a mouse or trackpad.
+- **Headings appear word by word.** Every page heading (About, Classroom, Scoreboard, Progress, Account, Privacy, the certificate check, Moderation, your results title and the big-screen boards) reveals one word after another. The small label above it comes first and the line below it follows. Each debrief question title reveals as you move between messages.
+- **Long pages come in in order.** The sections of the Privacy notice, the Account page and the certificate check rise in one after another, and so does the "What you'll learn" list on About.
+- All of it stays still if your device asks for reduced motion.
+
 ## 2.4.1 (29 October 2026)
 
 ### Changed

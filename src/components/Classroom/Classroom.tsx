@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import RevealText from '@/components/ui/reveal';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, ClipboardList, Copy, Eye, LogIn, MonitorPlay, Presentation, RefreshCw, UserRound, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -135,9 +137,9 @@ export function Classroom(props: ClassroomProps) {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
       <motion.section initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-        <p className="font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // CLASSROOM</p>
-        <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-5xl">Classroom mode</h1>
-        <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+        <p className="text-in font-mono text-xs tracking-[0.16em] text-primary">SPACEIO // CLASSROOM</p>
+        <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-5xl"><RevealText text="Classroom mode" /></h1>
+        <p className="text-in max-w-2xl text-base text-muted-foreground sm:text-lg" style={{ '--d': '280ms' } as CSSProperties}>
           Run LureLens with a group. Everyone who enters the same class code plays the same 10 messages in the same order,
           so you can talk through each one together afterwards.
           {ONLINE
@@ -560,8 +562,8 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
       </nav>
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="font-display text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
-          Message {index + 1} of {round.length}
+        <h1 key={index} className="font-display text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
+          <RevealText text={`Message ${index + 1} of ${round.length}`} delay={0} />
         </h1>
         <p className="text-sm text-muted-foreground">
           {CHANNELS[channelOf(email)].label} · {email.topic}
