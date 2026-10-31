@@ -1,0 +1,22 @@
+Copyright (c) 2026 Faith Alabi (Th3 SpaceIO). All rights reserved.
+
+LureLens, including its source code, training emails, lessons, artwork, logo and
+name, is proprietary. The code is published so that people can read it and see
+how the game works. Publishing it does not grant a licence to use it.
+
+You may view this repository on GitHub, and fork it on GitHub, only as GitHub's
+Terms of Service allow. You may play the game at its official address.
+
+Without written permission from Faith Alabi, you may not copy, modify, host,
+distribute, sell, sublicense or create derivative works from any part of this
+repository, in whole or in part, including running your own copy of the game
+for others.
+
+Third-party software that LureLens uses (for example the packages listed in
+package.json) remains under its own licence.
+
+For permission or licensing enquiries, contact th3officialspaceio@gmail.com.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.

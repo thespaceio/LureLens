@@ -11,6 +11,10 @@
 # hour. When everything answers again the issue is closed with a note, which
 # emails again. Nothing else is posted.
 #
+# The repository is public, so these issues are public too. Keep them to what
+# they say today: the public game address, the HTTP status code and the fix.
+# Never add response bodies, headers, keys or player data to the issue text.
+#
 # It also keeps the free Supabase project awake: free projects pause after 7
 # days with no activity, and the scoreboard read counts as activity. (This
 # replaces the old daily "Keep Supabase awake" workflow.)

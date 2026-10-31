@@ -4,3 +4,14 @@ dist
 .DS_Store
 *.tsbuildinfo
 .vite
+
+# Secrets never go into this public repository
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+supabase/.temp
+supabase/.branches

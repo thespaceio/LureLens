@@ -37,6 +37,16 @@ LureLens is a free awareness game, so the main things to protect are players' ac
 - **Moderation is server-checked.** Moderators are listed by hand in a closed table. Every moderation function checks it, hides rather than deletes, and logs who did what. Players can't see or change the list or the log (tested).
 - **Live updates leak nothing.** The scoreboard signal carries only the level; a class signal carries nothing and goes only to that class's channel.
 
+## The repository is public (checked 31 October 2026)
+
+The repository stays public: a free GitHub account only serves Pages from public repositories, and public repositories get unlimited Actions minutes. Keeping it private would not protect the game, because every player's browser downloads the built code, answer key and training emails anyway, and the database is protected by its rules, not by hiding the code.
+
+- **Licence:** [LICENSE](../LICENSE) states that all rights are reserved. People may read and fork on GitHub (GitHub's terms), but may not copy, host, sell or build on LureLens without written permission. `package.json` says `UNLICENSED` to match.
+- **History is clean:** a gitleaks scan of every commit on every branch, plus a search for Supabase secret keys, service role tokens and GitHub tokens, found nothing.
+- **Guards against a future leak:** GitHub secret scanning and push protection are on; the Secret scan workflow (`.github/workflows/secret-scan.yml`) scans every push and pull request, and the whole history weekly; `.gitignore` excludes `.env` files and key files.
+- **Uptime issues are public:** they contain only the public game address, the HTTP status and what to do. No uptime issue has been opened so far.
+- **If a secret ever leaks:** revoke or rotate it at its source first. Removing the commit is not enough, because forks and caches keep it.
+
 ## Accepted risks
 
 - **Scripted perfect scores.** The game runs in the browser, so the answer key ships with it, and a determined person could script a perfect, fast game. The server stops made-up scores and floods, but not a script that answers correctly. For an awareness game this is acceptable. Moderators can hide such entries in a tap, and likely scripted games (perfect and very fast) are flagged for them to review.

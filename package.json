@@ -2,6 +2,7 @@
   "name": "lurelens",
   "private": true,
   "version": "2.4.2",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",
