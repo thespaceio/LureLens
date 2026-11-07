@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.0 (8 November 2026)
+
+### Changed
+- **Public rounds open on Fridays only.** LureLens is played at Th3 SpaceIO's Game Night, so ranked and practice rounds now open from midnight to midnight West Africa Time every Friday. On other days the home screen says when the next Game Night is and links to it. The rule lives in `src/lib/gameNight.ts`; set `FRIDAY_ONLY` to `false` to open public play every day again.
+- **Still open every day:** Classroom rounds (for trainers and staff training), certificate checks, the scoreboard, Progress, About and Privacy.
+
 ## 2.4.2 (31 October 2026)
 
 ### Changed

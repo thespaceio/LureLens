@@ -29,6 +29,7 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
   | Intermediate | 25s | ×1.5 | Lookalike domains (`micros0ft`, `linkedln`), convincing branding, real alerts that look scary |
   | Advanced | 20s | ×2 | CEO fraud, changed supplier bank details, hidden link destinations, `.pdf.html` and macro attachments, MFA-code theft, OAuth consent and QR phishing |
 
+- **Game Night Fridays:** public rounds open from midnight to midnight West Africa Time every Friday, when the Th3 SpaceIO community plays live at 6pm. Classroom rounds, certificate checks, the scoreboard and Progress work every day. Switch it off with `FRIDAY_ONLY` in `src/lib/gameNight.ts`.
 - **Countdown timer** on every email. Running out of time counts as wrong.
 - **Verify first**, a third answer for "I'd check through the official app or a number I trust". On messages where that is the real-world best move (a supplier's new bank details, the CEO's urgent favour, a friend's WhatsApp asking for money, a genuine bank warning) it counts as correct. It always scores 0 points, because points reward deciding, but it never resets the streak. Every verify answer shows how to check that kind of message.
 - **Scoring:** 100 points per correct answer, plus up to 50 for speed, times the level multiplier. From 3 correct in a row, each further correct answer adds +50.

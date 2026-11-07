@@ -1,4 +1,4 @@
-import { Accessibility, Award, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import { Accessibility, Award, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
 import { isNewer } from '@/lib/whatsNew';
 import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,16 @@ import { APP_VERSION, REPO_URL } from '@/lib/report';
 // Each release's highlights, newest first. Returning players see every
 // release since the note they last saw.
 const RELEASES = [
+  {
+    version: '2.5',
+    title: 'Game Night is on Fridays',
+    description: 'Public rounds now open every Friday, when the Th3 SpaceIO community plays together live at 6pm WAT.',
+    items: [
+      { icon: CalendarDays, title: 'Play on Fridays', text: 'Public rounds open from midnight to midnight West Africa Time every Friday. On other days the home screen shows the date of the next Game Night.' },
+      { icon: Users, title: 'Classes run any day', text: 'Trainers and teams can still run Classroom rounds whenever they like.' },
+      { icon: Award, title: 'Your record stays open', text: 'Progress, the scoreboard and certificate checks work every day.' },
+    ],
+  },
   {
     version: '2.4',
     title: 'A fresh new look',

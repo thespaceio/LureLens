@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Play, Timer } from 'lucide-react';
+import { CalendarDays, Check, Play, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeroSlides from '@/components/DifficultySelector/HeroSlides';
 import { Input } from '@/components/ui/input';
 import { categoryCounts, channelCounts, emailsFor } from '@/lib/game';
+import { GAME_NIGHT_URL } from '@/lib/gameNight';
 import { bestScore } from '@/lib/stats';
 import { CATEGORIES, CHANNELS, LEVELS, LEVEL_ORDER, PLAYER } from '@/types';
 import type { CategoryId, Channel, GameSession, Level } from '@/types';
@@ -23,6 +24,8 @@ interface DifficultySelectorProps {
   extra?: ReactNode;
   /** Opens Classroom mode (from the hero's "Run a class"). */
   onClassroom?: () => void;
+  /** Set outside Game Night: the next Friday ("Friday 13 November"). Public rounds can't start until then. */
+  closedUntil?: string;
 }
 
 const LEVEL_ACCENT: Record<Level, string> = {
@@ -31,7 +34,7 @@ const LEVEL_ACCENT: Record<Level, string> = {
   advanced: 'text-muted-foreground border-muted-foreground',
 };
 
-export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart, lockedName, onAccount, extra, onClassroom }: DifficultySelectorProps) {
+export function DifficultySelector({ playerName, sessions, initialLevel, onNameChange, onStart, lockedName, onAccount, extra, onClassroom, closedUntil }: DifficultySelectorProps) {
   const [level, setLevel] = useState<Level>(initialLevel ?? 'beginner');
   const [categories, setCategories] = useState<CategoryId[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -56,6 +59,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
     setChannels(prev => (prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]));
 
   const start = () => {
+    if (closedUntil) return;
     if (!lockedName && !playerName.trim()) {
       setNameError(true);
       document.getElementById('player-name')?.focus();
@@ -252,15 +256,42 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
         </div>
       </section>
 
-      <div className="flex flex-col items-center gap-2">
-        <Button id="start-round" size="lg" onClick={start} disabled={rounds === 0} className="h-12 w-full gap-2 px-10 text-base font-semibold sm:w-auto">
-          <Play className="size-5" />
-          Start {LEVELS[level].label}
-        </Button>
-        <p className="text-xs text-muted-foreground">
-          {rounds} messages · {LEVELS[level].seconds}s each
-        </p>
-      </div>
+      {closedUntil ? (
+        <section id="game-night-closed" role="status" className="rounded-xl border border-primary/40 bg-primary/10 p-5 text-center sm:p-6">
+          <CalendarDays className="mx-auto mb-2 size-7 text-primary" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-foreground">Public rounds open on Fridays</h2>
+          <p className="mx-auto mt-2 max-w-prose text-sm text-muted-foreground">
+            The next Game Night is <strong className="text-foreground">{closedUntil}</strong>. Rounds open from midnight to
+            midnight West Africa Time, and the Th3 SpaceIO community plays together live at 6pm.
+          </p>
+          <p className="mx-auto mt-2 max-w-prose text-sm text-muted-foreground">
+            Running a class or staff training?{' '}
+            {onClassroom ? (
+              <button type="button" onClick={onClassroom} className="font-medium text-foreground underline decoration-primary/60 underline-offset-4 hover:decoration-primary">
+                Classroom mode
+              </button>
+            ) : (
+              'Classroom mode'
+            )}{' '}
+            works any day. Your progress, the scoreboard and certificate checks are always open.
+          </p>
+          <div className="mt-4 flex justify-center">
+            <Button asChild size="lg" className="h-11 w-full gap-2 sm:w-auto">
+              <a href={GAME_NIGHT_URL} rel="noopener">Join Game Night</a>
+            </Button>
+          </div>
+        </section>
+      ) : (
+        <div className="flex flex-col items-center gap-2">
+          <Button id="start-round" size="lg" onClick={start} disabled={rounds === 0} className="h-12 w-full gap-2 px-10 text-base font-semibold sm:w-auto">
+            <Play className="size-5" />
+            Start {LEVELS[level].label}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            {rounds} messages · {LEVELS[level].seconds}s each
+          </p>
+        </div>
+      )}
 
       {extra}
 
