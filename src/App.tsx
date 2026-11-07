@@ -18,6 +18,7 @@ import { useGameStore } from '@/hooks/useGameStore';
 import { accuracyOf, buildRound } from '@/lib/game';
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
 import { classRound, normalizeCode } from '@/lib/classroom';
+import { isGameNight, nextGameNightLabel } from '@/lib/gameNight';
 import { certificateProgress } from '@/lib/certificate';
 import { ONLINE } from '@/lib/online';
 import type { DecodedClass } from '@/lib/classroom';
@@ -179,6 +180,13 @@ function App() {
   }, [auth.status, auth.userId, removeSessions, setPlayerName]);
 
   const startGame = useCallback((level: Level, categories: CategoryId[] = [], channels: Channel[] = []) => {
+    // Public rounds open on Fridays only (Game Night). Classroom rounds use joinClass and stay open.
+    if (!isGameNight()) {
+      setGame(null);
+      setView('menu');
+      window.scrollTo(0, 0);
+      return;
+    }
     const emails = buildRound(level, categories, channels);
     if (emails.length === 0) return;
     setMenuLevel(level);
@@ -384,6 +392,7 @@ function App() {
             lockedName={signedIn ? username : undefined}
             onAccount={() => navigate('account')}
             onClassroom={() => navigate('classroom')}
+            closedUntil={isGameNight() ? undefined : nextGameNightLabel()}
             extra={ONLINE ? <TopPlayers onOpen={() => navigate('scoreboard')} /> : null}
           />
         );
