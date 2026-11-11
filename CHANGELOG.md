@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.1 (11 November 2026)
+
+### New
+- **An opening scene.** Opening LureLens now plays a short scene before the home screen: an "urgent" bank message drops in, the lens sweeps across it and flags the look-alike sender, the pressure and the hidden link, the message is stamped LURE SPOTTED and breaks apart, and the lens flies to the centre as the LureLens logo draws itself around it. The name and "See the lure before it hooks you." appear, and the home screen opens out from the lens. It lasts about six seconds and plays once per browser tab.
+- Any key, a tap or **Skip intro** ends it at once. It never holds up a class, certificate, big-screen or privacy link, and it doesn't play if your device asks for reduced motion. **Watch the intro** on the About page plays it again. The What's new note, when there is one, waits until it ends.
+
 ## 2.5.0 (8 November 2026)
 
 ### Changed
