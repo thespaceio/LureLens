@@ -24,6 +24,8 @@ import { ONLINE } from '@/lib/online';
 import type { DecodedClass } from '@/lib/classroom';
 import { bestScore, playerSessions, rankOf } from '@/lib/stats';
 import Roadmap from '@/components/About/Roadmap';
+import Intro from '@/components/Intro/Intro';
+import { introEnv, markIntroSeen, shouldPlayIntro } from '@/lib/intro';
 import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
 import './App.css';
 
@@ -59,6 +61,8 @@ const LINK_CERT = ONLINE ? paramFromLink('cert')?.trim().toUpperCase() : undefin
 /** ?live opens the big-screen scoreboard (for projectors); ?privacy the privacy notice. */
 const LINK_LIVE = ONLINE && paramFromLink('live') !== undefined;
 const LINK_PRIVACY = paramFromLink('privacy') !== undefined;
+/** ?intro plays the opening scene even where it would normally be skipped. */
+const LINK_INTRO = paramFromLink('intro') !== undefined;
 
 interface Game {
   id: string;
@@ -111,6 +115,14 @@ function App() {
   const [whatsNew, setWhatsNew] = useState(() =>
     LINK_CODE || LINK_CERT || LINK_LIVE || LINK_PRIVACY ? 'none' : whatsNewFor(store.sessions.length > 0 || Boolean(store.playerName)),
   );
+  // The opening scene, when the game is opened (rules in src/lib/intro.ts).
+  const [intro, setIntro] = useState(() =>
+    shouldPlayIntro(introEnv(LINK_INTRO, Boolean(LINK_CODE || LINK_CERT || LINK_LIVE || LINK_PRIVACY))),
+  );
+  useEffect(() => {
+    if (intro) markIntroSeen();
+  }, [intro]);
+  const endIntro = useCallback(() => setIntro(false), []);
   const closeWhatsNew = () => {
     markWhatsNewSeen();
     setWhatsNew('none');
@@ -378,7 +390,7 @@ function App() {
           </Suspense>
         );
       case 'about':
-        return <About onCheck={() => navigate('check')} onPrivacy={() => navigate('privacy')} />;
+        return <About onCheck={() => navigate('check')} onPrivacy={() => navigate('privacy')} onIntro={() => setIntro(true)} />;
       case 'menu':
       default:
         return (
@@ -433,7 +445,7 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col" inert={intro}>
       <header className="sticky top-0 z-40 border-b border-border bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
           <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg hover:opacity-80" aria-label="LureLens home">
@@ -474,7 +486,7 @@ function App() {
       </main>
 
       <WhatsNew
-        open={whatsNew !== 'none'}
+        open={whatsNew !== 'none' && !intro}
         kind={whatsNew}
         onClose={closeWhatsNew}
         onScoreboard={() => {
@@ -487,11 +499,12 @@ function App() {
         TH3 SPACEIO · LEARN. BUILD. SECURE.
       </footer>
     </div>
+    {intro && <Intro onDone={endIntro} />}
     </MotionConfig>
   );
 }
 
-function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => void }) {
+function About({ onCheck, onPrivacy, onIntro }: { onCheck: () => void; onPrivacy: () => void; onIntro: () => void }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -601,7 +614,11 @@ function About({ onCheck, onPrivacy }: { onCheck: () => void; onPrivacy: () => v
             className="inline-flex min-h-10 items-center text-lavender underline underline-offset-2 hover:text-foreground"
           >
             What's new
-          </a>
+          </a>{' '}
+          ·{' '}
+          <button type="button" onClick={onIntro} className="inline-flex min-h-10 items-center text-lavender underline underline-offset-2 hover:text-foreground">
+            Watch the intro
+          </button>
         </p>
       </section>
     </div>
