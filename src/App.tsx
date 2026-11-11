@@ -26,6 +26,10 @@ import { bestScore, playerSessions, rankOf } from '@/lib/stats';
 import Roadmap from '@/components/About/Roadmap';
 import Intro from '@/components/Intro/Intro';
 import { introEnv, markIntroSeen, shouldPlayIntro } from '@/lib/intro';
+import Scene3DHost from '@/components/Scene3D/Scene3DHost';
+import { deviceSuits3D, saveScenePref, sceneEnv, shouldShow3D } from '@/lib/scene3d';
+import type { ScenePref } from '@/lib/scene3d';
+import { installTilt } from '@/lib/tilt';
 import type { CategoryId, Channel, Email, GameSession, Level } from '@/types';
 import './App.css';
 
@@ -63,6 +67,8 @@ const LINK_LIVE = ONLINE && paramFromLink('live') !== undefined;
 const LINK_PRIVACY = paramFromLink('privacy') !== undefined;
 /** ?intro plays the opening scene even where it would normally be skipped. */
 const LINK_INTRO = paramFromLink('intro') !== undefined;
+/** ?3d shows the 3D scene even where it would normally stay off (for testing). */
+const LINK_3D = paramFromLink('3d') !== undefined;
 
 interface Game {
   id: string;
@@ -123,6 +129,27 @@ function App() {
     if (intro) markIntroSeen();
   }, [intro]);
   const endIntro = useCallback(() => setIntro(false), []);
+
+  // The 3D scene behind the site (rules in src/lib/scene3d.ts), and cards that
+  // tilt towards the pointer (src/lib/tilt.ts). The message you're judging
+  // during a round stays still.
+  const [scene] = useState(() => sceneEnv(LINK_3D));
+  const [scenePref, setScenePref] = useState<ScenePref>(scene.pref);
+  const [sceneSlow, setSceneSlow] = useState(false);
+  const sceneOn = !sceneSlow && shouldShow3D({ ...scene, pref: scenePref });
+  const toggleScene = () => {
+    const next = sceneOn ? 'off' : 'on';
+    saveScenePref(next);
+    setScenePref(next);
+    setSceneSlow(false);
+  };
+  const onSceneSlow = useCallback(() => setSceneSlow(true), []);
+  useEffect(() => installTilt(), []);
+  useEffect(() => {
+    const html = document.documentElement;
+    if (view === 'quiz') html.setAttribute('data-no-tilt', '');
+    else html.removeAttribute('data-no-tilt');
+  }, [view]);
   const closeWhatsNew = () => {
     markWhatsNewSeen();
     setWhatsNew('none');
@@ -445,10 +472,13 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="flex min-h-dvh flex-col" inert={intro}>
+    {scene.webgl && (
+      <Scene3DHost enabled={sceneOn} mode={view === 'menu' ? 'home' : view === 'quiz' ? 'quiz' : 'page'} guard={!scene.forced} onSlow={onSceneSlow} />
+    )}
+    <div className="relative z-[1] flex min-h-dvh flex-col" inert={intro}>
       <header className="sticky top-0 z-40 border-b border-border bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
-          <button onClick={() => navigate('menu')} className="flex min-h-11 items-center rounded-lg hover:opacity-80" aria-label="LureLens home">
+          <button onClick={() => navigate('menu')} className="logo-spin flex min-h-11 items-center rounded-lg hover:opacity-80" aria-label="LureLens home">
             <Logo size={34} wordmarkClassName="hidden sm:inline" />
           </button>
           <nav className="flex items-center sm:gap-0.5 lg:gap-1">
@@ -471,14 +501,15 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 [overflow-x:clip]">
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 18, rotateX: 5 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            exit={{ opacity: 0, y: -10, rotateX: -3 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ transformPerspective: 1400, transformOrigin: '50% 0%' }}
           >
             {content()}
           </motion.div>
@@ -497,6 +528,22 @@ function App() {
 
       <footer className="border-t border-border px-4 py-6 text-center font-mono text-[11px] tracking-[0.18em] text-muted-foreground">
         TH3 SPACEIO · LEARN. BUILD. SECURE.
+        {scene.webgl && (
+          <p className="mt-2 tracking-normal">
+            <button
+              type="button"
+              onClick={toggleScene}
+              aria-pressed={sceneOn}
+              data-testid="scene-toggle"
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-lavender underline-offset-2 hover:text-foreground hover:underline"
+            >
+              {sceneOn ? '3D effects on' : sceneSlow ? '3D effects paused: this device was struggling' : '3D effects off'}
+              <span className="text-muted-foreground">
+                · {sceneOn ? 'Turn off' : deviceSuits3D(scene) || sceneSlow ? 'Turn on' : 'Turn on (may be slow on this device)'}
+              </span>
+            </button>
+          </p>
+        )}
       </footer>
     </div>
     {intro && <Intro onDone={endIntro} />}

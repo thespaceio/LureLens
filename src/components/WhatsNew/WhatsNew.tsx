@@ -1,4 +1,4 @@
-import { Accessibility, Award, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import { Accessibility, Award, Box, MousePointer2, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
 import { isNewer } from '@/lib/whatsNew';
 import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,16 @@ import { APP_VERSION, REPO_URL } from '@/lib/report';
 // Each release's highlights, newest first. Returning players see every
 // release since the note they last saw.
 const RELEASES = [
+  {
+    version: '2.6',
+    title: 'LureLens in 3D',
+    description: 'The game now has depth: a 3D scene behind every page, and cards that respond to your pointer.',
+    items: [
+      { icon: Box, title: 'A 3D world behind the game', text: 'The LureLens logo in 3D, with emails and chats drifting past it. Phones that might struggle keep the plain background, and the switch at the bottom of every page turns 3D on or off.' },
+      { icon: MousePointer2, title: 'Cards you can tilt', text: 'Cards and panels tilt towards your mouse, and sections swing into place as they appear. The message you are judging always stays still.' },
+      { icon: Sparkles, title: 'A slower opening scene', text: 'The intro now takes its time, so you can see each red flag the lens catches. Any key or tap still skips it.' },
+    ],
+  },
   {
     version: '2.5',
     title: 'Game Night is on Fridays',
