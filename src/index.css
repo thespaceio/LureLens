@@ -113,7 +113,7 @@ a[data-button] {
 /* Entrances: cards and rows rise in one after another (--i is the order).
    Only for people who haven't asked for reduced motion. */
 @keyframes rise-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: perspective(1200px) translateY(14px) rotateX(-12deg); }
   to { opacity: 1; transform: none; }
 }
 @keyframes fade-in {
@@ -130,7 +130,8 @@ a[data-button] {
 }
 @media (prefers-reduced-motion: no-preference) {
   .rise-in {
-    animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    transform-origin: 50% 0%;
+    animation: rise-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: calc(min(var(--i, 0), 8) * 40ms);
   }
   .fade-in-row {
@@ -193,11 +194,43 @@ a[data-button] {
    Only the innermost hovered card glows. Mouse and trackpad only. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   :is(div, section, li, article, aside, form, ol, ul).bg-card.border:not([role='dialog']):not([data-no-glow]) {
-    transition: box-shadow 0.25s ease, border-color 0.25s ease, translate 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, translate 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s,
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
   :is(div, section, li, article, aside, form, ol, ul).bg-card.border:not([role='dialog']):not([data-no-glow]):hover:not(:has(.bg-card.border:hover)) {
     box-shadow: 0 0 0 1px hsl(var(--lavender) / 0.32), 0 18px 40px -26px hsl(var(--lavender) / 0.55);
   }
+
+  /* 3D: the card under the pointer tilts towards it, with a soft light that
+     follows (src/lib/tilt.ts sets the angles). */
+  [data-tilt] {
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .tilt-3d {
+    transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    background-image: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), hsl(var(--lavender) / 0.09), transparent 60%);
+  }
+  .tilt-3d.bg-card {
+    box-shadow: 0 0 0 1px hsl(var(--lavender) / 0.32), 0 26px 50px -28px hsl(var(--lavender) / 0.6);
+  }
+
+  /* The logo in the header turns over in 3D. */
+  .logo-spin svg {
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .logo-spin:hover svg {
+    transform: perspective(300px) rotateY(360deg);
+  }
+}
+
+/* With the 3D scene behind the site (src/components/Scene3D), the page itself
+   is see-through and the home headline turns to frosted glass. */
+html[data-scene] body {
+  background-color: transparent;
+}
+html[data-scene] [data-testid='hero-slides'] {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
 @media (hover: hover) and (prefers-reduced-motion: reduce) {
   :is(div, section, li, article, aside, form, ol, ul).bg-card.border:not([role='dialog']):not([data-no-glow]):hover:not(:has(.bg-card.border:hover)) {

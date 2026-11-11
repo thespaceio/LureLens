@@ -4,7 +4,7 @@
 // its three red flags, it is stamped LURE SPOTTED and breaks apart, the lens
 // flies to the centre and becomes the logo's lens while the two Ls draw in, the
 // name and line appear, and the scene opens outward from the lens onto the home
-// screen. About six seconds. Any key, a tap or "Skip intro" ends it at once.
+// screen. About ten seconds. Any key, a tap or "Skip intro" ends it at once.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { animate, motion, useMotionTemplate, useMotionValue } from 'framer-motion';
@@ -21,12 +21,12 @@ const NIGHT = '#0F0822';
  * 0 incoming, 1 message drops in, 2 lens sweeps, 3 stamp, 4 logo,
  * 5 name, 6 line, 7 opens onto the home screen.
  */
-const AT = [0, 0.5, 1.2, 2.75, 3.35, 3.75, 4.25, 5.35];
+const AT = [0, 0.8, 1.9, 4.4, 5.4, 6.1, 6.9, 8.6];
 const OUT = 7;
-const OUT_SECONDS = 0.8;
-const SWEEP_SECONDS = 1.45;
+const OUT_SECONDS = 1.1;
+const SWEEP_SECONDS = 2.3;
 /** When, into the sweep, the lens reaches each red flag. */
-const FLAG_AT = [0.3, 0.75, 1.2];
+const FLAG_AT = [0.46, 1.15, 1.84];
 const LENS = 76;
 
 const FRAGMENTS = [
@@ -136,7 +136,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
           className="absolute inset-0"
           initial={{ opacity: 0, scale: 1.12 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 5.5, ease: 'easeOut' }}
+          transition={{ duration: 9, ease: 'easeOut' }}
           style={{
             backgroundImage: `linear-gradient(rgba(185,166,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(185,166,255,0.07) 1px, transparent 1px)`,
             backgroundSize: '44px 44px',
@@ -151,7 +151,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
             style={{ left: f.x, top: f.y, color: LAVENDER }}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: landed ? 0 : 0.22, y: -14 }}
-            transition={{ opacity: { duration: landed ? 0.5 : 1.4, delay: landed ? 0 : 0.2 + i * 0.12 }, y: { duration: 6, ease: 'linear' } }}
+            transition={{ opacity: { duration: landed ? 0.5 : 1.4, delay: landed ? 0 : 0.2 + i * 0.12 }, y: { duration: 10, ease: 'linear' } }}
           >
             {f.text}
           </motion.p>
@@ -178,20 +178,22 @@ export default function Intro({ onDone }: { onDone: () => void }) {
           {/* The lure: message, red flags and stamp. It breaks apart when the logo arrives. */}
           <motion.div
             className="absolute inset-0"
-            animate={landed ? { opacity: 0, scale: 0.84, filter: 'blur(10px)', y: 12 } : { opacity: 1, scale: 1, filter: 'blur(0px)', y: 0 }}
-            transition={{ duration: 0.45, ease: [0.4, 0, 1, 1] }}
+            animate={landed ? { opacity: 0, scale: 0.8, filter: 'blur(10px)', y: 20, rotateX: 38 } : { opacity: 1, scale: 1, filter: 'blur(0px)', y: 0, rotateX: 0 }}
+            style={{ transformPerspective: 900 }}
+            transition={{ duration: 0.75, ease: [0.4, 0, 1, 1] }}
           >
             <motion.div
               className="absolute inset-x-0 top-2"
-              initial={{ opacity: 0, y: -46, rotate: -3, scale: 0.94 }}
+              initial={{ opacity: 0, y: -46, rotate: -3, scale: 0.94, rotateX: -62 }}
+              style={{ transformPerspective: 900, transformOrigin: '50% 0%' }}
               animate={
                 phase >= 3
-                  ? { opacity: 1, y: 0, rotate: 0, scale: 1, x: [0, -9, 8, -6, 5, -2, 0] }
+                  ? { opacity: 1, y: 0, rotate: 0, scale: 1, rotateX: 0, x: [0, -9, 8, -6, 5, -2, 0] }
                   : phase >= 1
-                    ? { opacity: 1, y: 0, rotate: 0, scale: 1, x: 0 }
-                    : { opacity: 0, y: -46, rotate: -3, scale: 0.94 }
+                    ? { opacity: 1, y: 0, rotate: 0, scale: 1, rotateX: 0, x: 0 }
+                    : { opacity: 0, y: -46, rotate: -3, scale: 0.94, rotateX: -62 }
               }
-              transition={phase >= 3 ? { x: { duration: 0.42 } } : { type: 'spring', stiffness: 260, damping: 18 }}
+              transition={phase >= 3 ? { x: { duration: 0.5 } } : { type: 'spring', stiffness: 150, damping: 17 }}
             >
               <div
                 className="rounded-2xl border p-4 text-left"
@@ -289,7 +291,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
             }
             transition={
               landed
-                ? { duration: 0.5, ease: [0.5, 0, 0.2, 1], opacity: { duration: 0.75, times: [0, 0.7, 1] } }
+                ? { duration: 0.8, ease: [0.5, 0, 0.2, 1], opacity: { duration: 1.15, times: [0, 0.7, 1] } }
                 : { duration: SWEEP_SECONDS, ease: 'easeInOut', times: [0, 0.2, 0.3, 0.5, 0.6, 0.8, 1] }
             }
           />
@@ -301,7 +303,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
               style={{ border: `2px solid ${LIME}`, left: '50%', top: '50%', marginLeft: -80, marginTop: -80 }}
               initial={{ opacity: 0, scale: 0.2 }}
               animate={landed ? { opacity: [0, 0.8, 0], scale: [0.2, 1.6, 2.6] } : { opacity: 0, scale: 0.2 }}
-              transition={{ duration: 0.9, delay: 0.42, ease: 'easeOut' }}
+              transition={{ duration: 1.3, delay: 0.7, ease: 'easeOut' }}
             />
             <LogoDraw on={landed} />
           </div>
@@ -315,7 +317,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
                   className="inline-block"
                   initial={{ opacity: 0, y: 26, filter: 'blur(6px)' }}
                   animate={phase >= 5 ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 26, filter: 'blur(6px)' }}
-                  transition={{ duration: 0.45, delay: phase >= 5 ? i * 0.045 : 0, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.6, delay: phase >= 5 ? i * 0.07 : 0, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {ch}
                 </motion.span>
@@ -328,7 +330,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
                   className="inline-block"
                   initial={{ opacity: 0, y: 10 }}
                   animate={phase >= 6 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                  transition={{ duration: 0.35, delay: phase >= 6 ? i * 0.08 : 0 }}
+                  transition={{ duration: 0.5, delay: phase >= 6 ? i * 0.12 : 0 }}
                 >
                   {word === 'lure' ? <span style={{ color: LIME }}>{word}</span> : word}
                   {i < TAGLINE.split(' ').length - 1 ? ' ' : ''}
@@ -340,7 +342,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
               style={{ color: LAVENDER }}
               initial={{ opacity: 0 }}
               animate={{ opacity: phase >= 6 ? 0.75 : 0 }}
-              transition={{ duration: 0.5, delay: phase >= 6 ? 0.6 : 0 }}
+              transition={{ duration: 0.7, delay: phase >= 6 ? 0.9 : 0 }}
             >
               TH3 SPACEIO · LEARN. BUILD. SECURE.
             </motion.p>
@@ -397,7 +399,7 @@ function Flag({
         style={{ background: 'rgba(255,107,107,0.2)', boxShadow: `inset 0 -2px 0 ${CORAL}` }}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: on ? 1 : 0 }}
-        transition={{ duration: 0.28, delay: on ? delay : 0, ease: 'easeOut' }}
+        transition={{ duration: 0.4, delay: on ? delay : 0, ease: 'easeOut' }}
       />
       <motion.span
         className="relative"
@@ -416,7 +418,7 @@ function LogoDraw({ on }: { on: boolean }) {
   const draw = (delay: number) => ({
     initial: { pathLength: 0, opacity: 0 },
     animate: on ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 },
-    transition: { pathLength: { duration: 0.55, delay, ease: [0.65, 0, 0.35, 1] as const }, opacity: { duration: 0.05, delay } },
+    transition: { pathLength: { duration: 0.85, delay, ease: [0.65, 0, 0.35, 1] as const }, opacity: { duration: 0.05, delay } },
   });
   return (
     <svg viewBox="0 0 120 120" width={136} height={136} className="relative block overflow-visible">
@@ -435,8 +437,8 @@ function LogoDraw({ on }: { on: boolean }) {
         </filter>
       </defs>
       <g mask="url(#intro-s)" filter="url(#intro-glow)">
-        <motion.path d="M22 18 L22 98 L66 98" fill="none" stroke={LAVENDER} strokeWidth={20} strokeLinejoin="miter" {...draw(0.3)} />
-        <motion.path d="M98 102 L98 22 L54 22" fill="none" stroke={LAVENDER} strokeWidth={20} strokeLinejoin="miter" {...draw(0.4)} />
+        <motion.path d="M22 18 L22 98 L66 98" fill="none" stroke={LAVENDER} strokeWidth={20} strokeLinejoin="miter" {...draw(0.5)} />
+        <motion.path d="M98 102 L98 22 L54 22" fill="none" stroke={LAVENDER} strokeWidth={20} strokeLinejoin="miter" {...draw(0.65)} />
       </g>
       <motion.circle
         cx="60"
@@ -447,7 +449,7 @@ function LogoDraw({ on }: { on: boolean }) {
         strokeWidth={8}
         initial={{ opacity: 0 }}
         animate={{ opacity: on ? 1 : 0 }}
-        transition={{ duration: 0.2, delay: on ? 0.4 : 0 }}
+        transition={{ duration: 0.3, delay: on ? 0.7 : 0 }}
         style={{ filter: `drop-shadow(0 0 6px ${LIME})` }}
       />
     </svg>

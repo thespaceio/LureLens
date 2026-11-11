@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.6.0 (11 November 2026)
+
+### New
+- **LureLens in 3D.** A three.js scene now sits behind every page: the LureLens mark in 3D (the two Ls extruded in lavender around a glowing lime lens) beside the home headline, with email and chat cards drifting through the dark, a star field and a slowly travelling grid floor. The camera leans with your pointer and sinks as you scroll, and the headline turns to frosted glass over it. Other pages keep the mark small, in the corner.
+- **Cards tilt in 3D** towards your mouse or trackpad, with a soft light that follows the pointer. Big panels tilt less than small cards. Sections swing into place as they appear, and screens tip in when you switch between them. The header logo turns over when you point at it.
+- **It never gets in the way.** During a round the scene freezes and dims, and the message you're judging never tilts. It stays off with reduced motion, data saver, no WebGL, or a phone with 2 or fewer processor cores or 2 GB or less of memory, and it switches itself off if a device can't keep up. **3D effects** at the bottom of every page turns it on or off, and the choice is remembered. three.js loads separately after the page, only on devices that show 3D, and isn't part of the offline download.
+
+### Changed
+- **The opening scene takes its time:** about ten seconds instead of six, with a pause on each red flag, the stamp and the logo. The message now tips forward in 3D as it drops in and tips back as it breaks apart. Skipping works as before.
+
 ## 2.5.1 (11 November 2026)
 
 ### New

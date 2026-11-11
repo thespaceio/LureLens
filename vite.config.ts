@@ -6,6 +6,9 @@ import { defineConfig, type Plugin } from "vite"
 
 // Files in dist/ that the offline cache should not hold.
 const SKIP_PRECACHE = new Set(["service-worker.js", "_redirects", "og-image.png", "favicon-16.png"])
+// The 3D scene (three.js) is decoration that many phones never show, so it isn't
+// part of the offline download; it loads when a device actually uses it.
+const SKIP_PRECACHE_PATTERN = /^assets\/Backdrop-[^/]+\.js$/
 
 /**
  * After the build, write the list of every built file and a build hash into
@@ -30,9 +33,9 @@ function precacheServiceWorker(): Plugin {
         }
       }
       walk(outDir)
-      const precache = files.filter(f => !SKIP_PRECACHE.has(f))
+      const precache = files.filter(f => !SKIP_PRECACHE.has(f) && !SKIP_PRECACHE_PATTERN.test(f))
       const hash = createHash("sha256")
-      for (const f of precache) hash.update(f).update(readFileSync(path.join(outDir, f)))
+      for (const f of files.filter(f => f !== "service-worker.js")) hash.update(f).update(readFileSync(path.join(outDir, f)))
       const buildId = hash.digest("hex").slice(0, 12)
 
       const swPath = path.join(outDir, "service-worker.js")
