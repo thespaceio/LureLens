@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Pause, Phone, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
+import { ArrowRight, Pause, Phone, Play, ShieldAlert, ShieldCheck, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import EmailViewer from '@/components/EmailViewer/EmailViewer';
-import MessageViewer from '@/components/MessageViewer/MessageViewer';
-import FeedbackModal from '@/components/FeedbackModal/FeedbackModal';
+import Explanation from '@/components/Explanation/Explanation';
 import LinkStatus from '@/components/LinkStatus/LinkStatus';
 import type { InspectedLink } from '@/components/LinkStatus/LinkStatus';
+import ReviewViewer from '@/components/Review/ReviewViewer';
+import Verdict from '@/components/Review/Verdict';
+import VerifyTip from '@/components/Review/VerifyTip';
 import { scoreAnswer, scoreVerify } from '@/lib/game';
+import { marksFor, showMark } from '@/lib/marks';
 import { CHANNELS, LEVELS, channelOf } from '@/types';
-import type { AnswerRecord, Choice, Email, EmailMessage, Level, Points } from '@/types';
+import type { AnswerRecord, Choice, Email, Level, Points } from '@/types';
 
 export interface QuizResult {
   answers: AnswerRecord[];
@@ -49,6 +51,10 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const remainingMs = useRef(0);
   const email = emails[index];
   const isLast = index === emails.length - 1;
+  const reviewing = phase === 'feedback' && last !== null;
+  const marks = useMemo(() => (email ? marksFor(email) : []), [email]);
+  const verdictRef = useRef<HTMLDivElement>(null);
+  const scopeRef = useRef<HTMLDivElement>(null);
 
   const answer = useCallback(
     (choice: Choice) => {
@@ -113,9 +119,22 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
 
   // Keep the latest handlers reachable from timers and key listeners.
   const answerRef = useRef(answer);
+  const nextRef = useRef(next);
   useEffect(() => {
     answerRef.current = answer;
+    nextRef.current = next;
   });
+
+  // After answering, the verdict takes focus (so screen readers announce it)
+  // and comes into view above the marked message.
+  useEffect(() => {
+    if (!reviewing) return;
+    const el = verdictRef.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (el.getBoundingClientRect().top < 64) el.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+  }, [reviewing, index]);
 
   // Start a fresh clock for each email.
   useEffect(() => {
@@ -158,10 +177,18 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [pause]);
 
-  // Keyboard shortcuts: L = legitimate, P = phishing, S = skip.
+  // Keyboard shortcuts: L = legitimate, P = phishing, S = skip, Enter = next.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'Enter') {
+        // Enter on a link or button does that instead.
+        const t = e.target as Element | null;
+        if (t?.closest?.('a, button, input, textarea, select, [role="link"], [role="button"]')) return;
+        e.preventDefault();
+        nextRef.current();
+        return;
+      }
       const key = e.key.toLowerCase();
       if (key === 'l') answerRef.current('legitimate');
       else if (key === 'p') answerRef.current('phishing');
@@ -184,7 +211,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
   const noun = CHANNELS[channelOf(email)].noun;
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-4">
+    <div className={`mx-auto w-full max-w-4xl space-y-4 ${reviewing ? 'pb-24 lg:max-w-6xl lg:pb-0' : ''}`}>
       {/* HUD */}
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
         {[
@@ -232,7 +259,15 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         />
       </div>
 
-      {/* Email */}
+      {reviewing && last && (
+        <Verdict ref={verdictRef} email={email} choice={last.choice} correct={last.correct} points={last.points} streak={streak} marked={marks.length} />
+      )}
+
+      {/* The message, and after answering, what it was and why */}
+      <div
+        ref={scopeRef}
+        className={reviewing ? 'grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-start lg:gap-6' : undefined}
+      >
       <motion.div
         key={email.id}
         initial={{ opacity: 0, y: 12 }}
@@ -241,11 +276,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         className="relative"
       >
         <div aria-hidden={paused} className={paused ? 'invisible' : undefined}>
-          {email.channel === 'sms' || email.channel === 'whatsapp' ? (
-            <MessageViewer message={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
-          ) : (
-            <EmailViewer email={email as EmailMessage} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
-          )}
+          <ReviewViewer email={email} marks={reviewing ? marks : undefined} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
         </div>
         {paused && (
           <div
@@ -266,7 +297,28 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         <LinkStatus link={link} noun={noun} />
       </motion.div>
 
+      {reviewing && last && (
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1" data-testid="feedback">
+          <VerifyTip email={email} choice={last.choice} />
+          <Explanation email={email} onShow={n => showMark(scopeRef.current, n)} />
+          <div className="hidden lg:block">
+            <NextButton isLast={isLast} onNext={next} />
+          </div>
+        </aside>
+      )}
+      </div>
+
+      {reviewing && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
+          <div className="mx-auto max-w-4xl">
+            <NextButton isLast={isLast} onNext={next} />
+          </div>
+        </div>
+      )}
+
       {/* Answers */}
+      {!reviewing && (
+      <>
       <div className="grid grid-cols-2 gap-3">
         <Button
           variant="outline"
@@ -330,20 +382,19 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           Skip (0 points)
         </Button>
       </div>
-
-      {last && (
-        <FeedbackModal
-          open={phase === 'feedback'}
-          email={email}
-          choice={last.choice}
-          correct={last.correct}
-          points={last.points}
-          streak={streak}
-          isLast={isLast}
-          onNext={next}
-        />
+      </>
       )}
     </div>
+  );
+}
+
+function NextButton({ isLast, onNext }: { isLast: boolean; onNext: () => void }) {
+  return (
+    <Button onClick={onNext} size="lg" className="w-full gap-2 font-semibold" data-testid="next-button">
+      {isLast ? 'See results' : 'Next message'}
+      <ArrowRight className="size-4" />
+      <kbd className="ml-1 hidden rounded border border-current px-1.5 font-mono text-[10px] sm:inline">Enter</kbd>
+    </Button>
   );
 }
 

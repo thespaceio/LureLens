@@ -11,7 +11,7 @@
 
 **Play it:** [thespaceio.github.io/LureLens](https://thespaceio.github.io/LureLens/) · also at [lurelens.netlify.app](https://lurelens.netlify.app/), which may lag behind (Netlify's free plan limits how often it updates)
 
-**Version 2.1** · see the [changelog](CHANGELOG.md) for what's new.
+**Version 2.7** · see the [changelog](CHANGELOG.md) for what's new.
 
 LureLens was previously called PhishGuard. Old links to `phishguard-by-faith.netlify.app` redirect here.
 
@@ -35,7 +35,9 @@ Most scenarios are built around what people in Nigeria actually receive: GTBank,
 - **Countdown timer** on every email. Running out of time counts as wrong.
 - **Verify first**, a third answer for "I'd check through the official app or a number I trust". On messages where that is the real-world best move (a supplier's new bank details, the CEO's urgent favour, a friend's WhatsApp asking for money, a genuine bank warning) it counts as correct. It always scores 0 points, because points reward deciding, but it never resets the streak. Every verify answer shows how to check that kind of message.
 - **Scoring:** 100 points per correct answer, plus up to 50 for speed, times the level multiplier. From 3 correct in a row, each further correct answer adds +50.
-- **Emails, SMS and WhatsApp.** 110 scenarios: 80 emails, 15 text messages and 15 WhatsApp chats, including spoofed bank sender IDs, OTP tricks and hijacked friends asking for money. Every mixed round includes texts or chats.
+- **Emails, SMS and WhatsApp.** 140 scenarios: 98 emails, 21 text messages and 21 WhatsApp chats, including spoofed bank sender IDs, OTP tricks and hijacked friends asking for money. Mixed rounds include texts or chats.
+- **No repeats.** Each round prefers messages the player hasn't seen yet on this device, then the ones they saw longest ago, so nobody meets the same message twice until they've worked through the level (classroom rounds are unaffected, so everyone in a class still gets the same messages).
+- **Red flags marked on the message.** After each answer, the message stays on screen with every red flag (or sign it is safe) highlighted and numbered, and the explanation beside it uses the same numbers. Results let you reopen any message the same way, and **Replay my mistakes** plays the ones you got wrong again as practice (open any day, never ranked). The classroom debrief marks them too when the answer is revealed.
 - **Classroom mode** for trainers and lecturers: create a class code, link or QR code, and everyone who joins plays the same 10 messages in the same order. Players send back a one-line result, you paste the lines in to see the class table and which messages most people missed, then step through each message on the projector and reveal the answer after the room has voted. No server or sign-up needed.
 - **Certificate** for scoring at least 80% in a full round of every level (ranked or classroom rounds; topic practice doesn't count). It is drawn in the browser as an A4 landscape image with the player's name, each level's result and date, and a reference, ready to download, print, share or add to LinkedIn through LinkedIn's "Add to profile" link. The Progress page shows how close each player is.
 - **Share your result** as a branded image card (works offline), straight to WhatsApp, LinkedIn or X.
@@ -81,6 +83,7 @@ src/
   data/emails.json                 the email bank
   lib/game.ts                      picking emails and scoring rules
   lib/classroom.ts                 class codes, seeded class rounds, result lines
+  lib/marks.ts                     marking red flags on the message after answering
   lib/stats.ts                     scoreboard and progress calculations
   hooks/useGameStore.ts            saved games and player name (localStorage)
   components/
@@ -113,7 +116,7 @@ Every email in `src/data/emails.json` uses the same fields:
   "date": "2026-10-16T09:14:00",
   "body": "<div>HTML body. Use single quotes inside HTML attributes.</div>",
   "attachments": ["optional_file.pdf"],
-  "red_flags": [{ "description": "…", "location": "optional: where it appears" }],
+  "red_flags": [{ "description": "…", "spot": "the exact words in the message it points to" }],
   "trust_signals": [],
   "explanation": "One or two sentences shown after answering.",
   "verify_first": "Optional. How to verify, for messages where checking through another channel is the best move."
@@ -122,7 +125,8 @@ Every email in `src/data/emails.json` uses the same fields:
 
 - `level` is `beginner`, `intermediate` or `advanced`.
 - `category` is one of `banking`, `workplace`, `accounts`, `shopping`, `government`, `offers` (labels are in `src/types.ts`).
-- Phishing emails need `red_flags`. Legitimate emails need `trust_signals`.
+- Phishing emails need `red_flags`. Legitimate emails need `trust_signals`, each `{ "description": "…", "spot": "…" }` (a plain string also works).
+- `spot` is copied exactly from the message as players see it: the sender's address, a button's text, a phrase in the body or a bubble, an attachment name. It is marked on the message after answering and numbered like the flag. Spots in one message must not overlap; `npm test` checks every spot lands. Leave it out for a flag about something that isn't in the message ("you never ordered this").
 - Inside `body`, use single quotes for HTML attributes (`style='…'`). A double quote ends the JSON string and breaks the file. `npm run build` reports the line if the JSON is invalid.
 - Keep each level roughly half phishing and half legitimate. Each game picks 10 random emails with 4 to 6 phishing ones.
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.7.0 (13 November 2026)
+
+### New
+- **Red flags marked on the message.** After answering, the message stays on screen and every red flag (or sign it is safe) is highlighted on it with a number: the fake sender address, the button, the pressure line, the account name. The explanation sits beside it on laptops and below it on phones, numbered the same way, and tapping a number brings that spot into view. The verdict appears above the message instead of in a pop-up, and **Next message** stays at the bottom of the screen on phones. 499 of the game's 525 red flags and trust signs are marked; the rest are about things that aren't in the message, such as "you never ordered this".
+- **Review any answer from your results.** Each row in **Review your answers** opens the message again with its flags marked and explained.
+- **Replay my mistakes** plays just the messages you got wrong, as a practice round. It is never ranked, doesn't count towards the certificate, and works any day.
+- **The classroom debrief marks the red flags** on the projected message when the answer is revealed.
+- **30 new messages** (10 per level), bringing the bank to 140: Black Friday "deals", a fake end-of-year bonus letter, a scholarship fee scam, a "new number" message from Mum, a fake Moniepoint job interview, a PiggyVest withdrawal scare, a supplier lookalike domain with one swapped letter, a password-protected "assessment" zip, a fake company strike-off notice, a SIM swap text and an IT "VPN app" on WhatsApp, plus 15 genuine messages to set beside them. Four more have **Verify first** as the best answer.
+
+### Changed
+- **Rounds don't repeat messages.** Each round now prefers messages you haven't seen yet on this device, then those you saw longest ago, so a message only comes back once you've worked through the rest of the level. This also means retrying for the certificate brings fresh messages instead of ones you've memorised. Classroom rounds are unchanged.
+- **Class codes made before 2.7 stop working,** because the message bank changed (codes are tied to it so a class never gets different messages from its facilitator). Create a new code for your next class.
+
+
 ## 2.6.0 (11 November 2026)
 
 ### New

@@ -1,12 +1,19 @@
 import { FileText, UserRound } from 'lucide-react';
+import Marked from '@/components/Marks/Marked';
 import { splitLinks } from '@/lib/game';
+import { cutPieces, placeMarks } from '@/lib/marks';
+import type { Mark, Placed } from '@/lib/marks';
 import type { PhoneMessage } from '@/types';
 
 interface MessageViewerProps {
   message: PhoneMessage;
   /** Called when a link is hovered, focused or tapped. Links never open. */
   onLinkInspect?: (url: string, clicked: boolean) => void;
+  /** Red flags or reasons to trust, marked on the message after answering. */
+  marks?: Mark[];
 }
+
+const UNKNOWN_NOTE = 'This number is not saved in your contacts.';
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -19,11 +26,15 @@ function formatDay(iso: string): string {
 }
 
 /** Message text with every link turned into an inspect-only button. */
-function MessageText({ text, onLinkInspect, linkClass }: { text: string; onLinkInspect?: MessageViewerProps['onLinkInspect']; linkClass: string }) {
+function MessageText({ text, onLinkInspect, linkClass, placed }: { text: string; onLinkInspect?: MessageViewerProps['onLinkInspect']; linkClass: string; placed?: Placed[] }) {
+  const parts = splitLinks(text);
+  const starts = parts.map((_, i) => parts.slice(0, i).reduce((sum, p) => sum + p.text.length, 0));
   return (
     <>
-      {splitLinks(text).map((part, i) =>
-        part.url ? (
+      {parts.map((part, i) => {
+        const at = starts[i];
+        const content = placed?.length ? <Marked pieces={cutPieces(part.text, placed, at)} /> : part.text;
+        return part.url ? (
           <button
             key={i}
             type="button"
@@ -32,17 +43,17 @@ function MessageText({ text, onLinkInspect, linkClass }: { text: string; onLinkI
             onFocus={() => onLinkInspect?.(part.url!, false)}
             onClick={() => onLinkInspect?.(part.url!, true)}
           >
-            {part.text}
+            {content}
           </button>
         ) : (
-          <span key={i}>{part.text}</span>
-        ),
-      )}
+          <span key={i}>{content}</span>
+        );
+      })}
     </>
   );
 }
 
-export function MessageViewer({ message, onLinkInspect }: MessageViewerProps) {
+export function MessageViewer({ message, onLinkInspect, marks }: MessageViewerProps) {
   const isWhatsApp = message.channel === 'whatsapp';
   const time = formatTime(message.date);
   const initial = (message.sender.name.replace(/^\+/, '').trim()[0] ?? '?').toUpperCase();
@@ -55,13 +66,20 @@ export function MessageViewer({ message, onLinkInspect }: MessageViewerProps) {
       ? `Text message · ${message.sender.number}`
       : 'Text message · sender ID';
 
+  // Fields in reading order: sender, the line under it, the unknown-number note, each bubble, attachments.
+  const attachments = message.attachments ?? [];
+  const fieldsKey = [message.sender.name, subline, unknown ? UNKNOWN_NOTE : '', ...message.messages, ...attachments];
+  const placed = marks?.length ? placeMarks(fieldsKey, marks) : null;
+  const BUBBLES = 3;
+  const show = (text: string, field: number) => (placed ? <Marked pieces={cutPieces(text, placed[field])} /> : text);
+
   return (
     <article
       className="mx-auto w-full max-w-md overflow-hidden rounded-[1.75rem] border-[6px] border-[#2A1A55] bg-white text-[#1E0F45] shadow-2xl shadow-black/40"
       data-testid="message-viewer"
       aria-label={isWhatsApp ? 'WhatsApp chat' : 'Text message'}
     >
-      <header className={`flex items-center gap-3 px-4 py-3 ${isWhatsApp ? 'bg-[#0F5C4D] text-white' : 'border-b border-[#DDD6EE] bg-[#F7F5FC]'}`}>
+      <header className={`flex items-center gap-3 px-4 py-3 ${isWhatsApp ? 'lure-on-dark bg-[#0F5C4D] text-white' : 'border-b border-[#DDD6EE] bg-[#F7F5FC]'}`}>
         <div
           className={`grid size-10 shrink-0 place-items-center rounded-full font-bold ${
             isWhatsApp ? 'bg-white/20 text-white' : 'bg-[#DDD6EE] text-[#3B1F7A]'
@@ -71,8 +89,8 @@ export function MessageViewer({ message, onLinkInspect }: MessageViewerProps) {
           {/^\+?\d/.test(message.sender.name) ? <UserRound className="size-5" /> : initial}
         </div>
         <div className="min-w-0">
-          <div className="truncate font-semibold [overflow-wrap:anywhere]">{message.sender.name}</div>
-          <div className={`truncate font-mono text-xs ${isWhatsApp ? 'text-white/80' : 'text-[#4A3E6B]'}`}>{subline}</div>
+          <div className={`font-semibold [overflow-wrap:anywhere] ${placed ? '' : 'truncate'}`}>{show(message.sender.name, 0)}</div>
+          <div className={`font-mono text-xs ${placed ? '' : 'truncate'} ${isWhatsApp ? 'text-white/80' : 'text-[#4A3E6B]'}`}>{show(subline, 1)}</div>
         </div>
         <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${isWhatsApp ? 'bg-white/15 text-white' : 'bg-[#E8E3F5] text-[#3B1F7A]'}`}>
           {isWhatsApp ? 'WhatsApp' : 'SMS'}
@@ -83,7 +101,7 @@ export function MessageViewer({ message, onLinkInspect }: MessageViewerProps) {
         <span className="mx-auto mb-1 rounded-md bg-[#E8E3F5] px-2.5 py-0.5 text-[11px] font-medium text-[#4A3E6B]">{formatDay(message.date)}</span>
         {unknown && (
           <p className="mx-auto max-w-[85%] rounded-md bg-[#FFF4D6] px-3 py-1.5 text-center text-[12px] text-[#6B4E00]">
-            This number is not saved in your contacts.
+            {show(UNKNOWN_NOTE, 2)}
           </p>
         )}
         {message.messages.map((text, i) => (
@@ -93,11 +111,11 @@ export function MessageViewer({ message, onLinkInspect }: MessageViewerProps) {
               isWhatsApp ? 'bg-white shadow-sm' : 'bg-[#ECE8F5]'
             }`}
           >
-            <MessageText text={text} onLinkInspect={onLinkInspect} linkClass="text-[#1a62d6]" />
-            {i === message.messages.length - 1 && message.attachments?.map(name => (
+            <MessageText text={text} onLinkInspect={onLinkInspect} linkClass="text-[#1a62d6]" placed={placed?.[BUBBLES + i]} />
+            {i === message.messages.length - 1 && attachments.map((name, j) => (
               <span key={name} className="mt-2 flex items-center gap-2 rounded-lg bg-black/5 px-2.5 py-2 font-mono text-xs">
                 <FileText className="size-4 shrink-0" />
-                {name}
+                <span>{show(name, BUBBLES + message.messages.length + j)}</span>
               </span>
             ))}
             <span className="mt-1 block text-right text-[11px] text-[#6B6185]">{time}</span>

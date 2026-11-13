@@ -1,12 +1,12 @@
 import type { CSSProperties } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import RevealText from '@/components/ui/reveal';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, ClipboardList, Copy, Eye, LogIn, MonitorPlay, Presentation, RefreshCw, UserRound, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import EmailViewer from '@/components/EmailViewer/EmailViewer';
-import MessageViewer from '@/components/MessageViewer/MessageViewer';
+import ReviewViewer from '@/components/Review/ReviewViewer';
+import { marksFor, showMark } from '@/lib/marks';
 import Explanation from '@/components/Explanation/Explanation';
 import LinkStatus from '@/components/LinkStatus/LinkStatus';
 import type { InspectedLink } from '@/components/LinkStatus/LinkStatus';
@@ -26,7 +26,7 @@ import {
 } from '@/lib/classroom';
 import type { ClassResult, DecodedClass } from '@/lib/classroom';
 import { CHANNELS, LEVELS, LEVEL_ORDER, channelOf, verifyTip } from '@/types';
-import type { Email, EmailMessage, Level } from '@/types';
+import type { Email, Level } from '@/types';
 
 type JoinedClass = Extract<DecodedClass, { ok: true }>;
 
@@ -510,6 +510,8 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
   const email = round[index];
   const noun = CHANNELS[channelOf(email)].noun;
   const stat = perMessage[index];
+  const marks = useMemo(() => marksFor(email), [email]);
+  const scope = useRef<HTMLDivElement>(null);
 
   const go = (i: number) => {
     if (i < 0 || i >= round.length) return;
@@ -570,12 +572,10 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
         </p>
       </div>
 
+      <div ref={scope} className="space-y-4">
       <motion.div key={email.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
-        {email.channel === 'sms' || email.channel === 'whatsapp' ? (
-          <MessageViewer message={email} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
-        ) : (
-          <EmailViewer email={email as EmailMessage} onLinkInspect={(url, clicked) => setLink({ url, clicked })} highlightLinks={revealed} />
-        )}
+        {/* Revealing the answer marks the red flags on the message, numbered like the list below. */}
+        <ReviewViewer email={email} marks={revealed ? marks : undefined} onLinkInspect={(url, clicked) => setLink({ url, clicked })} />
         <LinkStatus link={link} noun={noun} />
       </motion.div>
 
@@ -603,7 +603,7 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
               {verifyTip(email)}
             </p>
           )}
-          <Explanation email={email} large />
+          <Explanation email={email} large onShow={n => showMark(scope.current, n)} />
         </section>
       ) : (
         <section className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-6 text-center">
@@ -616,6 +616,7 @@ function Debrief({ host, board, onBack }: { host: HostState; board: ClassBoard; 
           </Button>
         </section>
       )}
+      </div>
 
       <div className="flex items-center justify-between gap-2">
         <Button variant="outline" className="gap-2 bg-transparent" onClick={() => go(index - 1)} disabled={index === 0}>

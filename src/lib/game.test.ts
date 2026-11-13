@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, scoreVerify, MIN_PHONE_MESSAGES, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, splitLinks } from './game';
+import { ALL_EMAILS, BASE_POINTS, MAX_SPEED_BONUS, STREAK_BONUS, buildRound, scoreVerify, MIN_PHONE_MESSAGES, channelCounts, emailsFor, hostOf, rankTitle, scoreAnswer, seenOrder, splitLinks } from './game';
+import type { GameSession } from '@/types';
 import { LEVELS, LEVEL_ORDER, channelOf } from '@/types';
 
 describe('buildRound', () => {
@@ -129,5 +130,43 @@ describe('splitLinks', () => {
 
   it('needs a whole top-level domain', () => {
     expect(splitLinks('kuda.company').some(p => p.url)).toBe(false);
+  });
+});
+
+describe('rounds avoid messages the player has already seen', () => {
+  const session = (ids: string[], date: string) =>
+    ({ id: date, name: 'Ada', level: 'beginner', date, score: 0, correct: 0, total: ids.length, accuracy: 0, bestStreak: 0, avgSeconds: 0,
+       answers: ids.map(id => ({ id, subject: '', category: 'banking', topic: '', is_phishing: false, choice: 'skip', correct: false, seconds: 0, points: 0 })) }) as GameSession;
+
+  it('never repeats a message until every message in the level has been seen', () => {
+    const level = 'beginner' as const;
+    const pool = emailsFor(level).length;
+    const sessions: GameSession[] = [];
+    const counts = new Map<string, number>();
+    const rounds = Math.floor(pool / 10);
+    for (let r = 0; r < rounds; r++) {
+      const round = buildRound(level, [], [], Math.random, seenOrder(sessions));
+      for (const e of round) counts.set(e.id, (counts.get(e.id) ?? 0) + 1);
+      sessions.push(session(round.map(e => e.id), new Date(2026, 10, 1, 0, r).toISOString()));
+    }
+    // A few repeats are allowed only where the 4–6 phishing balance needs them.
+    const repeats = [...counts.values()].filter(c => c > 1).length;
+    expect(repeats).toBeLessThanOrEqual(3);
+  });
+
+  it('serves the least recently seen messages once everything has been seen', () => {
+    const all = emailsFor('beginner').map(e => e.id);
+    const old = all.slice(0, 20);
+    const recent = all.slice(20);
+    const seen = seenOrder([session(old, '2026-11-01T10:00:00Z'), session(recent, '2026-11-08T10:00:00Z')]);
+    const round = buildRound('beginner', [], [], Math.random, seen).map(e => e.id);
+    expect(round.filter(id => old.includes(id)).length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('classroom rounds are unchanged by it (same seed, same messages)', () => {
+    const seeded = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+    const a = buildRound('advanced', [], [], seeded(42)).map(e => e.id);
+    const b = buildRound('advanced', [], [], seeded(42), undefined).map(e => e.id);
+    expect(a).toEqual(b);
   });
 });

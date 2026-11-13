@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { ALL_EMAILS } from '@/lib/game';
 import { BadgeCheck, ChevronLeft, ChevronRight, Landmark, MessageCircle, Pause, Play, ShieldAlert, Timer, Users } from 'lucide-react';
 
 // The rotating hooks at the top of the home screen. Every claim here is true
@@ -137,7 +138,7 @@ const SLIDES: Slide[] = [
   {
     tag: 'THE GAME',
     title: 'Can you spot the phish before the clock runs out?',
-    sub: '110 emails, texts and WhatsApp messages. Some are scams, some are safe. Three levels, one clock.',
+    sub: `${ALL_EMAILS.length} emails, texts and WhatsApp messages. Some are scams, some are safe. Three levels, one clock.`,
     visual: TimerVisual,
   },
   {

@@ -31,7 +31,9 @@ const PHASES: Phase[] = [
     status: 'now',
     intro: 'A free, trustworthy way for anyone to practise spotting scams.',
     done: [
-      '110 real-world scenarios across email, SMS and WhatsApp, built on the scams people in Nigeria actually get',
+      '140 real-world scenarios across email, SMS and WhatsApp, built on the scams people in Nigeria actually get',
+      'After every answer, the red flags are marked on the message itself',
+      'Rounds that never repeat a message until you have seen the rest of the level',
       'Beginner, Intermediate and Advanced levels, against the clock',
       'Verify first: an answer for checking through a channel you already trust',
       'Accounts, plus quick join with just a username',

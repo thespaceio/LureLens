@@ -1,4 +1,4 @@
-import { Accessibility, Award, Box, MousePointer2, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import { Accessibility, Award, Box, MousePointer2, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, RotateCcw, Sparkles, UserRound, Users, Zap } from 'lucide-react';
 import { isNewer } from '@/lib/whatsNew';
 import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,16 @@ import { APP_VERSION, REPO_URL } from '@/lib/report';
 // Each release's highlights, newest first. Returning players see every
 // release since the note they last saw.
 const RELEASES = [
+  {
+    version: '2.7',
+    title: 'See the red flags on the message',
+    description: 'Every answer now shows you exactly where the warning signs were, and every round brings messages you have not seen yet.',
+    items: [
+      { icon: Flag, title: 'Red flags marked on the message', text: 'After you answer, each red flag (or sign it is safe) is highlighted on the message itself and numbered, with the explanation beside it. Tap a number to jump to it.' },
+      { icon: MessageSquareText, title: '30 new messages, no repeats', text: '140 messages now, including Black Friday deals, "new number" scams and fake job interviews. Rounds show you messages you have not seen before repeating any.' },
+      { icon: RotateCcw, title: 'Replay your mistakes', text: 'Open any message from your results to see it again with its flags marked, or replay just the ones you got wrong.' },
+    ],
+  },
   {
     version: '2.6',
     title: 'LureLens in 3D',

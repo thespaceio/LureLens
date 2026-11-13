@@ -15,7 +15,7 @@ import { isReady, useAuth } from '@/hooks/authContext';
 import { pullGames, pushGames } from '@/lib/sync';
 import { markWhatsNewSeen, whatsNewFor } from '@/lib/whatsNew';
 import { useGameStore } from '@/hooks/useGameStore';
-import { accuracyOf, buildRound } from '@/lib/game';
+import { ALL_EMAILS, accuracyOf, buildRound, seenOrder, shuffle } from '@/lib/game';
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
 import { classRound, normalizeCode } from '@/lib/classroom';
 import { isGameNight, nextGameNightLabel } from '@/lib/gameNight';
@@ -78,6 +78,8 @@ interface Game {
   emails: Email[];
   /** Set for classroom rounds. */
   classCode?: string;
+  /** A replay of the messages a finished round got wrong (practice). */
+  replay?: boolean;
 }
 
 interface Result {
@@ -86,6 +88,8 @@ interface Result {
   personalBest: boolean;
   /** This game completed the certificate. */
   newCertificate: boolean;
+  /** The round was a replay of mistakes. */
+  replay?: boolean;
 }
 
 const NAV: { id: View; label: string; short: string; icon: typeof Play }[] = [
@@ -226,10 +230,23 @@ function App() {
       window.scrollTo(0, 0);
       return;
     }
-    const emails = buildRound(level, categories, channels);
+    // Messages this player hasn't seen come first, so rounds don't repeat.
+    const name = (signedIn ? username : store.playerName.trim()) || 'Player';
+    const emails = buildRound(level, categories, channels, Math.random, seenOrder(playerSessions(store.sessions, name)));
     if (emails.length === 0) return;
     setMenuLevel(level);
     setGame({ id: `${level}-${Date.now()}`, level, categories, channels, emails });
+    setView('quiz');
+    window.scrollTo(0, 0);
+  }, [signedIn, username, store.playerName, store.sessions]);
+
+  // Practice the messages a finished round got wrong. Open any day: it only
+  // follows a round the player was allowed to play, and is never ranked.
+  const replayMistakes = useCallback((session: GameSession) => {
+    const wrong = new Set(session.answers.filter(a => !a.correct).map(a => a.id));
+    const emails = shuffle(ALL_EMAILS.filter(e => wrong.has(e.id)));
+    if (emails.length === 0) return;
+    setGame({ id: `replay-${Date.now()}`, level: session.level, categories: [], channels: [], emails, replay: true });
     setView('quiz');
     window.scrollTo(0, 0);
   }, []);
@@ -260,7 +277,7 @@ function App() {
         bestStreak,
         avgSeconds: total ? Math.round((answers.reduce((s, a) => s + a.seconds, 0) / total) * 10) / 10 : 0,
         answers,
-        ...(game.categories.length > 0 || game.channels.length > 0 || game.classCode ? { practice: true } : {}),
+        ...(game.categories.length > 0 || game.channels.length > 0 || game.classCode || game.replay ? { practice: true } : {}),
         ...(game.classCode ? { classCode: game.classCode } : {}),
         ...(signedIn && auth.userId ? { userId: auth.userId, synced: false } : {}),
       };
@@ -273,6 +290,7 @@ function App() {
         rank: rankOf([session, ...store.sessions], session),
         personalBest: !session.practice && playedBefore && score > previousBest,
         newCertificate: !hadCertificate && certificateProgress([session, ...store.sessions], name).earned,
+        ...(game.replay ? { replay: true } : {}),
       });
       setView('results');
       window.scrollTo(0, 0);
@@ -299,7 +317,8 @@ function App() {
         return result ? (
           <ResultsScreen
             {...result}
-            onPlayAgain={() => startGame(result.session.level, game?.categories ?? [], game?.channels ?? [])}
+            onPlayAgain={() => startGame(result.session.level, game?.replay ? [] : game?.categories ?? [], game?.replay ? [] : game?.channels ?? [])}
+            onReplayMistakes={() => replayMistakes(result.session)}
             onClassroom={() => navigate('classroom')}
             signedIn={signedIn}
             onSignIn={() => signIn('results')}
