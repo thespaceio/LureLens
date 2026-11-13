@@ -8,6 +8,18 @@ export interface RedFlag {
   description: string;
   /** Where in the email the flag appears (optional). */
   location?: string;
+  /**
+   * The exact words in the message this flag points to (a sender address, a
+   * link's text, a line of the body). After answering, they are marked on the
+   * message with the flag's number. Must appear in the message as shown.
+   */
+  spot?: string;
+}
+
+/** A reason a legitimate message can be trusted, optionally marked on the message like a red flag. */
+export interface TrustSignal {
+  description: string;
+  spot?: string;
 }
 
 export type Channel = 'email' | 'sms' | 'whatsapp';
@@ -25,7 +37,8 @@ interface MessageBase {
   date: string;
   attachments?: string[];
   red_flags: RedFlag[];
-  trust_signals: string[];
+  /** Plain strings are still accepted. */
+  trust_signals: (string | TrustSignal)[];
   explanation: string;
   /**
    * Set when checking through another channel is the real-world best move

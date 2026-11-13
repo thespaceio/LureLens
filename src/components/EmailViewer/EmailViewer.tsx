@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 import DOMPurify from 'dompurify';
 import { Paperclip } from 'lucide-react';
+import Marked from '@/components/Marks/Marked';
+import { cutPieces, markElement, placeMarks, textOf } from '@/lib/marks';
+import type { Mark, Placed } from '@/lib/marks';
 import type { EmailMessage } from '@/types';
 
 interface EmailViewerProps {
@@ -9,6 +12,8 @@ interface EmailViewerProps {
   onLinkInspect?: (url: string, clicked: boolean) => void;
   /** Outline every link (used when reviewing an email after answering). */
   highlightLinks?: boolean;
+  /** Red flags or reasons to trust, marked on the email after answering. */
+  marks?: Mark[];
 }
 
 const EMAIL_STYLES = `
@@ -19,6 +24,17 @@ const EMAIL_STYLES = `
   .mail a[data-href] { cursor: pointer; }
   .mail a[data-href]:focus { outline: 2px solid #1a62d6; outline-offset: 2px; }
   .mail.highlight a[data-href] { outline: 2px dashed #e5484d; outline-offset: 3px; }
+  ${'' /* Keep in step with the .lure-* rules in index.css. */}
+  .lure-mark { color: #1e0f45; background: #ffe1e2; box-shadow: inset 0 -2px 0 #c4343a;
+               border-radius: 3px; padding: 0 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+               scroll-margin: 96px; }
+  .lure-trust { background: #e4f5bd; box-shadow: inset 0 -2px 0 #3f6b00; }
+  .lure-num { margin-right: 0.3em; padding: 0.05em 0.42em; border-radius: 999px; background: #c4343a; color: #fff;
+              font: 700 0.72em/1 Arial, Helvetica, sans-serif; vertical-align: 0.15em; text-decoration: none; }
+  .lure-trust .lure-num { background: #3f6b00; }
+  .lure-pulse { animation: lure-pulse 1.2s ease-out 1; }
+  @keyframes lure-pulse { 0%, 60% { outline: 3px solid #7b5cff; outline-offset: 3px; } 100% { outline: 3px solid transparent; outline-offset: 3px; } }
+  @media (prefers-reduced-motion: reduce) { .lure-pulse { animation: none; outline: 3px solid #7b5cff; outline-offset: 3px; } }
 `;
 
 /**
@@ -62,10 +78,23 @@ function formatDate(iso: string): string {
   });
 }
 
-export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: EmailViewerProps) {
+/** Fields in reading order, for placing marks: subject, sender name and address, reply-to, body, attachments. */
+const BODY = 4;
+
+export function EmailViewer({ email, onLinkInspect, highlightLinks = false, marks }: EmailViewerProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const inspectRef = useRef(onLinkInspect);
-  const body = useMemo(() => prepareBody(email.body), [email.body]);
+  const prepared = useMemo(() => prepareBody(email.body), [email.body]);
+  const { body, placed } = useMemo((): { body: string; placed: Placed[][] | null } => {
+    if (!marks?.length) return { body: prepared, placed: null };
+    const root = new DOMParser().parseFromString(`<div>${prepared}</div>`, 'text/html').body.firstElementChild;
+    if (!root) return { body: prepared, placed: null };
+    const fields = [email.subject, email.sender.name, email.sender.email, email.reply_to ?? '', textOf(root), ...(email.attachments ?? [])];
+    const placed = placeMarks(fields, marks);
+    markElement(root, placed[BODY]);
+    return { body: root.innerHTML, placed };
+  }, [prepared, marks, email.subject, email.sender.name, email.sender.email, email.reply_to, email.attachments]);
+  const show = (text: string, field: number) => (placed ? <Marked pieces={cutPieces(text, placed[field])} /> : text);
 
   useEffect(() => {
     inspectRef.current = onLinkInspect;
@@ -125,7 +154,7 @@ export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: Em
 
       <header className="border-b border-[#DDD6EE] px-4 py-4 sm:px-6">
         <h2 className="mb-3 text-lg font-semibold leading-snug [overflow-wrap:anywhere] sm:text-xl">
-          {email.subject}
+          {show(email.subject, 0)}
         </h2>
         <div className="flex items-start gap-3">
           <div className="hidden size-10 shrink-0 place-items-center rounded-full bg-[#DDD6EE] font-bold text-[#3B1F7A] sm:grid">
@@ -133,12 +162,12 @@ export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: Em
           </div>
           <div className="min-w-0 flex-1 text-sm">
             <div className="[overflow-wrap:anywhere]">
-              <strong>{email.sender.name}</strong>{' '}
-              <span className="font-mono text-[13px] text-[#4A3E6B]">&lt;{email.sender.email}&gt;</span>
+              <strong>{show(email.sender.name, 1)}</strong>{' '}
+              <span className="font-mono text-[13px] text-[#4A3E6B]">&lt;{show(email.sender.email, 2)}&gt;</span>
             </div>
             {email.reply_to && (
               <div className="font-mono text-[13px] text-[#9A5B00] [overflow-wrap:anywhere]">
-                reply-to &lt;{email.reply_to}&gt;
+                reply-to &lt;{show(email.reply_to, 3)}&gt;
               </div>
             )}
             <div className="font-mono text-[13px] text-[#4A3E6B]">to me &lt;ada.okafor@brightpath.ng&gt;</div>
@@ -153,13 +182,13 @@ export function EmailViewer({ email, onLinkInspect, highlightLinks = false }: Em
 
       {email.attachments && email.attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 border-t border-[#DDD6EE] bg-white px-4 py-3 sm:px-6">
-          {email.attachments.map(name => (
+          {email.attachments.map((name, i) => (
             <span
               key={name}
               className="inline-flex items-center gap-2 rounded-md border border-[#DDD6EE] bg-[#F7F5FC] px-3 py-1.5 font-mono text-xs [overflow-wrap:anywhere]"
             >
               <Paperclip className="size-3.5 shrink-0" />
-              {name}
+              <span>{show(name, BODY + 1 + i)}</span>
             </span>
           ))}
         </div>

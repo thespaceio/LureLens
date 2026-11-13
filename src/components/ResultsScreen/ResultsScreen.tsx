@@ -2,13 +2,14 @@ import type { CSSProperties } from 'react';
 import RevealText from '@/components/ui/reveal';
 import { useEffect, useRef, useState } from 'react';
 import { animate, motion, useReducedMotion } from 'framer-motion';
-import { Award, Check, Copy, Loader2, Phone, RotateCcw, Send, Share2, Trophy, UserRound, Users, X } from 'lucide-react';
+import { Award, Check, ChevronDown, Copy, Loader2, Phone, RotateCcw, Send, Share2, Trophy, UserRound, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SharePanel from '@/components/SharePanel/SharePanel';
 import PostScore from '@/components/Online/PostScore';
 import { ONLINE, OnlineError, postClassResult } from '@/lib/online';
 import type { PostedScore } from '@/lib/online';
-import { rankTitle } from '@/lib/game';
+import MessageReview from '@/components/Review/MessageReview';
+import { ALL_EMAILS, rankTitle } from '@/lib/game';
 import { formatCode, resultLine } from '@/lib/classroom';
 import { LEVELS, LEVEL_ORDER } from '@/types';
 import type { Choice, GameSession, Level } from '@/types';
@@ -28,6 +29,10 @@ interface ResultsScreenProps {
   onClassPosted: (posted: PostedScore) => void;
   signedIn: boolean;
   onSignIn: () => void;
+  /** Play the messages this round got wrong again, as practice. */
+  onReplayMistakes?: () => void;
+  /** This round was itself a replay of mistakes. */
+  replay?: boolean;
 }
 
 const CHOICE: Record<Choice, string> = {
@@ -38,15 +43,17 @@ const CHOICE: Record<Choice, string> = {
   skip: 'Skipped',
 };
 
-export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom, onPosted, onClassPosted, signedIn, onSignIn }: ResultsScreenProps) {
+export function ResultsScreen({ session, rank, personalBest, newCertificate, onPlayAgain, onPlayLevel, onScoreboard, onProgress, onClassroom, onPosted, onClassPosted, signedIn, onSignIn, onReplayMistakes, replay }: ResultsScreenProps) {
   const cfg = LEVELS[session.level];
   const nextLevel = LEVEL_ORDER[LEVEL_ORDER.indexOf(session.level) + 1];
   const [sharing, setSharing] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
+  const mistakes = session.answers.filter(a => !a.correct).length;
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="mx-auto w-full max-w-3xl space-y-6">
       <div className="text-center">
-        <p className="text-in font-mono text-xs uppercase tracking-[0.16em] text-primary">{cfg.label} complete</p>
+        <p className="text-in font-mono text-xs uppercase tracking-[0.16em] text-primary">{replay ? `${cfg.label} mistakes replay` : `${cfg.label} complete`}</p>
         <h1 className="mt-2 text-3xl font-bold sm:text-4xl"><RevealText text={rankTitle(session.accuracy)} /></h1>
         <p className="mt-1 text-5xl font-bold text-primary sm:text-6xl" data-testid="results-score">
           <CountUp value={session.score} /> <span className="text-base font-medium text-muted-foreground">points</span>
@@ -146,32 +153,71 @@ export function ResultsScreen({ session, rank, personalBest, newCertificate, onP
 
       {sharing && <SharePanel session={session} />}
 
-      <section>
-        <h2 className="mb-3 font-semibold">Review your answers</h2>
+      <section aria-labelledby="review-heading">
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          <div>
+            <h2 id="review-heading" className="font-semibold">Review your answers</h2>
+            <p className="text-sm text-muted-foreground">Open any message to see it again with its red flags marked.</p>
+          </div>
+          {onReplayMistakes && mistakes > 0 && (
+            <Button variant="secondary" className="gap-2" onClick={onReplayMistakes} data-testid="replay-mistakes">
+              <RotateCcw className="size-4" /> Replay my {mistakes === 1 ? 'mistake' : `${mistakes} mistakes`}
+            </Button>
+          )}
+        </div>
         <ol className="space-y-2">
-          {session.answers.map((a, i) => (
-            <li key={a.id} className="rise-in flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3" style={{ '--i': i } as CSSProperties}>
-              <span
-                className={`grid size-7 shrink-0 place-items-center rounded-full ${
-                  a.correct
-                    ? 'bg-primary/15 text-primary'
-                    : a.choice === 'verify'
-                      ? 'bg-lavender/15 text-lavender'
-                      : 'bg-destructive/15 text-destructive'
-                }`}
-              >
-                {a.correct ? <Check className="size-4" /> : a.choice === 'verify' ? <Phone className="size-4" /> : <X className="size-4" />}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="font-medium [overflow-wrap:anywhere]">{a.subject}</div>
-                <div className="text-xs text-muted-foreground">
-                  {a.topic} · was <strong className="text-foreground">{a.is_phishing ? 'phishing' : 'legitimate'}</strong> ·
-                  you said {CHOICE[a.choice]} · {a.seconds}s
-                </div>
-              </div>
-              <span className="font-mono text-sm text-muted-foreground">{a.points ? `+${a.points}` : '0'}</span>
-            </li>
-          ))}
+          {session.answers.map((a, i) => {
+            const email = ALL_EMAILS.find(e => e.id === a.id);
+            const expanded = open === a.id && Boolean(email);
+            const panel = `review-${a.id}`;
+            const row = (
+              <>
+                <span
+                  className={`grid size-7 shrink-0 place-items-center rounded-full ${
+                    a.correct
+                      ? 'bg-primary/15 text-primary'
+                      : a.choice === 'verify'
+                        ? 'bg-lavender/15 text-lavender'
+                        : 'bg-destructive/15 text-destructive'
+                  }`}
+                >
+                  {a.correct ? <Check className="size-4" /> : a.choice === 'verify' ? <Phone className="size-4" /> : <X className="size-4" />}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium [overflow-wrap:anywhere]">{a.subject}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {a.topic} · was <strong className="text-foreground">{a.is_phishing ? 'phishing' : 'legitimate'}</strong> ·
+                    you said {CHOICE[a.choice]} · {a.seconds}s
+                  </span>
+                </span>
+                <span className="font-mono text-sm text-muted-foreground">{a.points ? `+${a.points}` : '0'}</span>
+              </>
+            );
+            return (
+              <li key={a.id} className="rise-in overflow-hidden rounded-lg border border-border bg-card" style={{ '--i': i } as CSSProperties} data-no-tilt>
+                {email ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/40"
+                    aria-expanded={expanded}
+                    aria-controls={panel}
+                    onClick={() => setOpen(o => (o === a.id ? null : a.id))}
+                    data-testid="review-row"
+                  >
+                    {row}
+                    <ChevronDown className={`size-4 shrink-0 text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`} aria-hidden />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3 px-4 py-3">{row}</div>
+                )}
+                {expanded && email && (
+                  <div id={panel} className="border-t border-border px-3 py-4 sm:px-5">
+                    <MessageReview email={email} choice={a.choice} />
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       </section>
     </motion.div>

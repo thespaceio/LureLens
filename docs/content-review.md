@@ -4,6 +4,12 @@ LureLens teaches people which senders to trust, so a wrong "real domain" does re
 
 **Last full review:** 23 October 2026, covering all 80 emails. The 30 SMS and WhatsApp scenarios added the same day were checked as they were written.
 
+## 2.7: thirty new messages and red-flag spots (13 November 2026)
+
+The 30 messages added in 2.7 (ids ending p13–p18, l13–l18, sp04, sl03, wp03, wl04 in each level) only use real domains already confirmed in the table below: jumia.com.ng, flyairpeace.com, google.com (accounts.google.com, one.google.com), moniepoint.com, piggyvest.com, coursera.org, github.com, konga.com, docusign.net and dstv.com. Every other domain in them is fictional or a lookalike. The Corporate Affairs Commission notice makes no claim about the commission's real address; its red flag is only that `cac-gov-ng.com` is an ordinary .com dressed up with hyphens. Phone numbers are fictional (the 555 range), as before.
+
+Every red flag and trust sign can now name a `spot`, the exact words it points to, which the game marks on the message after answering. `npm test` checks that each spot appears in its message and doesn't overlap another.
+
 ## What was checked
 
 - Every **legitimate** email: that its sender domain is the organisation's real domain, and that its trust signals are actually reasons to trust it.
