@@ -69,3 +69,27 @@ describe('certificateProgress', () => {
 });
 
 const LEVELS_ALL: Level[] = ['beginner', 'intermediate', 'advanced'];
+
+describe('certificate rounds (2.8)', () => {
+  const game = (level: 'beginner' | 'intermediate' | 'advanced', date: string, extra: Partial<GameSession> = {}): GameSession => ({
+    id: `${level}-${date}`, name: 'Ada', level, date, score: 1000, correct: 9, total: 10, accuracy: 90, bestStreak: 5, avgSeconds: 6, answers: [], ...extra,
+  });
+  const levels = ['beginner', 'intermediate', 'advanced'] as const;
+
+  it('online, a certificate needs certificate rounds; ordinary rounds from 2.8 on no longer count', () => {
+    const ranked = levels.map(l => game(l, '2026-11-20T10:00:00.000Z'));
+    expect(certificateProgress(ranked, 'Ada', true).earned).toBe(false);
+    const rounds = levels.map(l => game(l, '2026-11-20T10:00:00.000Z', { practice: true, exam: true, onlineId: `s-${l}` }));
+    expect(certificateProgress(rounds, 'Ada', true).earned).toBe(true);
+  });
+
+  it('keeps certificates earned before 2.8', () => {
+    const old = levels.map(l => game(l, '2026-11-01T10:00:00.000Z'));
+    expect(certificateProgress(old, 'Ada', true).earned).toBe(true);
+  });
+
+  it('a copy without the online features keeps the old rule', () => {
+    const ranked = levels.map(l => game(l, '2026-11-20T10:00:00.000Z'));
+    expect(certificateProgress(ranked, 'Ada', false).earned).toBe(true);
+  });
+});

@@ -98,9 +98,11 @@ export function CertificateCheck({ initialReference }: { initialReference?: stri
               );
             })}
           </ul>
-          <p className="text-xs text-muted-foreground">
-            Each result was scored by the LureLens server from the player's answers. LureLens is self-paced training by Th3
-            SpaceIO, not a supervised exam.
+          <p className="text-xs text-muted-foreground" data-testid="certificate-basis">
+            {outcome.cert.certificate_rounds
+              ? 'Each level was passed in a certificate round: messages that are not public, dealt and timed by the LureLens server, which scored the answers. '
+              : "Each result was scored by the LureLens server from the player's answers. "}
+            LureLens is self-paced training by Th3 SpaceIO, not a supervised exam.
           </p>
         </section>
       ) : outcome ? (

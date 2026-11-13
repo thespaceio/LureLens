@@ -309,6 +309,8 @@ describe('certificates', () => {
     await relax();
     const ids: string[] = [];
     for (const level of LEVEL_ORDER) ids.push((await submit(ADA, level, perfect(level), level !== 'advanced')).id);
+    // Games posted before 2.8 still back a certificate (later ones need certificate rounds).
+    await db.query(`update scores set created_at = '2026-11-01' where id = any ($1::uuid[])`, [ids]);
     const [{ r }] = await as<{ r: { display_name: string } }>(ADA, 'select register_certificate($1, null, $2::uuid[]) as r', ['LL-ABCD-EFGH', ids]);
     expect(r.display_name).toBe('Ọlálékan Adébáyọ̀'); // the profile's full name
 
@@ -329,6 +331,106 @@ describe('certificates', () => {
     const b = await submit(ADA, 'beginner', perfect('beginner'));
     const i = await submit(ADA, 'intermediate', perfect('intermediate'));
     expect(await refusal(as(ADA, 'select register_certificate($1, $2, $3::uuid[])', ['LL-WEAK-0001', 'Ada', [b.id, i.id, weak.id]]))).toMatch(/80%/);
+  });
+});
+
+describe('certificate rounds', () => {
+  type View = { round: string; level: Level; index: number; total: number; seconds: number; elapsed: number; message: Record<string, unknown> };
+  type Done = { done: true; result: { id: string; score: number; correct: number; total: number; accuracy: number; answers: { id: string; choice: string; seconds: number }[] } };
+  type Next = { done: false; next: View };
+  const start = (uid: string | null, level: string) => as<{ r: View }>(uid, 'select start_certificate_round($1) as r', [level]).then(r => r[0].r);
+  const answer = (uid: string, round: string, choice: string) =>
+    as<{ r: Next | Done }>(uid, 'select answer_certificate_round($1, $2) as r', [round, choice]).then(r => r[0].r);
+  const key = async (id: string) => (await db.query<{ is_phishing: boolean }>('select is_phishing from exam_messages where id = $1', [id])).rows[0].is_phishing;
+  const hex = (n: number) => n.toString(16).padStart(8, '0');
+
+  beforeAll(async () => {
+    // 12 private messages per level, 6 of them phishing (the real ones live in a private repository).
+    let n = 0;
+    for (const level of LEVEL_ORDER)
+      for (let i = 0; i < 12; i++)
+        await db.query('insert into exam_messages (id, level, is_phishing, verify_first, content) values ($1, $2, $3, $4, $5)', [
+          `x${hex(++n)}`, level, i % 2 === 0, i === 1, JSON.stringify({ channel: 'sms', sender: { name: 'Bank' }, subject: `S${n}`, date: '2026-11-13T10:00:00', messages: [`m${n}`] }),
+        ]);
+  });
+
+  async function playRound(uid: string, level: Level, wrong = 0) {
+    let view = await start(uid, level);
+    for (;;) {
+      const right = (await key(view.message.id as string)) ? 'phishing' : 'legitimate';
+      const reply = await answer(uid, view.round, view.index < wrong ? (right === 'phishing' ? 'legitimate' : 'phishing') : right);
+      if (reply.done) return reply.result;
+      view = reply.next;
+    }
+  }
+
+  it('needs an account with a username, and keeps the messages and answers closed', async () => {
+    expect(await refusal(start(null, 'beginner'))).toMatch(/permission denied|Sign in/);
+    const fay = '00000000-0000-4000-8000-00000000000f'; // signed in, no username yet
+    await db.query(`insert into auth.users (id, email) values ($1, 'fay@example.com')`, [fay]);
+    expect(String(await refusal(start(fay, 'beginner')))).toMatch(/username/);
+    for (const table of ['exam_messages', 'exam_rounds']) {
+      expect(String(await refusal(as(ADA, `select * from ${table}`)))).toMatch(/permission denied/);
+      expect(String(await refusal(as(null, `select * from ${table}`)))).toMatch(/permission denied/);
+    }
+  });
+
+  it('deals ten messages one at a time without ever revealing an answer, then scores the round', async () => {
+    const view = await start(BOLA, 'intermediate');
+    expect(view).toMatchObject({ level: 'intermediate', index: 0, total: 10, seconds: 25 });
+    expect(view.message.id).toMatch(/^x[0-9a-f]{8}$/);
+    const replies: unknown[] = [view];
+    let current: View = view;
+    let result: Done['result'] | null = null;
+    for (;;) {
+      const right = (await key(current.message.id as string)) ? 'phishing' : 'legitimate';
+      const reply = await answer(BOLA, current.round, right);
+      replies.push(reply);
+      if (reply.done) { result = reply.result; break; }
+      current = reply.next;
+    }
+    // Nothing before the end says which answers were right.
+    for (const r of replies.slice(0, -1)) expect(JSON.stringify(r)).not.toMatch(/is_phishing|verify_first|"correct"/);
+    expect(result).toMatchObject({ correct: 10, total: 10, accuracy: 100 });
+    const ids = result!.answers.map(a => a.id);
+    expect(new Set(ids).size).toBe(10);
+    const [row] = (await db.query<{ exam: boolean; ranked: boolean; accuracy: number }>('select exam, ranked, accuracy from scores where id = $1', [result!.id])).rows;
+    expect(row).toEqual({ exam: true, ranked: false, accuracy: 100 });
+    expect(await refusal(answer(BOLA, current.round, 'phishing'))).toMatch(/finished/);
+  });
+
+  it('times answers itself: too late counts as no answer', async () => {
+    const view = await start(DAN, 'advanced').catch(async () => {
+      await saveProfile(DAN, 'Dan');
+      return start(DAN, 'advanced');
+    });
+    await db.query("update exam_rounds set served_at = now() - interval '60 seconds' where id = $1", [view.round]);
+    const reply = (await answer(DAN, view.round, 'phishing')) as Next;
+    expect(reply.done).toBe(false);
+    const [{ answers }] = (await db.query<{ answers: { choice: string; seconds: number }[] }>('select answers from exam_rounds where id = $1', [view.round])).rows;
+    expect(answers[0]).toMatchObject({ choice: 'timeout', seconds: 20 });
+  });
+
+  it('prefers messages the player has not been dealt, and allows three rounds per level a day', async () => {
+    const first = await playRound(ADA, 'beginner');
+    const second = await playRound(ADA, 'beginner');
+    const overlap = second.answers.filter(a => first.answers.some(b => b.id === a.id)).length;
+    expect(overlap).toBeLessThanOrEqual(8); // 12 messages: at least two are new
+    await playRound(ADA, 'beginner', 5);
+    expect(await refusal(start(ADA, 'beginner'))).toMatch(/three certificate rounds/);
+  });
+
+  it('backs a certificate; games posted after 2.8 outside certificate rounds no longer can', async () => {
+    const b = (await db.query<{ id: string }>("select id from scores where user_id = $1 and exam and level = 'beginner' and accuracy = 100 limit 1", [ADA])).rows[0].id;
+    const i = (await playRound(ADA, 'intermediate')).id;
+    const a = (await playRound(ADA, 'advanced')).id;
+    await as(ADA, 'select register_certificate($1, null, $2::uuid[])', ['LL-EXAM-0001', [b, i, a]]);
+    const [{ c }] = await as<{ c: { certificate_rounds: boolean } }>(null, 'select check_certificate($1) as c', ['LL-EXAM-0001']);
+    expect(c.certificate_rounds).toBe(true);
+
+    const plain = await submit(ADA, 'advanced', perfect('advanced'));
+    await db.query(`update scores set created_at = '2026-12-01' where id = $1`, [plain.id]);
+    expect(await refusal(as(ADA, 'select register_certificate($1, null, $2::uuid[])', ['LL-EXAM-0002', [b, i, plain.id]]))).toMatch(/certificate round/);
   });
 });
 

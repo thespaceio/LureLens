@@ -1,4 +1,4 @@
-import { Accessibility, Award, Box, MousePointer2, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, RotateCcw, Sparkles, UserRound, Users, Zap } from 'lucide-react';
+import { Accessibility, Award, Box, MousePointer2, CalendarDays, Hand, LayoutTemplate, ShieldCheck, BadgeCheck, Flag, Globe, Lock, Map, MessageSquareText, MonitorPlay, Phone, Radio, RotateCcw, Sparkles, Timer, UserRound, Users, Zap } from 'lucide-react';
 import { isNewer } from '@/lib/whatsNew';
 import type { WhatsNewKind } from '@/lib/whatsNew';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,16 @@ import { APP_VERSION, REPO_URL } from '@/lib/report';
 // Each release's highlights, newest first. Returning players see every
 // release since the note they last saw.
 const RELEASES = [
+  {
+    version: '2.8',
+    title: 'Certificate rounds, and practice every day',
+    description: 'Certificates now come from rounds nobody can look up, and you can practise any day, with or without the clock.',
+    items: [
+      { icon: Lock, title: 'Certificate rounds', text: 'Earn your certificate by passing a certificate round at each level: messages you won\'t see in practice, dealt and timed by the LureLens server, with your result at the end. Find them on the Progress page. Certificates you already have still count.' },
+      { icon: CalendarDays, title: 'Practice is open every day', text: 'Play any level any day. Rounds outside Game Night are practice, saved to your progress. Ranked rounds and the scoreboard stay on Fridays.' },
+      { icon: Timer, title: 'Practice without a timer', text: 'Turn on No timer to take as long as you need over each message. It is practice only, with no speed points.' },
+    ],
+  },
   {
     version: '2.7',
     title: 'See the red flags on the message',
@@ -87,7 +97,7 @@ const SINCE_PHISHGUARD = [
   { icon: MessageSquareText, title: 'Texts and WhatsApp', text: '30 SMS and WhatsApp scams, from fake bank alerts to hijacked friends asking for money.' },
   { icon: Users, title: 'Classroom mode', text: 'Share a code and a whole class plays the same messages, then walk through them together.' },
   { icon: Phone, title: 'Verify first', text: 'A third answer for checking through a number you trust. It scores no points but keeps your streak.' },
-  { icon: Award, title: 'Certificate', text: 'Score 80% on every level to earn a certificate you can print or add to LinkedIn.' },
+  { icon: Award, title: 'Certificate', text: 'Pass a certificate round at every level with 80% to earn a certificate you can print, check online or add to LinkedIn.' },
   { icon: Flag, title: 'Report a mistake', text: 'Spot something wrong in a message? Report it straight from the explanation.' },
 ];
 

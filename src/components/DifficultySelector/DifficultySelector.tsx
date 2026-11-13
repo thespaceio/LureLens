@@ -16,7 +16,7 @@ interface DifficultySelectorProps {
   sessions: GameSession[];
   initialLevel?: Level;
   onNameChange: (name: string) => void;
-  onStart: (level: Level, categories: CategoryId[], channels: Channel[]) => void;
+  onStart: (level: Level, categories: CategoryId[], channels: Channel[], options?: { untimed?: boolean }) => void;
   /** Signed in: play under the account's username. */
   lockedName?: string;
   onAccount?: () => void;
@@ -24,7 +24,7 @@ interface DifficultySelectorProps {
   extra?: ReactNode;
   /** Opens Classroom mode (from the hero's "Run a class"). */
   onClassroom?: () => void;
-  /** Set outside Game Night: the next Friday ("Friday 13 November"). Public rounds can't start until then. */
+  /** Set outside Game Night: the next Friday ("Friday 13 November"). Until then rounds are practice, not ranked. */
   closedUntil?: string;
 }
 
@@ -39,6 +39,9 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
   const [categories, setCategories] = useState<CategoryId[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [nameError, setNameError] = useState(false);
+  // Practice only: no clock, no speed points.
+  const [untimed, setUntimed] = useState(false);
+  const practice = Boolean(closedUntil) || untimed || categories.length > 0 || channels.length > 0;
 
   const counts = useMemo(() => categoryCounts(level), [level]);
   const chCounts = useMemo(() => channelCounts(level), [level]);
@@ -59,13 +62,12 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
     setChannels(prev => (prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]));
 
   const start = () => {
-    if (closedUntil) return;
     if (!lockedName && !playerName.trim()) {
       setNameError(true);
       document.getElementById('player-name')?.focus();
       return;
     }
-    onStart(level, categories, channels);
+    onStart(level, categories, channels, { untimed });
   };
 
   /** "Play now" in the hero: bring the round's setup into view, ready to type or pick. */
@@ -189,7 +191,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
 
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-semibold">Practise a channel or topic (optional, not ranked)</h2>
+          <h2 className="font-semibold">Practice options: a channel, a topic or no timer (not ranked)</h2>
           <span className="font-mono text-xs text-muted-foreground">
             {available} message{available === 1 ? '' : 's'} available
           </span>
@@ -223,7 +225,7 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
             );
           })}
         </div>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Topics">
+        <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Topics">
           <button
             type="button"
             aria-pressed={categories.length === 0}
@@ -254,15 +256,30 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
             );
           })}
         </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-3">
+          <button
+            type="button"
+            aria-pressed={untimed}
+            onClick={() => setUntimed(u => !u)}
+            data-testid="untimed-toggle"
+            className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+              untimed ? 'border-lavender bg-lavender text-primary-foreground hover:bg-lavender/85' : 'border-border hover:border-lavender/60 hover:bg-lavender/10'
+            }`}
+          >
+            No timer
+          </button>
+          <span className="text-xs text-muted-foreground">Take as long as you need. Practice only: no speed points, and it isn't ranked.</span>
+        </div>
       </section>
 
-      {closedUntil ? (
+      {closedUntil && (
         <section id="game-night-closed" role="status" className="rounded-xl border border-primary/40 bg-primary/10 p-5 text-center sm:p-6">
           <CalendarDays className="mx-auto mb-2 size-7 text-primary" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-foreground">Public rounds open on Fridays</h2>
+          <h2 className="text-lg font-semibold text-foreground">Ranked rounds open on Fridays. Practice is open now.</h2>
           <p className="mx-auto mt-2 max-w-prose text-sm text-muted-foreground">
-            The next Game Night is <strong className="text-foreground">{closedUntil}</strong>. Rounds open from midnight to
-            midnight West Africa Time, and the Th3 SpaceIO community plays together live at 6pm.
+            Rounds you play today count towards your progress, not the scoreboard. The next Game Night is{' '}
+            <strong className="text-foreground">{closedUntil}</strong>: ranked rounds open from midnight to midnight West Africa
+            Time, and the Th3 SpaceIO community plays together live at 6pm.
           </p>
           <p className="mx-auto mt-2 max-w-prose text-sm text-muted-foreground">
             Running a class or staff training?{' '}
@@ -273,25 +290,25 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
             ) : (
               'Classroom mode'
             )}{' '}
-            works any day. Your progress, the scoreboard and certificate checks are always open.
+            works any day, and so do certificate rounds (see Progress).
           </p>
           <div className="mt-4 flex justify-center">
-            <Button asChild size="lg" className="h-11 w-full gap-2 sm:w-auto">
+            <Button asChild variant="outline" size="lg" className="h-11 w-full gap-2 bg-transparent sm:w-auto">
               <a href={GAME_NIGHT_URL} rel="noopener">Join Game Night</a>
             </Button>
           </div>
         </section>
-      ) : (
-        <div className="flex flex-col items-center gap-2">
-          <Button id="start-round" size="lg" onClick={start} disabled={rounds === 0} className="h-12 w-full gap-2 px-10 text-base font-semibold sm:w-auto">
-            <Play className="size-5" />
-            Start {LEVELS[level].label}
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            {rounds} messages · {LEVELS[level].seconds}s each
-          </p>
-        </div>
       )}
+      <div className="flex flex-col items-center gap-2">
+        <Button id="start-round" size="lg" onClick={start} disabled={rounds === 0} className="h-12 w-full gap-2 px-10 text-base font-semibold sm:w-auto">
+          <Play className="size-5" />
+          Start {LEVELS[level].label}{practice ? ' practice' : ''}
+        </Button>
+        <p className="text-xs text-muted-foreground">
+          {rounds} messages · {untimed ? 'no timer' : `${LEVELS[level].seconds}s each`}
+          {practice ? ' · practice, not ranked' : ''}
+        </p>
+      </div>
 
       {extra}
 
@@ -308,8 +325,8 @@ export function DifficultySelector({ playerName, sessions, initialLevel, onNameC
             change, a boss or friend asking for money), it also counts as correct.
           </li>
           <li>Need a moment? <strong className="text-foreground">Pause</strong> stops the clock and hides the message. Switching apps pauses automatically.</li>
-          <li>Channel or topic practice rounds count towards your progress but not the scoreboard.</li>
-          <li>Score <strong className="text-foreground">80% or more on every level</strong> to earn a LureLens certificate (see Progress).</li>
+          <li>Ranked rounds open on Fridays (Game Night). Any other day, and any round with a channel, topic or <strong className="text-foreground">No timer</strong>, is practice: it counts towards your progress but not the scoreboard.</li>
+          <li>Score <strong className="text-foreground">80% or more in a certificate round at every level</strong> to earn a LureLens certificate (see Progress).</li>
           <li>Shortcuts: <kbd className="font-mono">L</kbd> legitimate, <kbd className="font-mono">P</kbd> phishing, <kbd className="font-mono">V</kbd> verify first, <kbd className="font-mono">S</kbd> skip, <kbd className="font-mono">Enter</kbd> next.</li>
         </ul>
       </section>

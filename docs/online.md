@@ -62,6 +62,17 @@ Because it reads the scoreboard every half hour, it also stops the free Supabase
 
 GitHub turns off scheduled workflows after 60 days without commits to the repository and emails the owner; re-enable it from the same Actions page.
 
+## Certificate rounds (2.8)
+
+A certificate needs a **certificate round** at each level. The answers to the game's own messages are in this public repository, so certificate rounds use a separate set kept out of it:
+
+- The messages live in the **private** repository `thespaceio/LureLens-certificate-messages` (`source.mjs`). `node build.mjs` writes `load.sql`; run it in the SQL editor to add or update them in `public.exam_messages`. Never copy them into this repository.
+- Only what the player sees goes into `exam_messages.content` (sender, subject, body or chat bubbles, attachments, date). The answer is in its own columns, and topics, categories and chat summaries stay in the private repository, because they could hint at the answer. Ids are opaque (`x` + 8 hex).
+- `start_certificate_round(level)` deals 10 messages (4 to 6 phishing, preferring ones the player hasn't had), `answer_certificate_round(round, choice)` records each answer timed by the server (more than the level's seconds plus 3 counts as no answer) and deals the next, and after the tenth it scores the round like a normal game into `scores` with `exam = true` and `ranked = false`. Nothing says which answers were right. `certificate_round_current(round)` returns the message on screen after a reload; the clock keeps running.
+- Limits: three rounds per level per player per day (an abandoned round counts), and 600 rounds an hour across everyone. Players need an account with a username.
+- `register_certificate` accepts games from certificate rounds, plus games posted before 13 November 2026 10:00 UTC, so no one lost a certificate. `check_certificate` reports `certificate_rounds: true` when every level came from one.
+- Keep at least 20 messages per level (40 to 60% phishing) so retries see new messages. A determined person with many accounts could still collect the messages over time, so add new ones now and then.
+
 ## When the messages change
 
 `npm run check:data` fails until the answer key is regenerated:

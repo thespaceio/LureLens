@@ -116,6 +116,12 @@ export interface GameSession {
   practice?: boolean;
   /** Set for classroom rounds: the class code, without the dash. */
   classCode?: string;
+  /**
+   * A certificate round (2.8): played on the server's private messages, scored
+   * by the server. Its answers aren't kept (the player is never told them), so
+   * `answers` is empty and `onlineId` is the server's score.
+   */
+  exam?: boolean;
   /** Set once this game has been posted online: the server's id for it. */
   onlineId?: string;
   /** The account this game belongs to, when played signed in (or added to an account). */

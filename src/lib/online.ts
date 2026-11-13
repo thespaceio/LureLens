@@ -123,6 +123,8 @@ export interface CheckedCertificate {
   /** Registered by a signed-in account (2.2 and later). */
   account?: boolean;
   completed_on: string;
+  /** Every level passed in a certificate round (2.8 and later): private messages, timed by the server. */
+  certificate_rounds?: boolean;
   levels: Record<Level, { accuracy: number; score: number; played_at: string }>;
 }
 
