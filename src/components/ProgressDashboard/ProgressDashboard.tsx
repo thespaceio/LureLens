@@ -20,6 +20,8 @@ interface ProgressDashboardProps {
   signedIn?: boolean;
   fullName?: string | null;
   onSignIn?: () => void;
+  /** Opens a certificate round at a level. */
+  onCertificateRound?: (level: Level) => void;
 }
 
 const PILL: Record<Level, string> = {
@@ -37,7 +39,7 @@ function formatDateTime(iso: string) {
     : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
 
-export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPosted, signedIn = false, fullName = null, onSignIn }: ProgressDashboardProps) {
+export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPosted, signedIn = false, fullName = null, onSignIn, onCertificateRound }: ProgressDashboardProps) {
   const names = playerNames(sessions);
   const [chosen, setChosen] = useState<string>('');
   const current = playerName.trim();
@@ -99,7 +101,7 @@ export function ProgressDashboard({ sessions, playerName, onPlay, onReset, onPos
             ))}
           </div>
 
-          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} onPosted={onPosted} signedIn={signedIn} fullName={fullName} onSignIn={onSignIn} />
+          <CertificatePanel sessions={sessions} name={selected} onPlay={level => onPlay(level)} onPosted={onPosted} signedIn={signedIn} fullName={fullName} onSignIn={onSignIn} onCertificateRound={onCertificateRound} />
 
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-4 font-semibold">Levels</h2>

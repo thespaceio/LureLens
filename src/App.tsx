@@ -19,6 +19,7 @@ import { ALL_EMAILS, accuracyOf, buildRound, seenOrder, shuffle } from '@/lib/ga
 import { APP_VERSION, CONTACT_EMAIL, NEW_ISSUE_URL } from '@/lib/report';
 import { classRound, normalizeCode } from '@/lib/classroom';
 import { isGameNight, nextGameNightLabel } from '@/lib/gameNight';
+import CertificateRound from '@/components/Certificate/CertificateRound';
 import { certificateProgress } from '@/lib/certificate';
 import { ONLINE } from '@/lib/online';
 import type { DecodedClass } from '@/lib/classroom';
@@ -43,7 +44,7 @@ const LiveBoard = lazy(() => import('@/components/Online/LiveBoard'));
 const ClassLiveBoard = lazy(() => import('@/components/Online/ClassLiveBoard'));
 const Moderation = lazy(() => import('@/components/Moderation/Moderation'));
 
-type View = 'menu' | 'quiz' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about' | 'account' | 'privacy' | 'live' | 'moderation';
+type View = 'menu' | 'quiz' | 'certificate' | 'results' | 'scoreboard' | 'progress' | 'classroom' | 'check' | 'about' | 'account' | 'privacy' | 'live' | 'moderation';
 
 /** Reads ?class=… or ?cert=… from a link, and removes it from the address bar. */
 function paramFromLink(name: string): string | undefined {
@@ -80,6 +81,10 @@ interface Game {
   classCode?: string;
   /** A replay of the messages a finished round got wrong (practice). */
   replay?: boolean;
+  /** Played outside Game Night, or untimed: practice, never ranked. */
+  practice?: boolean;
+  /** No clock (practice only). */
+  untimed?: boolean;
 }
 
 interface Result {
@@ -121,6 +126,8 @@ function App() {
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [menuLevel, setMenuLevel] = useState<Level>('beginner');
+  // The level of the certificate round being played.
+  const [certLevel, setCertLevel] = useState<Level>('beginner');
   // Returning players see what changed, once. Not over an invite link.
   const [whatsNew, setWhatsNew] = useState(() =>
     LINK_CODE || LINK_CERT || LINK_LIVE || LINK_PRIVACY ? 'none' : whatsNewFor(store.sessions.length > 0 || Boolean(store.playerName)),
@@ -151,7 +158,7 @@ function App() {
   useEffect(() => installTilt(), []);
   useEffect(() => {
     const html = document.documentElement;
-    if (view === 'quiz') html.setAttribute('data-no-tilt', '');
+    if (view === 'quiz' || view === 'certificate') html.setAttribute('data-no-tilt', '');
     else html.removeAttribute('data-no-tilt');
   }, [view]);
   const closeWhatsNew = () => {
@@ -161,6 +168,7 @@ function App() {
 
   const navigate = (next: View) => {
     if (view === 'quiz' && next !== 'quiz' && !window.confirm("Leave this game? This round won't be saved.")) return;
+    if (view === 'certificate' && next !== 'certificate' && !window.confirm('Leave the certificate round? The clock keeps running, so unanswered messages will count as wrong.')) return;
     if (next === 'menu') setGame(null);
     setView(next);
     window.scrollTo(0, 0);
@@ -222,20 +230,17 @@ function App() {
     }
   }, [auth.status, auth.userId, removeSessions, setPlayerName]);
 
-  const startGame = useCallback((level: Level, categories: CategoryId[] = [], channels: Channel[] = []) => {
-    // Public rounds open on Fridays only (Game Night). Classroom rounds use joinClass and stay open.
-    if (!isGameNight()) {
-      setGame(null);
-      setView('menu');
-      window.scrollTo(0, 0);
-      return;
-    }
+  const startGame = useCallback((level: Level, categories: CategoryId[] = [], channels: Channel[] = [], options: { untimed?: boolean } = {}) => {
+    // Ranked rounds are for Game Night (Fridays). Any other day the same round is
+    // practice: saved to progress, never ranked. Untimed rounds are always practice.
+    const untimed = Boolean(options.untimed);
+    const practice = untimed || !isGameNight();
     // Messages this player hasn't seen come first, so rounds don't repeat.
     const name = (signedIn ? username : store.playerName.trim()) || 'Player';
     const emails = buildRound(level, categories, channels, Math.random, seenOrder(playerSessions(store.sessions, name)));
     if (emails.length === 0) return;
     setMenuLevel(level);
-    setGame({ id: `${level}-${Date.now()}`, level, categories, channels, emails });
+    setGame({ id: `${level}-${Date.now()}`, level, categories, channels, emails, ...(practice ? { practice } : {}), ...(untimed ? { untimed } : {}) });
     setView('quiz');
     window.scrollTo(0, 0);
   }, [signedIn, username, store.playerName, store.sessions]);
@@ -277,7 +282,7 @@ function App() {
         bestStreak,
         avgSeconds: total ? Math.round((answers.reduce((s, a) => s + a.seconds, 0) / total) * 10) / 10 : 0,
         answers,
-        ...(game.categories.length > 0 || game.channels.length > 0 || game.classCode || game.replay ? { practice: true } : {}),
+        ...(game.categories.length > 0 || game.channels.length > 0 || game.classCode || game.replay || game.practice ? { practice: true } : {}),
         ...(game.classCode ? { classCode: game.classCode } : {}),
         ...(signedIn && auth.userId ? { userId: auth.userId, synced: false } : {}),
       };
@@ -306,6 +311,7 @@ function App() {
             key={game.id}
             level={game.level}
             emails={game.emails}
+            untimed={game.untimed}
             onFinish={finishGame}
             onQuit={() => {
               setGame(null);
@@ -317,7 +323,7 @@ function App() {
         return result ? (
           <ResultsScreen
             {...result}
-            onPlayAgain={() => startGame(result.session.level, game?.replay ? [] : game?.categories ?? [], game?.replay ? [] : game?.channels ?? [])}
+            onPlayAgain={() => startGame(result.session.level, game?.replay ? [] : game?.categories ?? [], game?.replay ? [] : game?.channels ?? [], { untimed: game?.untimed })}
             onReplayMistakes={() => replayMistakes(result.session)}
             onClassroom={() => navigate('classroom')}
             signedIn={signedIn}
@@ -355,6 +361,37 @@ function App() {
             onBigScreen={() => navigate('live')}
           />
         );
+      case 'certificate':
+        return (
+          <CertificateRound
+            key={certLevel}
+            level={certLevel}
+            onExit={() => {
+              setView('progress');
+              window.scrollTo(0, 0);
+            }}
+            onFinished={r => {
+              const name = (signedIn ? username : store.playerName.trim()) || 'Player';
+              store.saveSession({
+                id: `cert-${r.id}`,
+                name,
+                level: r.level,
+                date: r.played_at,
+                score: r.score,
+                correct: r.correct,
+                total: r.total,
+                accuracy: r.accuracy,
+                bestStreak: r.best_streak,
+                avgSeconds: r.avg_seconds,
+                answers: [],
+                practice: true,
+                exam: true,
+                onlineId: r.id,
+                ...(auth.userId ? { userId: auth.userId, synced: false } : {}),
+              });
+            }}
+          />
+        );
       case 'progress':
         return (
           <Suspense fallback={<p className="text-center text-muted-foreground">Loading…</p>}>
@@ -369,6 +406,11 @@ function App() {
               signedIn={signedIn}
               fullName={auth.profile?.full_name ?? null}
               onSignIn={() => signIn('progress')}
+              onCertificateRound={level => {
+                setCertLevel(level);
+                setView('certificate');
+                window.scrollTo(0, 0);
+              }}
               onPosted={(sessionId, posted) =>
                 store.updateSession(sessionId, {
                   onlineId: posted.id,
@@ -457,7 +499,7 @@ function App() {
     }
   };
 
-  const activeNav = view === 'quiz' || view === 'results' ? 'menu' : view === 'check' || view === 'privacy' ? 'about' : view === 'moderation' ? 'account' : view;
+  const activeNav = view === 'certificate' ? 'progress' : view === 'quiz' || view === 'results' ? 'menu' : view === 'check' || view === 'privacy' ? 'about' : view === 'moderation' ? 'account' : view;
   const nav = ONLINE
     ? [
         ...NAV,
@@ -492,7 +534,7 @@ function App() {
   return (
     <MotionConfig reducedMotion="user">
     {scene.webgl && (
-      <Scene3DHost enabled={sceneOn} mode={view === 'menu' ? 'home' : view === 'quiz' ? 'quiz' : 'page'} guard={!scene.forced} onSlow={onSceneSlow} />
+      <Scene3DHost enabled={sceneOn} mode={view === 'menu' ? 'home' : view === 'quiz' || view === 'certificate' ? 'quiz' : 'page'} guard={!scene.forced} onSlow={onSceneSlow} />
     )}
     <div className="relative z-[1] flex min-h-dvh flex-col" inert={intro}>
       <header className="sticky top-0 z-40 border-b border-border bg-card/90 backdrop-blur">
@@ -623,7 +665,11 @@ function About({ onCheck, onPrivacy, onIntro }: { onCheck: () => void; onPrivacy
                 ? " Signed-in players' results go to the facilitator's live class board."
                 : ' Nothing is sent to a server.'}
             </li>
-            <li>Score 80% or more on every level to earn a LureLens certificate you can print or add to LinkedIn.</li>
+            <li>
+              {ONLINE
+                ? 'Pass a certificate round at every level with 80% or more to earn a LureLens certificate you can print, add to LinkedIn and have checked online. Certificate rounds use messages that are not in the public code, timed by the server.'
+                : 'Score 80% or more on every level to earn a LureLens certificate you can print or add to LinkedIn.'}
+            </li>
             {ONLINE && (
               <li>
                 Games only reach the public online scoreboard when you tap "Post to the online scoreboard". See the{' '}

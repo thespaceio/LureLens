@@ -21,10 +21,13 @@ interface CertificatePanelProps {
   /** The account's full name, used as the certificate name by default. */
   fullName?: string | null;
   onSignIn?: () => void;
+  /** Opens a certificate round (needs the online features and an account). */
+  onCertificateRound?: (level: Level) => void;
 }
 
 /** Progress towards the certificate, and the certificate itself once earned. */
-export function CertificatePanel({ sessions, name, onPlay, onPosted, signedIn = false, fullName = null, onSignIn }: CertificatePanelProps) {
+export function CertificatePanel({ sessions, name, onPlay, onPosted, signedIn = false, fullName = null, onSignIn, onCertificateRound }: CertificatePanelProps) {
+  const rounds = ONLINE && Boolean(onCertificateRound);
   const progress = useMemo(() => certificateProgress(sessions, name), [sessions, name]);
 
   return (
@@ -36,10 +39,19 @@ export function CertificatePanel({ sessions, name, onPlay, onPosted, signedIn = 
         <EarnedCertificate progress={progress} name={fullName || name} onPosted={onPosted} signedIn={signedIn} onSignIn={onSignIn} />
       ) : (
         <>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Score at least {CERTIFICATE_ACCURACY}% in a full round of every level to earn a certificate you can print, share or
-            add to LinkedIn. Classroom rounds count; single-topic practice rounds don't.
-          </p>
+          {rounds ? (
+            <p className="mb-4 text-sm text-muted-foreground">
+              Pass a <strong className="text-foreground">certificate round</strong> at every level with at least {CERTIFICATE_ACCURACY}%
+              to earn a certificate you can print, share, add to LinkedIn and have checked online. Certificate rounds use
+              messages you won't see in practice, are timed by the server, and work any day.
+              {!signedIn && ' Sign in first, so your result is saved to your account.'}
+            </p>
+          ) : (
+            <p className="mb-4 text-sm text-muted-foreground">
+              Score at least {CERTIFICATE_ACCURACY}% in a full round of every level to earn a certificate you can print, share or
+              add to LinkedIn. Classroom rounds count; single-topic practice rounds don't.
+            </p>
+          )}
           <ul className="grid gap-3 md:grid-cols-3">
             {LEVEL_ORDER.map(level => {
               const { best, passedWith } = progress.levels[level];
@@ -52,13 +64,25 @@ export function CertificatePanel({ sessions, name, onPlay, onPosted, signedIn = 
                         ? `Passed with ${passedWith.accuracy}% on ${formatCertificateDate(passedWith.date)}`
                         : best
                           ? `Best so far ${best.accuracy}%, need ${CERTIFICATE_ACCURACY}%`
-                          : 'Not played yet'}
+                          : rounds
+                            ? 'No certificate round yet'
+                            : 'Not played yet'}
                     </div>
                   </div>
                   {passedWith ? (
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary" role="img" aria-label="Passed">
                       <Check className="size-4" />
                     </span>
+                  ) : rounds ? (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="shrink-0 gap-1.5"
+                      onClick={() => (signedIn ? onCertificateRound!(level) : onSignIn?.())}
+                      data-testid={`certificate-round-${level}`}
+                    >
+                      <Award className="size-3.5" /> {signedIn ? 'Take round' : 'Sign in'}
+                    </Button>
                   ) : (
                     <Button size="sm" variant="secondary" className="shrink-0 gap-1.5" onClick={() => onPlay(level)}>
                       <Play className="size-3.5" /> Play

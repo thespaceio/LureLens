@@ -1,6 +1,9 @@
-// The LureLens certificate: earned by scoring at least 80% on all three levels
-// in full rounds (ranked or classroom, not single-topic practice). It is drawn
-// in the browser, so it works offline and nothing is sent anywhere.
+// The LureLens certificate: earned by scoring at least 80% at all three levels.
+// From 2.8 that means a certificate round at each level (messages kept off the
+// public code, dealt and timed by the server). Full rounds played before 2.8
+// still count, so nobody loses a certificate they had. It is drawn in the
+// browser; nothing is sent anywhere unless the player makes it checkable.
+import { ONLINE } from '@/lib/supabase';
 import { DAYLIGHT_MARK, SITE_HOST, drawMark, fit, fontsReady } from '@/lib/shareCard';
 import { playerSessions } from '@/lib/stats';
 import { LEVELS, LEVEL_ORDER } from '@/types';
@@ -24,11 +27,22 @@ export interface CertificateProgress {
   reference: string | null;
 }
 
-/** Full mixed rounds count; rounds filtered to one topic or channel do not. */
-export const countsForCertificate = (s: GameSession) => !s.practice || Boolean(s.classCode);
+/** When certificate rounds arrived (2.8). Full rounds played before this still count. */
+export const CERTIFICATE_ROUNDS_FROM = '2026-11-13T10:00:00.000Z';
 
-export function certificateProgress(sessions: GameSession[], name: string): CertificateProgress {
-  const games = name.trim() ? playerSessions(sessions, name).filter(countsForCertificate) : [];
+/**
+ * Which games count. With the online features (the normal case): certificate
+ * rounds, plus full ranked or classroom rounds from before 2.8. A copy of
+ * LureLens without them keeps the old rule, as it has no private messages.
+ */
+export function countsForCertificate(s: GameSession, online = ONLINE): boolean {
+  const fullRound = !s.practice || Boolean(s.classCode);
+  if (!online) return fullRound && !s.exam;
+  return Boolean(s.exam) || (fullRound && s.date < CERTIFICATE_ROUNDS_FROM);
+}
+
+export function certificateProgress(sessions: GameSession[], name: string, online = ONLINE): CertificateProgress {
+  const games = name.trim() ? playerSessions(sessions, name).filter(s => countsForCertificate(s, online)) : [];
   const levels = {} as Record<Level, LevelProgress>;
   for (const level of LEVEL_ORDER) {
     const at = games.filter(s => s.level === level);

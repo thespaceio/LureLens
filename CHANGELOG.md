@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.8.0 (13 November 2026)
+
+### New
+- **Certificate rounds.** A certificate now needs a certificate round at each level, started from the Progress page. Certificate rounds use 60 messages (20 per level) that are not in the public code: they are kept in a private repository and loaded only into the database. The server deals them one at a time, times each answer itself (no pause, and the clock keeps running across a reload), and shows only the final result, never which answers were right. Three tries per level a day; an account with a username is needed. The certificate check page says when every level was passed in a certificate round.
+- **Practice every day.** Outside Game Night, rounds no longer stay locked: the same levels start as practice, saved to progress but not ranked. Ranked rounds and the online scoreboard stay on Fridays.
+- **No timer** for practice: no clock, no pause needed, no speed points, never ranked.
+
+### Changed
+- Certificates earned before 2.8 still count, on this device and online. Games posted to the scoreboard from 2.8 on no longer back a new certificate; certificate rounds do.
+- The practice panel is now "Practice options", with the No timer switch beside the channel and topic filters.
+
+
 ## 2.7.0 (13 November 2026)
 
 ### New

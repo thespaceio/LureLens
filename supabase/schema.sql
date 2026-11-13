@@ -641,6 +641,267 @@ drop trigger if exists scores_announce on public.scores;
 create trigger scores_announce after insert on public.scores for each row execute function public.lurelens_announce_score();
 
 -- ---------------------------------------------------------------------------
+-- Certificate rounds (2.8). The answers to the game's 140 messages are in the
+-- public code, so anyone could look them up while playing. A certificate now
+-- needs a certificate round at each level, played on messages that are NOT in
+-- the public code: they live in a private repository and are loaded straight
+-- into exam_messages. The server deals each message one at a time, times the
+-- answer itself, and never says which answers were right; the player sees only
+-- the final result.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.exam_messages (
+  -- Opaque ids: nothing about the answer or level shows in the id.
+  id text primary key check (id ~ '^x[0-9a-f]{8}$'),
+  level text not null check (level in ('beginner', 'intermediate', 'advanced')),
+  is_phishing boolean not null,
+  verify_first boolean not null default false,
+  -- What the player sees: channel, sender, subject, date, body or messages, attachments.
+  content jsonb not null,
+  active boolean not null default true
+);
+
+create table if not exists public.exam_rounds (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  level text not null check (level in ('beginner', 'intermediate', 'advanced')),
+  message_ids text[] not null,
+  -- One entry per answered message: {"id", "choice", "seconds"}.
+  answers jsonb not null default '[]'::jsonb,
+  -- When the message now on screen was dealt. Null between messages.
+  served_at timestamptz,
+  started_at timestamptz not null default now(),
+  finished_at timestamptz,
+  score_id uuid references public.scores (id) on delete set null
+);
+create index if not exists exam_rounds_by_user on public.exam_rounds (user_id, started_at desc);
+create index if not exists exam_rounds_recent on public.exam_rounds (started_at desc);
+
+-- Games from certificate rounds are saved as scores (never ranked) with exam = true.
+alter table public.scores add column if not exists exam boolean not null default false;
+
+alter table public.exam_messages enable row level security;
+alter table public.exam_rounds enable row level security;
+revoke all on public.exam_messages, public.exam_rounds from anon, authenticated;
+
+-- Seconds per message and points multiplier for a level.
+create or replace function public.lurelens_level_rules(p_level text, out seconds numeric, out mult numeric)
+language sql
+immutable
+as $$
+  select case p_level when 'beginner' then 30 when 'intermediate' then 25 when 'advanced' then 20 end::numeric,
+         case p_level when 'beginner' then 1 when 'intermediate' then 1.5 when 'advanced' then 2 end::numeric;
+$$;
+
+-- What the player is shown for a message: its content and its id, never the answer.
+create or replace function public.lurelens_exam_view(p_round public.exam_rounds)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select jsonb_build_object(
+    'round', p_round.id,
+    'level', p_round.level,
+    'index', jsonb_array_length(p_round.answers),
+    'total', cardinality(p_round.message_ids),
+    'seconds', (lurelens_level_rules(p_round.level)).seconds,
+    'elapsed', round(extract(epoch from (now() - p_round.served_at))::numeric, 1),
+    'message', m.content || jsonb_build_object('id', m.id, 'level', m.level)
+  )
+  from exam_messages m
+  where m.id = p_round.message_ids[jsonb_array_length(p_round.answers) + 1];
+$$;
+
+create or replace function public.start_certificate_round(p_level text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+  v_rounds constant integer := 10;
+  v_phish_n integer;
+  v_phish text[];
+  v_legit text[];
+  v_ids text[];
+  v_round exam_rounds%rowtype;
+begin
+  if v_uid is null then
+    raise exception 'Sign in to take a certificate round.' using errcode = '22023';
+  end if;
+  if not exists (select 1 from profiles where id = v_uid) then
+    raise exception 'Choose a username in your profile first.' using errcode = '22023';
+  end if;
+  if p_level is null or p_level not in ('beginner', 'intermediate', 'advanced') then
+    raise exception 'Unknown level.' using errcode = '22023';
+  end if;
+
+  -- A round left unfinished counts as an attempt; it can't be resumed with a fresh clock.
+  update exam_rounds set finished_at = now()
+  where user_id = v_uid and finished_at is null;
+
+  if (select count(*) from exam_rounds
+      where user_id = v_uid and level = p_level and started_at > now() - interval '1 day') >= 3 then
+    raise exception 'You''ve had three certificate rounds at this level today. Practise, then try again tomorrow.' using errcode = '22023';
+  end if;
+  if (select count(*) from exam_rounds where started_at > now() - interval '1 hour') >= 600 then
+    raise exception 'Certificate rounds are busy. Try again in a few minutes.' using errcode = '22023';
+  end if;
+
+  -- 4 to 6 phishing messages, preferring ones this player hasn't been dealt before.
+  v_phish_n := 4 + floor(random() * 3)::integer;
+  select array(
+    select m.id from exam_messages m
+    where m.level = p_level and m.active and m.is_phishing
+    order by exists (select 1 from exam_rounds r where r.user_id = v_uid and m.id = any (r.message_ids)), random()
+    limit v_phish_n
+  ) into v_phish;
+  select array(
+    select m.id from exam_messages m
+    where m.level = p_level and m.active and not m.is_phishing
+    order by exists (select 1 from exam_rounds r where r.user_id = v_uid and m.id = any (r.message_ids)), random()
+    limit v_rounds - cardinality(v_phish)
+  ) into v_legit;
+  if cardinality(v_phish) + cardinality(v_legit) < v_rounds then
+    raise exception 'Certificate rounds aren''t ready yet. Try again later.' using errcode = '22023';
+  end if;
+  select array(select x from unnest(v_phish || v_legit) x order by random()) into v_ids;
+
+  insert into exam_rounds (user_id, level, message_ids, served_at)
+  values (v_uid, p_level, v_ids, now())
+  returning * into v_round;
+  return lurelens_exam_view(v_round);
+end;
+$$;
+
+-- The message now on screen (after a reload, say). The clock keeps running.
+create or replace function public.certificate_round_current(p_round uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_round exam_rounds%rowtype;
+begin
+  select * into v_round from exam_rounds where id = p_round and user_id = auth.uid();
+  if not found or v_round.finished_at is not null then
+    raise exception 'This certificate round has finished.' using errcode = '22023';
+  end if;
+  if v_round.served_at is null then
+    update exam_rounds set served_at = now() where id = v_round.id returning * into v_round;
+  end if;
+  return lurelens_exam_view(v_round);
+end;
+$$;
+
+-- Records an answer, timed by the server, and deals the next message. After
+-- the last one, scores the round. It never says whether an answer was right.
+create or replace function public.answer_certificate_round(p_round uuid, p_choice text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+  v_round exam_rounds%rowtype;
+  v_rules record;
+  v_elapsed numeric;
+  v_choice text := p_choice;
+  v_index integer;
+  v_answer jsonb;
+  v_msg exam_messages%rowtype;
+  v_correct boolean;
+  v_streak integer := 0;
+  v_best integer := 0;
+  v_score integer := 0;
+  v_right integer := 0;
+  v_time numeric := 0;
+  v_spent numeric;
+  v_total integer;
+  v_name text;
+  v_id uuid;
+  v_accuracy integer;
+begin
+  select * into v_round from exam_rounds where id = p_round and user_id = v_uid for update;
+  if not found or v_round.finished_at is not null then
+    raise exception 'This certificate round has finished.' using errcode = '22023';
+  end if;
+  if v_round.served_at is null then
+    raise exception 'Load the message before answering.' using errcode = '22023';
+  end if;
+  if v_choice is null or v_choice not in ('phishing', 'legitimate', 'verify', 'skip') then
+    raise exception 'Unknown answer.' using errcode = '22023';
+  end if;
+
+  select * into v_rules from lurelens_level_rules(v_round.level);
+  v_elapsed := extract(epoch from (now() - v_round.served_at))::numeric;
+  -- A moment of grace for the network; after that the answer is too late.
+  if v_elapsed > v_rules.seconds + 3 then
+    v_choice := 'timeout';
+  end if;
+  v_index := jsonb_array_length(v_round.answers) + 1;
+  v_answer := jsonb_build_object('id', v_round.message_ids[v_index], 'choice', v_choice,
+                                 'seconds', round(least(v_elapsed, v_rules.seconds), 1));
+  v_total := cardinality(v_round.message_ids);
+
+  if v_index < v_total then
+    update exam_rounds set answers = answers || v_answer, served_at = now()
+    where id = v_round.id returning * into v_round;
+    return jsonb_build_object('done', false, 'next', lurelens_exam_view(v_round));
+  end if;
+
+  -- The last answer: score the round exactly like a normal game.
+  update exam_rounds set answers = answers || v_answer, served_at = null
+  where id = v_round.id returning * into v_round;
+  for v_answer in select value from jsonb_array_elements(v_round.answers) loop
+    select * into v_msg from exam_messages where id = v_answer ->> 'id';
+    v_spent := (v_answer ->> 'seconds')::numeric;
+    v_time := v_time + v_spent;
+    if v_answer ->> 'choice' = 'verify' then
+      v_correct := v_msg.verify_first;
+      if v_correct then v_streak := v_streak + 1; end if;
+    else
+      v_correct := (v_answer ->> 'choice' = 'phishing' and v_msg.is_phishing)
+                or (v_answer ->> 'choice' = 'legitimate' and not v_msg.is_phishing);
+      if v_correct then
+        v_streak := v_streak + 1;
+        v_score := v_score
+          + round(100 * v_rules.mult)::integer
+          + round(50 * ((v_rules.seconds - v_spent) / v_rules.seconds) * v_rules.mult)::integer
+          + case when v_streak >= 3 then 50 else 0 end;
+      else
+        v_streak := 0;
+      end if;
+    end if;
+    if v_correct then v_right := v_right + 1; end if;
+    v_best := greatest(v_best, v_streak);
+  end loop;
+
+  select username into v_name from profiles where id = v_uid;
+  v_accuracy := round(v_right * 100.0 / v_total)::integer;
+  insert into scores (user_id, name, level, score, correct, total, accuracy, best_streak, avg_seconds, ranked, exam, played_at)
+  values (v_uid, coalesce(v_name, 'Player'), v_round.level, v_score, v_right, v_total, v_accuracy, v_best,
+          round(v_time / v_total, 1), false, true, now())
+  returning id into v_id;
+  update exam_rounds set finished_at = now(), score_id = v_id where id = v_round.id;
+
+  return jsonb_build_object(
+    'done', true,
+    'result', jsonb_build_object(
+      'id', v_id, 'level', v_round.level, 'score', v_score, 'correct', v_right, 'total', v_total,
+      'accuracy', v_accuracy, 'best_streak', v_best, 'avg_seconds', round(v_time / v_total, 1),
+      'played_at', now(), 'answers', v_round.answers
+    )
+  );
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- Certificates: registered by a signed-in player from three of their own
 -- posted games (one per level, each 80%+), so the online check shows
 -- server-checked results.
@@ -686,6 +947,13 @@ begin
   if least(v_b.accuracy, v_i.accuracy, v_a.accuracy) < 80 then
     raise exception 'Each level needs at least 80%% accuracy.' using errcode = '22023';
   end if;
+  -- From 2.8 a certificate rests on certificate rounds, whose messages aren't
+  -- public. Games posted before then still count, so no one loses a certificate.
+  if (not v_b.exam and v_b.created_at >= timestamptz '2026-11-13 10:00:00+00')
+     or (not v_i.exam and v_i.created_at >= timestamptz '2026-11-13 10:00:00+00')
+     or (not v_a.exam and v_a.created_at >= timestamptz '2026-11-13 10:00:00+00') then
+    raise exception 'Certificates now need a certificate round at each level. Take them from the Progress page.' using errcode = '22023';
+  end if;
 
   select * into v_existing from certificates where reference = v_ref;
   if found then
@@ -716,6 +984,8 @@ as $$
     'player_name', coalesce(p.username, c.player_name),
     'account', c.user_id is not null,
     'completed_on', c.completed_on,
+    -- true when every level was passed in a certificate round (2.8 and later)
+    'certificate_rounds', b.exam and i.exam and a.exam,
     'levels', jsonb_build_object(
       'beginner', jsonb_build_object('accuracy', b.accuracy, 'score', b.score, 'played_at', b.played_at),
       'intermediate', jsonb_build_object('accuracy', i.accuracy, 'score', i.score, 'played_at', i.played_at),
@@ -940,6 +1210,11 @@ revoke execute on function public.moderation_scores(text, text, integer) from pu
 revoke execute on function public.moderate_score(uuid, boolean, text) from public, anon;
 revoke execute on function public.moderate_player(uuid, boolean, text) from public, anon;
 revoke execute on function public.moderation_history(integer) from public, anon;
+revoke execute on function public.lurelens_level_rules(text) from public, anon, authenticated;
+revoke execute on function public.lurelens_exam_view(public.exam_rounds) from public, anon, authenticated;
+revoke execute on function public.start_certificate_round(text) from public, anon;
+revoke execute on function public.certificate_round_current(uuid) from public, anon;
+revoke execute on function public.answer_certificate_round(uuid, text) from public, anon;
 
 -- Everyone: read the board, check a certificate.
 grant execute on function public.leaderboard(text, integer, integer) to anon, authenticated;
@@ -950,6 +1225,9 @@ grant execute on function public.submit_score(text, text, jsonb, timestamptz, bo
 grant execute on function public.register_certificate(text, text, uuid[]) to authenticated;
 grant execute on function public.save_profile(text, text, text) to authenticated;
 grant execute on function public.delete_my_account() to authenticated;
+grant execute on function public.start_certificate_round(text) to authenticated;
+grant execute on function public.certificate_round_current(uuid) to authenticated;
+grant execute on function public.answer_certificate_round(uuid, text) to authenticated;
 -- Moderators only (each function checks the moderators table itself).
 grant execute on function public.is_moderator() to authenticated;
 grant execute on function public.moderation_scores(text, text, integer) to authenticated;

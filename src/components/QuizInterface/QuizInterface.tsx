@@ -24,6 +24,8 @@ interface QuizInterfaceProps {
   emails: Email[];
   onFinish: (result: QuizResult) => void;
   onQuit: () => void;
+  /** Practice without a clock: no time limit, no speed points, nothing to pause. */
+  untimed?: boolean;
 }
 
 interface LastAnswer {
@@ -32,7 +34,7 @@ interface LastAnswer {
   points: Points;
 }
 
-export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterfaceProps) {
+export function QuizInterface({ level, emails, onFinish, onQuit, untimed = false }: QuizInterfaceProps) {
   const cfg = LEVELS[level];
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<'answering' | 'feedback'>('answering');
@@ -63,8 +65,11 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
 
       // Time is kept to a tenth of a second, the same precision the online
       // scoreboard uses to check the score.
-      const spent = Math.min(cfg.seconds, Math.round((cfg.seconds - Math.max(0, (deadline.current - performance.now()) / 1000)) * 10) / 10);
-      const left = cfg.seconds - spent;
+      // Untimed practice counts up from when the message appeared, and earns no speed points.
+      const spent = untimed
+        ? Math.round(((performance.now() - (deadline.current - cfg.seconds * 1000)) / 1000) * 10) / 10
+        : Math.min(cfg.seconds, Math.round((cfg.seconds - Math.max(0, (deadline.current - performance.now()) / 1000)) * 10) / 10);
+      const left = untimed ? 0 : cfg.seconds - spent;
       let correct: boolean;
       let newStreak: number;
       let points: Points;
@@ -82,7 +87,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       setScore(s => s + points.total);
       setStreak(newStreak);
       setBestStreak(b => Math.max(b, newStreak));
-      setSecondsLeft(left);
+      if (!untimed) setSecondsLeft(left);
       setAnswers(a => [
         ...a,
         {
@@ -100,7 +105,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
       setLast({ choice, correct, points });
       setPhase('feedback');
     },
-    [phase, email, streak, level, cfg.seconds],
+    [phase, email, streak, level, cfg.seconds, untimed],
   );
 
   const next = useCallback(() => {
@@ -144,22 +149,22 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
 
   // Tick while answering and not paused.
   useEffect(() => {
-    if (phase !== 'answering' || paused) return;
+    if (phase !== 'answering' || paused || untimed) return;
     const id = window.setInterval(() => {
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
       setSecondsLeft(left);
       if (left <= 0) answerRef.current('timeout');
     }, 100);
     return () => window.clearInterval(id);
-  }, [phase, index, paused]);
+  }, [phase, index, paused, untimed]);
 
   // Pausing freezes the clock and hides the email, so it can't be used to study it.
   const pause = useCallback(() => {
-    if (phase !== 'answering' || pausedRef.current || answered.current) return;
+    if (untimed || phase !== 'answering' || pausedRef.current || answered.current) return;
     remainingMs.current = Math.max(0, deadline.current - performance.now());
     pausedRef.current = true;
     setPaused(true);
-  }, [phase]);
+  }, [phase, untimed]);
 
   const resume = useCallback(() => {
     if (!pausedRef.current) return;
@@ -221,7 +226,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           { label: 'Streak', value: String(streak), pop: true, valueClass: streak >= 3 ? 'text-primary' : '' },
           {
             label: 'Time',
-            value: `${Math.ceil(secondsLeft)}s`,
+            value: untimed ? 'No timer' : `${Math.ceil(secondsLeft)}s`,
             valueClass: `font-mono ${danger ? 'text-destructive' : ''}`,
             testId: 'hud-time',
           },
@@ -250,7 +255,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           </div>
         ))}
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-secondary" aria-hidden>
+      <div className={`h-1.5 overflow-hidden rounded-full bg-secondary ${untimed ? 'invisible' : ''}`} aria-hidden>
         <div
           className={`h-full rounded-full transition-[width] duration-100 ease-linear ${
             danger ? 'bg-destructive' : warn ? 'bg-lavender' : 'bg-primary'
@@ -360,6 +365,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
         <Button variant="ghost" size="sm" onClick={handleQuit}>
           Quit game
         </Button>
+        {!untimed && (
         <Button
           variant="ghost"
           size="sm"
@@ -371,6 +377,7 @@ export function QuizInterface({ level, emails, onFinish, onQuit }: QuizInterface
           {paused ? <Play className="size-4" /> : <Pause className="size-4" />}
           {paused ? 'Resume' : 'Pause'}
         </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"
